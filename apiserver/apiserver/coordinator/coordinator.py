@@ -69,7 +69,7 @@ def upload_game():
     # Store the replay and any error logs
     replay_key, bucket_class = store_game_artifacts(replay_name, users)
 
-    with model.engine.connect() as conn:
+    with model.engine.begin() as conn:
         total_users = conn.execute(model.total_ranked_users).first()[0]
         for user in users:
             stored_user = conn.execute(
@@ -129,15 +129,15 @@ def upload_game():
                 user["leaderboard_rank"] = total_users
                 user["tier"] = util.tier(total_users, total_users)
 
-    # Store game results in database
-    game_id = store_game_results(game_output, stats,
-                                 replay_key, bucket_class,
-                                 users, challenge)
-    # Store game stats in database
-    store_game_stats(game_output, stats, game_id, users)
-    # Update rankings
-    if not challenge:
-        update_rankings(users)
+        # Store game results in database
+        game_id = store_game_results(conn, game_output, stats,
+                                     replay_key, bucket_class,
+                                     users, challenge)
+        # Store game stats in database
+        store_game_stats(conn, game_output, stats, game_id, users)
+        # Update rankings
+        if not challenge:
+            update_rankings(conn, users)
 
     # Clean up old games
     delete_old_games(users)
@@ -192,7 +192,8 @@ def store_game_artifacts(replay_name, users):
     return replay_key, bucket_class
 
 
-def store_game_results(game_output, stats, replay_key, bucket_class, users, challenge):
+def store_game_results(conn, game_output, stats, replay_key, bucket_class,
+                       users, challenge):
     """
     Store the outcome of a game in the database.
 
@@ -205,110 +206,108 @@ def store_game_results(game_output, stats, replay_key, bucket_class, users, chal
     """
 
     # Store game results in database
-    with model.engine.connect() as conn:
-        game_id = conn.execute(model.games.insert().values(
-            replay_name=replay_key,
-            map_width=game_output["map_width"],
-            map_height=game_output["map_height"],
-            map_seed=game_output["map_seed"],
-            map_generator=game_output["map_generator"],
-            time_played=sqlalchemy.sql.func.NOW(),
-            replay_bucket=bucket_class,
-            challenge_id=challenge,
-        )).inserted_primary_key[0]
+    game_id = conn.execute(model.games.insert().values(
+        replay_name=replay_key,
+        map_width=game_output["map_width"],
+        map_height=game_output["map_height"],
+        map_seed=game_output["map_seed"],
+        map_generator=game_output["map_generator"],
+        time_played=sqlalchemy.sql.func.NOW(),
+        replay_bucket=bucket_class,
+        challenge_id=challenge,
+    )).inserted_primary_key[0]
 
-        # Initialize the game view stats
-        conn.execute(model.game_view_stats.insert().values(
+    # Initialize the game view stats
+    conn.execute(model.game_view_stats.insert().values(
+        game_id=game_id,
+        views_total=0,
+    ))
+
+    # Update the participants' stats
+    for user in users:
+        conn.execute(model.game_participants.insert().values(
             game_id=game_id,
-            views_total=0,
+            user_id=user["user_id"],
+            bot_id=user["bot_id"],
+            version_number=user["version_number"],
+            log_name=user["log_name"],
+            rank=user["rank"],
+            # Which player in the game (numbered starting from 0) was
+            # this user?
+            player_index=user["player_tag"],
+            timed_out=user["timed_out"],
+            leaderboard_rank=user["leaderboard_rank"],
+            mu=user["mu"],
+            sigma=user["sigma"]
         ))
 
-        # Update the participants' stats
-        for user in users:
-            conn.execute(model.game_participants.insert().values(
-                game_id=game_id,
-                user_id=user["user_id"],
-                bot_id=user["bot_id"],
-                version_number=user["version_number"],
-                log_name=user["log_name"],
-                rank=user["rank"],
-                # Which player in the game (numbered starting from 0) was
-                # this user?
-                player_index=user["player_tag"],
-                timed_out=user["timed_out"],
-                leaderboard_rank=user["leaderboard_rank"],
-                mu=user["mu"],
-                sigma=user["sigma"]
-            ))
+        # Increment number of games played
+        conn.execute(model.bots.update().where(
+            (model.bots.c.user_id == user["user_id"]) &
+            (model.bots.c.id == user["bot_id"])
+        ).values(
+            games_played=model.bots.c.games_played + 1,
+        ))
 
-            # Increment number of games played
-            conn.execute(model.bots.update().where(
-                (model.bots.c.user_id == user["user_id"]) &
-                (model.bots.c.id == user["bot_id"])
-            ).values(
-                games_played=model.bots.c.games_played + 1,
-            ))
+        # If this is the user's first timeout, let them know
+        if user["timed_out"]:
+            update_user_timeout(conn, game_id, user)
 
-            # If this is the user's first timeout, let them know
-            if user["timed_out"]:
-                update_user_timeout(conn, game_id, user)
+    if challenge is not None:
+        store_challenge_results(conn, users, challenge, stats)
 
-        if challenge is not None:
-            store_challenge_results(users, challenge, stats)
-
-        return game_id
+    return game_id
 
 
-def store_challenge_results(users, challenge, stats):
-    with model.engine.connect() as conn:
+def store_challenge_results(conn, users, challenge, stats):
+    conn.execute(model.challenges.update().values(
+        num_games=model.challenges.c.num_games + 1,
+        status=sqlalchemy.case(
+            [
+                (model.challenges.c.num_games >= 30,
+                 model.ChallengeStatus.FINISHED.value),
+            ],
+            else_=model.ChallengeStatus.CREATED.value,
+        ),
+    ).where(model.challenges.c.id == challenge))
+
+    for user in users:
+        # 4 points for 1st place, 3 for 2nd, etc.
+        points = len(users) - user["rank"] + 1
+        if len(users) == 2:
+            points += 2
+
+        if user["player_tag"] in stats.players:
+            ships_produced = stats.players[user["player_tag"]].ships_produced
+            attacks_made = stats.players[user["player_tag"]].attacks_total
+        else:
+            ships_produced = attacks_made = 0
+
+        conn.execute(model.challenge_participants.update().values(
+            points=model.challenge_participants.c.points + points,
+            ships_produced=model.challenge_participants.c.ships_produced + ships_produced,
+            attacks_made=model.challenge_participants.c.attacks_made + attacks_made,
+        ).where((model.challenge_participants.c.challenge_id == challenge) &
+                (model.challenge_participants.c.user_id == user["user_id"])))
+
+    challenge_row = conn.execute(
+        model.challenges.select(model.challenges.c.id == challenge)
+    ).first()
+
+    if challenge_row and \
+       challenge_row["status"] == model.ChallengeStatus.FINISHED.value:
+        winner = conn.execute(model.challenge_participants.select().order_by(
+            model.challenge_participants.c.points.desc(),
+            model.challenge_participants.c.ships_produced.desc(),
+            model.challenge_participants.c.attacks_made.desc(),
+        )).first()
         conn.execute(model.challenges.update().values(
-            num_games=model.challenges.c.num_games + 1,
-            status=sqlalchemy.case(
-                [
-                    (model.challenges.c.num_games >= 30,
-                     model.ChallengeStatus.FINISHED.value),
-                ],
-                else_=model.ChallengeStatus.CREATED.value,
-            ),
+            finished=sqlalchemy.sql.func.now(),
+            winner=winner["user_id"],
         ).where(model.challenges.c.id == challenge))
 
-        for user in users:
-            # 4 points for 1st place, 3 for 2nd, etc.
-            points = len(users) - user["rank"] + 1
-            if len(users) == 2:
-                points += 2
 
-            if user["player_tag"] in stats.players:
-                ships_produced = stats.players[user["player_tag"]].ships_produced
-                attacks_made = stats.players[user["player_tag"]].attacks_total
-            else:
-                ships_produced = attacks_made = 0
-
-            conn.execute(model.challenge_participants.update().values(
-                points=model.challenge_participants.c.points + points,
-                ships_produced=model.challenge_participants.c.ships_produced + ships_produced,
-                attacks_made=model.challenge_participants.c.attacks_made + attacks_made,
-            ).where((model.challenge_participants.c.challenge_id == challenge) &
-                    (model.challenge_participants.c.user_id == user["user_id"])))
-
-        challenge_row = conn.execute(
-            model.challenges.select(model.challenges.c.id == challenge)
-        ).first()
-
-        if challenge_row and \
-           challenge_row["status"] == model.ChallengeStatus.FINISHED.value:
-            winner = conn.execute(model.challenge_participants.select().order_by(
-                model.challenge_participants.c.points.desc(),
-                model.challenge_participants.c.ships_produced.desc(),
-                model.challenge_participants.c.attacks_made.desc(),
-            )).first()
-            conn.execute(model.challenges.update().values(
-                finished=sqlalchemy.sql.func.now(),
-                winner=winner["user_id"],
-            ).where(model.challenges.c.id == challenge))
-
-
-def store_game_stats(game_output, stats, game_id, users):
+def store_game_stats(conn, game_output, stats, game_id, users):
     """
     Store additional game stats into database.
 
@@ -324,31 +323,30 @@ def store_game_stats(game_output, stats, game_id, users):
             400, message="Replay file not found in uploaded files.")
 
     # Store game stats in database
-    with model.engine.connect() as conn:
-        conn.execute(model.game_stats.insert().values(
-            game_id=game_id,
-            turns_total=stats.turns_total,
-            planets_destroyed=stats.planets_destroyed,
-            ships_produced=stats.ships_produced,
-            ships_destroyed=stats.ships_destroyed
-        ))
+    conn.execute(model.game_stats.insert().values(
+        game_id=game_id,
+        turns_total=stats.turns_total,
+        planets_destroyed=stats.planets_destroyed,
+        ships_produced=stats.ships_produced,
+        ships_destroyed=stats.ships_destroyed
+    ))
 
-        # Use player_tag to get the correct user_id from replay
-        for user in users:
-            player_tag = user["player_tag"]
-            if player_tag in stats.players:
-                conn.execute(model.game_bot_stats.insert().values(
-                    game_id=game_id,
-                    user_id=user["user_id"],
-                    bot_id=user["bot_id"],
-                    planets_controlled=stats.players[player_tag].planets_controlled,
-                    ships_produced=stats.players[player_tag].ships_produced,
-                    ships_alive=stats.players[player_tag].ships_alive,
-                    ships_alive_ratio=stats.players[player_tag].ships_alive_ratio,
-                    ships_relative_ratio=stats.players[player_tag].ships_relative_ratio,
-                    planets_destroyed=stats.players[player_tag].planets_destroyed,
-                    attacks_total=stats.players[player_tag].attacks_total
-                ))
+    # Use player_tag to get the correct user_id from replay
+    for user in users:
+        player_tag = user["player_tag"]
+        if player_tag in stats.players:
+            conn.execute(model.game_bot_stats.insert().values(
+                game_id=game_id,
+                user_id=user["user_id"],
+                bot_id=user["bot_id"],
+                planets_controlled=stats.players[player_tag].planets_controlled,
+                ships_produced=stats.players[player_tag].ships_produced,
+                ships_alive=stats.players[player_tag].ships_alive,
+                ships_alive_ratio=stats.players[player_tag].ships_alive_ratio,
+                ships_relative_ratio=stats.players[player_tag].ships_relative_ratio,
+                planets_destroyed=stats.players[player_tag].planets_destroyed,
+                attacks_total=stats.players[player_tag].attacks_total
+            ))
 
 
 def decode_replay(replay_file_obj):
@@ -415,7 +413,7 @@ def parse_replay(replay):
     return stats
 
 
-def update_rankings(users):
+def update_rankings(conn, users):
     """
     Update the rankings via TrueSkill and store in the database.
 
@@ -431,71 +429,70 @@ def update_rankings(users):
     teams = [[trueskill.Rating(mu=user["mu"], sigma=user["sigma"])]
              for user in users]
     new_ratings = trueskill.rate(teams)
-    with model.engine.connect() as conn:
-        for user, rating in zip(users, new_ratings):
-            new_score = rating[0].mu - 3*rating[0].sigma
-            conn.execute(model.bots.update().where(
-                (model.bots.c.user_id == user["user_id"]) &
-                (model.bots.c.id == user["bot_id"]) &
-                # Filter on version so we don't update the score for an old
-                # version of the bot
-                (model.bots.c.version_number == user["version_number"])
-            ).values(
-                mu=rating[0].mu,
-                sigma=rating[0].sigma,
-                score=new_score,
-            ))
+    for user, rating in zip(users, new_ratings):
+        new_score = rating[0].mu - 3*rating[0].sigma
+        conn.execute(model.bots.update().where(
+            (model.bots.c.user_id == user["user_id"]) &
+            (model.bots.c.id == user["bot_id"]) &
+            # Filter on version so we don't update the score for an old
+            # version of the bot
+            (model.bots.c.version_number == user["version_number"])
+        ).values(
+            mu=rating[0].mu,
+            sigma=rating[0].sigma,
+            score=new_score,
+        ))
 
-            # Update the hackathon scoring tables
-            hackathons = conn.execute(sqlalchemy.sql.select([
-                model.hackathons.c.id.label("hackathon_id"),
-            ]).select_from(
-                model.hackathon_participants.join(
-                    model.hackathons,
-                    (model.hackathon_participants.c.hackathon_id == model.hackathons.c.id) &
-                    (model.hackathon_participants.c.user_id == user["user_id"])
-                )
-            ).where(
-                (model.hackathons.c.start_date <= sqlalchemy.sql.func.now()) &
-                (model.hackathons.c.end_date > sqlalchemy.sql.func.now())
-            ))
+        # Update the hackathon scoring tables
+        hackathons = conn.execute(sqlalchemy.sql.select([
+            model.hackathons.c.id.label("hackathon_id"),
+        ]).select_from(
+            model.hackathon_participants.join(
+                model.hackathons,
+                (model.hackathon_participants.c.hackathon_id == model.hackathons.c.id) &
+                (model.hackathon_participants.c.user_id == user["user_id"])
+            )
+        ).where(
+            (model.hackathons.c.start_date <= sqlalchemy.sql.func.now()) &
+            (model.hackathons.c.end_date > sqlalchemy.sql.func.now())
+        ))
 
-            for hackathon in hackathons.fetchall():
-                hackathon_id = hackathon["hackathon_id"]
-                try:
-                    # Try and insert
-                    insert_values = {
-                        "hackathon_id": hackathon_id,
-                        "user_id": user["user_id"],
-                        "bot_id": user["bot_id"],
-                        "score": new_score,
-                        "mu": rating[0].mu,
-                        "sigma": rating[0].sigma,
-                        "version_number": user["version_number"],
-                        "language": user["language"],
-                        "games_played": 1,
-                    }
+        for hackathon in hackathons.fetchall():
+            hackathon_id = hackathon["hackathon_id"]
+            try:
+                # Try and insert
+                insert_values = {
+                    "hackathon_id": hackathon_id,
+                    "user_id": user["user_id"],
+                    "bot_id": user["bot_id"],
+                    "score": new_score,
+                    "mu": rating[0].mu,
+                    "sigma": rating[0].sigma,
+                    "version_number": user["version_number"],
+                    "language": user["language"],
+                    "games_played": 1,
+                }
 
-                    conn.execute(
-                        model.hackathon_snapshot.insert().values(
-                            **insert_values))
-                except sqlalchemy.exc.IntegrityError:
-                    # Row exists, update
-                    condition = ((model.hackathon_snapshot.c.hackathon_id ==
-                                  hackathon_id) &
-                                 (model.hackathon_snapshot.c.user_id ==
-                                  user["user_id"]) &
-                                 (model.hackathon_snapshot.c.bot_id ==
-                                  user["bot_id"]))
-                    conn.execute(
-                        model.hackathon_snapshot.update().values(
-                            score=new_score,
-                            mu=rating[0].mu,
-                            sigma=rating[0].sigma,
-                            version_number=user["version_number"],
-                            language=user["language"],
-                            games_played=model.hackathon_snapshot.c.games_played + 1,
-                        ).where(condition))
+                conn.execute(
+                    model.hackathon_snapshot.insert().values(
+                        **insert_values))
+            except sqlalchemy.exc.IntegrityError:
+                # Row exists, update
+                condition = ((model.hackathon_snapshot.c.hackathon_id ==
+                              hackathon_id) &
+                             (model.hackathon_snapshot.c.user_id ==
+                              user["user_id"]) &
+                             (model.hackathon_snapshot.c.bot_id ==
+                              user["bot_id"]))
+                conn.execute(
+                    model.hackathon_snapshot.update().values(
+                        score=new_score,
+                        mu=rating[0].mu,
+                        sigma=rating[0].sigma,
+                        version_number=user["version_number"],
+                        language=user["language"],
+                        games_played=model.hackathon_snapshot.c.games_played + 1,
+                    ).where(condition))
 
 
 def update_user_timeout(conn, game_id, user):
