@@ -82,7 +82,7 @@
                   <div class="popup-share">
                     <label>Share as a link</label>
                     <div class="form-inline-button">
-                      <input ref="shareInput" type="text" :value="shareLink"> 
+                      <input ref="shareInput" type="text" :value="shareLink">
                       <button class="btn" @click="copyToClipboard">
                         <span>Copy</span>
                       </button>
@@ -106,10 +106,10 @@
               </div>
             </div>
           </div>
-          <div class="game-replay-controller" v-if="false">
+          <div class="game-replay-controller" v-if="showHoliday">
               <div class="game-replay-btn-table" style="width: 200px;">
-                  <label for="halloween">Halloween Theme:</label>
-                  <input type="checkbox" class="pull-left" style="margin-top: -5px;" id="halloween" v-bind:checked="isHalloween" v-on:click="toggleHalloween(this)">
+                  <label for="holiday">Holiday Theme:</label>
+                  <input type="checkbox" class="pull-left" style="margin-top: -5px;" id="holiday" v-bind:checked="isHoliday" v-on:click="toggleHoliday(this)">
               </div>
               <i class="xline xline-bottom"></i>
           </div>
@@ -368,7 +368,8 @@
         speedLabel: '3x',
         stats: null,
         sharePopup: false,
-        isHalloween: true,
+        isHoliday: true,
+        showHoliday: false,
         isMobile: window.mobileAndTabletcheck(),
         user: null,
         // showChart: false,
@@ -424,16 +425,18 @@
         value: this.frame
       })
 
+      this.showHoliday = libhaliteviz.isHoliday();
+
       // current user
       api.me().then((user) => {
         this.user = user;
       });
 
-      if(window.localStorage['halloween'] === undefined || window.localStorage['halloween'] === 'true'){
-        this.isHalloween = true;
+      if(window.localStorage['holiday'] === undefined || window.localStorage['holiday'] === 'true'){
+        this.isHoliday = true;
       }
       else{
-        this.isHalloween = false;
+        this.isHoliday = false;
       }
 
       const visualizer = new HaliteVisualizer(this.replay)
@@ -542,14 +545,14 @@
         this.gaData('visualizer', 'click-slider', 'gameplay')
       }
 
-      this.toggleHalloween = function() {
-        if (window.localStorage['halloween'] === undefined || window.localStorage['halloween'] === 'true') {
-          window.localStorage['halloween'] = "false";
-          this.isHalloween = false;
+      this.toggleHoliday = function() {
+        if (window.localStorage['holiday'] === undefined || window.localStorage['holiday'] === 'true') {
+          window.localStorage['holiday'] = "false";
+          this.isHoliday = false;
         }
         else {
-          window.localStorage['halloween'] = "true";
-           this.isHalloween = true;
+          window.localStorage['holiday'] = "true";
+           this.isHoliday = true;
         }
 
         this.$forceUpdate();
