@@ -46,6 +46,7 @@
                         </div>
                     </div>
                     <h2 class="highest-rank" v-if="highestRank" title="This is either your current (top rank) or highest rank any of your bots had achieved when retired"> Highest Rank Achieved: {{highestRank}}</h2>
+
                 </div>
                 <div class="game-replay-share text-center">
                     <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>
@@ -66,9 +67,13 @@
                         </div>
                     </div>
                     <div>
-                        <button class="btn" @click="toggleShare">
-                            <span>SHARE</span>
+                        <button class="btn" @click="openChallengeModal">
+                            <span>CHALLENGE</span>
                         </button>
+                        <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="user.username"></ChallengeModal>
+                        <!-- <button class="btn" @click="toggleShare">
+                            <span>SHARE</span>
+                        </button> -->
                         <!-- <div class="user-profile-badge">
                             <i class="xline xline-top"></i>
                             <h2>Badges</h2>
@@ -478,10 +483,12 @@
     import * as utils from '../utils'
     import moment from 'moment'
     import dateformat from 'dateformat'
+    import ChallengeModal from './ChallengeModal.vue'
 
     export default {
       name: 'UserProfile',
       props: ['baseUrl'],
+      components: {ChallengeModal},
       data: function () {
         return {
           tierClass: tierClass,
@@ -515,7 +522,8 @@
           messages: {
             hackathon: ''
           },
-          isLastPage: false
+          isLastPage: false,
+          isChallengeModalOpen: false,
         }
       },
       mounted: function () {
@@ -560,8 +568,8 @@
           this.is_my_page = me && me.user_id === this.user.user_id
         })
 
-    // sticky tables
-    this.setupStickyTable()
+        // sticky tables
+        this.setupStickyTable()
       },
       computed: {
         botLang: function () {
@@ -843,6 +851,12 @@
           if (e) e.preventDefault()
           this.$refs.shareInput.select()
           document.execCommand('copy')
+        },
+        openChallengeModal: function(e) {
+            this.isChallengeModalOpen = true;
+        },
+        closeChallengeModal: function(e) {
+            this.isChallengeModalOpen = false;
         }
       }
     }

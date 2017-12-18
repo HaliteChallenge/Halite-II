@@ -109,9 +109,9 @@
 
 <script>
     import * as api from '../api'
-import vSelect from 'vue-select'
-import {Alert, countries_data} from '../utils'
-import * as utils from '../utils'
+    import vSelect from 'vue-select'
+    import {Alert, countries_data} from '../utils'
+    import * as utils from '../utils'
 
 export default {
       name: 'EditUserProfile',

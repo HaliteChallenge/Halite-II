@@ -202,17 +202,24 @@
                             <i class="xline xline-left"></i>
                             <i class="xline xline-right"></i>
                             <div class="content">
-                                <p class="t3 c-wht font-headline">INVITE A FRIEND</p>
-                                <p class="t5 c-gry">Invite a friend to join in the fun</p>
+                                <p class="t3 c-wht font-headline">Challenge A Friend</p>
+                                <p class="t5 c-gry">Invite a friend to join in the fun by challenge any user already playing in Halite</p>
                                 <div class="clear"></div>
                                 <div class="ha-input-container btn-bottom btn-bottom-width">
-                                    <div class="input-field">
+                                    <!-- <div class="input-field">
                                         <input id="intmpid" type="email" placeholder="Your friend's email..."/>
                                         <button class="btn" v-on:click="invite"><span>INVITE</span></button>
                                         <br/>
                                     </div>
-                                    <p id="invitestatus" class="t5 c-gry"></p>
+                                    <p id="invitestatus" class="t5 c-gry"></p> -->
+                                    
                                 </div>
+                                <div class="ha-button-container no-bg-button btn-bottom">
+                                    <div>
+                                        <a @click="openChallengeModal" class="ha-button"><span>SEND A CHALLENGE</span></a>
+                                    </div>
+                                </div>
+                                <ChallengeModal :baseUrl="baseUrl" :isOn="modalOpen" :close="closeChallengeModel" username=""></ChallengeModal>
                             </div>
                         </div>
                     </div>
@@ -323,24 +330,28 @@
 
 <script>
    import * as api from '../api'
-import * as utils from '../utils'
+    import * as utils from '../utils'
+    import ChallengeModal from './ChallengeModal.vue'
 
 export default {
      name: 'home',
      props: ['baseUrl'],
+     components: {ChallengeModal},
      data: function () {
-       const me = api.me_cached()
-       let me_in = false
-       if (me) {
-         return {
-           me_in: true
-         }
-       }
-       return {
-         me_in,
-         loginServerUrl: `${api.LOGIN_SERVER_URL}/github`
-       }
-  },
+        const me = api.me_cached()
+        let me_in = false
+        if (me) {
+            return {
+                me_in: true,
+                modalOpen: false,
+            }
+        }
+        return {
+            me_in,
+            loginServerUrl: `${api.LOGIN_SERVER_URL}/github`,
+            modalOpen: false,
+        }
+    },
      mounted: function () {
        this.createRedditWidget()
      },
@@ -378,6 +389,12 @@ export default {
        },
        gaData: function (category, action, label) {
          utils.gaEvent(category, action, label)
+       },
+       openChallengeModal: function(){
+        this.modalOpen = !this.modalOpen;
+       },
+       closeChallengeModel: function(){
+        this.modalOpen = false;
        }
      }
    }
