@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="71px" height="84px" viewBox="0 0 71 84" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>3</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Challenge-a-Friend" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="01_Challenge-a-Friend" transform="translate(-685.000000, -290.000000)">
+            <g id="5" transform="translate(390.000000, 220.000000)">
+                <g id="Group-3" transform="translate(70.000000, 70.000000)">
+                    <g id="3" transform="translate(225.000000, 0.000000)">
+                        <g id="Icon-frame">
+                            <path d="M69,60 C70.104,60 71,60.896 71,62 C71,63.104 70.104,64 69,64 C67.896,64 67,63.104 67,62 C67,60.896 67.896,60 69,60" id="Fill-1" fill="#FFBE00"></path>
+                            <path d="M69,20 C70.104,20 71,20.896 71,22 C71,23.104 70.104,24 69,24 C67.896,24 67,23.104 67,22 C67,20.896 67.896,20 69,20" id="Fill-3" fill="#FFBE00"></path>
+                            <path d="M2,60 C3.104,60 4,60.896 4,62 C4,63.104 3.104,64 2,64 C0.896,64 0,63.104 0,62 C0,60.896 0.896,60 2,60" id="Fill-5" fill="#FFBE00"></path>
+                            <path d="M35,80 C36.104,80 37,80.896 37,82 C37,83.104 36.104,84 35,84 C33.896,84 33,83.104 33,82 C33,80.896 33.896,80 35,80" id="Fill-7" fill="#FFBE00"></path>
+                            <path d="M35,0 C36.104,0 37,0.896 37,2 C37,3.104 36.104,4 35,4 C33.896,4 33,3.104 33,2 C33,0.896 33.896,0 35,0" id="Fill-9" fill="#FFBE00"></path>
+                            <path d="M2,20 C3.104,20 4,20.896 4,22 C4,23.104 3.104,24 2,24 C0.896,24 0,23.104 0,22 C0,20.896 0.896,20 2,20" id="Fill-12" fill="#FFBE00"></path>
+                            <polygon id="Stroke-14" stroke="#FFBE00" points="69 22 69 62 35 82 2 62 2 22 35 2"></polygon>
+                        </g>
+                        <g id="Page-1" transform="translate(20.000000, 27.000000)" stroke="#FFBE00" stroke-width="2">
+                            <path d="M19.1255,8.001 C19.1255,12.419 15.5425,16 11.1265,16 C6.7075,16 3.1255,12.419 3.1255,8.001 C3.1255,3.581 6.7075,0 11.1265,0 C15.5425,0 19.1255,3.581 19.1255,8.001 Z" id="Stroke-1"></path>
+                            <path d="M22.1255,4 C25.4385,4 28.1255,6.685 28.1255,10.001 C28.1255,13.313 25.4385,15.999 22.1255,15.999" id="Stroke-3"></path>
+                            <polyline id="Stroke-5" points="25.1255 19.9746 29.1255 20.9996 30.1255 27.9996 25.1255 27.9996"></polyline>
+                            <polyline id="Stroke-7" points="16.9922 20 21.0982 21.331 22.1252 30 0.1252 30 1.1522 21.331 5.2592 20"></polyline>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

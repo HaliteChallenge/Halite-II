@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="26px" height="26px" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>small-add</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Challenge-a-Friend" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="03_Challenge-a-Friend" transform="translate(-616.000000, -636.000000)">
+            <g id="5" transform="translate(390.000000, 225.000000)">
+                <g id="Group-3" transform="translate(70.000000, 70.000000)">
+                    <g id="Group" transform="translate(157.000000, 342.000000)">
+                        <g id="small-add">
+                            <circle id="Oval" stroke="#FFBE00" fill-opacity="0.102043705" fill="#FFFFFF" cx="12" cy="12" r="12"></circle>
+                            <polygon id="Shape" fill="#FFBE00" fill-rule="nonzero" points="13 8 11 8 11 11 8 11 8 13 11 13 11 16 13 16 13 13 16 13 16 11 13 11"></polygon>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
