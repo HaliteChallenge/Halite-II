@@ -31,10 +31,13 @@
             Add more opponents</span>
         </a>
       </div>
-      <div class="user-search" v-if="!me">
+      <div class="user-search" v-else>
         <p class="no-login">You have to log in first</p>
       </div>
 
+      <div class="error-message" v-if="errorMessage">
+        {{this.errorMessage}}
+      </div>
       <div class="ha-button-container">
         <div>
           <a class="ha-button" @click="submit"><span>SEND CHALLENGE</span></a>
@@ -60,6 +63,7 @@ export default{
       friends: [],
       members: {},
       me: false,
+      errorMessage: "",
     }
   },
   mounted: function(){
@@ -106,6 +110,7 @@ export default{
     submit: function(){
       //convert user name to 
       // this.close
+      this.errorMessage = "Please select at least one player to challenge";
     }
   }
 }
@@ -161,5 +166,10 @@ export default{
     width: 24px !important;
     height: 24px;
     margin-right: 10px;
+  }
+  .error-message{
+    text-align: center;
+    color: #FF2D55;
+    padding-bottom: 25px;
   }
 </style>
