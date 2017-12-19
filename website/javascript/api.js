@@ -345,6 +345,12 @@ export function subscribe (email) {
   })
 }
 
+export function challenge(user_id) {
+  return $.post({
+    url: `${API_SERVER_URL}/user/` + user_id + `/challenge`
+  })
+}
+
 /** leagues **/
 export function getLeaguesList(){
   return $.get({
