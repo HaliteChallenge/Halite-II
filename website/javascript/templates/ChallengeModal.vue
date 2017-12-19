@@ -78,74 +78,81 @@ export default{
       errorMessage: "",
       emptyFields: [],
       validated: false,
-      showResult: false
+      showResult: false,
+      challengeCount: 0
     }
   },
   mounted: function(){
     api.me().then((me) => {
       if (me){
-        this.me = true;
+        this.me = true
       }
     });
 
-    let options = [];
-    let members = {};
+    let options = []
+    let members = {}
 
     if (this.username){
-      this.friends.push(username);
+      this.friends.push(username)
     } else {
-      this.friends.push("");
+      this.friends.push("")
     }
 
     api.leaderboard(null, null, 0, 9999).then((members) => {
       this.options = members.map((member) => {
-        return member.username;
+        return member.username
       })
       this.members = members.reduce((result, item) => {
-        result[item.username] = item;
-        return result;
+        result[item.username] = item
+        return result
       })
-    });
+    })
   },
   watch: {
     username: function(newUsername){
       if (newUsername){
-        this.friends[0] = newUsername;
+        this.friends[0] = newUsername
       }
     }
   },
   methods: {
     addOpponent: function(){
-      this.friends.push("");
+      this.friends.push("")
     },
     removeFriend: function(index){
-      this.friends[index] = "";
-      this.$forceUpdate();
+      this.friends[index] = ""
+      this.$forceUpdate()
     },
     hasEmptyField: function(index){
-      return this.emptyFields.indexOf(index) == -1;
+      return this.emptyFields.indexOf(index) == -1
     },
     submit: function(){
       // convert user name to 
       // this.close
-      let emptyFields = {};
-      let hasError = false;
-      this.validated = true; // enable showing error
+      let emptyFields = {}
+      let hasError = false
+      this.validated = true // enable showing error
       this.friends.forEach((item, index) => {
         if (!item){
-          emptyFields[index] = 0;
-          hasError = true;
+          emptyFields[index] = 0
+          hasError = true
         } else {
-          emptyFields[index] = 1;
+          emptyFields[index] = 1
         }
       });
 
       if (hasError){
         this.errorMessage = "Please select at least one player to challenge";
-        this.emptyFields = emptyFields;
+        this.emptyFields = emptyFields
       } else {
         this.showResult = true; 
-        
+        this.friends.forEach((item, index) => {
+          let user_id = this.members[item].user_id
+          api.challenge(user_id).then((data) => {
+            console.log(data)
+            console.log(`success send challenge to ${user_id}`)
+          })
+        });
       }
     }
   }
