@@ -1,10 +1,6 @@
-# Install Halite environment
-curl "https://halite.io/downloads/environment/HaliteEnvironment-Source.zip" -o "HaliteEnvironment-Source.zip"
-mkdir HaliteEnvironment-Source
-unzip HaliteEnvironment-Source.zip -d HaliteEnvironment-Source
-rm HaliteEnvironment-Source.zip
-cd HaliteEnvironment-Source
+#!/usr/bin/env bash
+
+set -e
+
+cmake .
 make
-mv halite ../
-cd ../
-rm -r HaliteEnvironment-Source 
