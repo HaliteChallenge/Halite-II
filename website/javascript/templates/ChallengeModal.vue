@@ -85,7 +85,7 @@ export default{
   mounted: function(){
     api.me().then((me) => {
       if (me){
-        this.me = true
+        this.me = me
       }
     });
 
@@ -98,14 +98,15 @@ export default{
       this.friends.push("")
     }
 
-    api.leaderboard(null, null, 0, 9999).then((members) => {
+    api.leaderboard(null, null, 0, 99999).then((members) => {
       this.options = members.map((member) => {
         return member.username
       })
-      this.members = members.reduce((result, item) => {
-        result[item.username] = item
-        return result
-      })
+      let arr = {};
+      members.forEach((item) => {
+        arr[item.username] = item
+      });
+      this.members = arr;
     })
   },
   watch: {
@@ -145,14 +146,17 @@ export default{
         this.errorMessage = "Please select at least one player to challenge";
         this.emptyFields = emptyFields
       } else {
-        this.showResult = true; 
-        this.friends.forEach((item, index) => {
-          let user_id = this.members[item].user_id
-          api.challenge(user_id).then((data) => {
-            console.log(data)
-            console.log(`success send challenge to ${user_id}`)
-          })
-        });
+        let opponents = this.friends.map((username) => {
+          return this.members[username].user_id
+        })
+        api.challenge(this.me.user_id, opponents).then((data) => {
+          this.showResult = true; 
+          console.log(data)
+          console.log(`success send challenge`)
+        }, (error) => {
+          this.showResult = false;
+          this.errorMessage = error.responseJSON.message;
+        })
       }
     }
   }
