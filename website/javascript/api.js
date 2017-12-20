@@ -345,9 +345,15 @@ export function subscribe (email) {
   })
 }
 
-export function challenge(user_id) {
+export function challenge(user_id, opponents) {
   return $.post({
-    url: `${API_SERVER_URL}/user/` + user_id + `/challenge`
+    url: `${API_SERVER_URL}/user/` + user_id + `/challenge`,
+    method: 'POST',
+    data: JSON.stringify({opponents: opponents}),
+    contentType: 'application/json',
+    xhrFields: {
+      withCredentials: true
+    }
   })
 }
 
