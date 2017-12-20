@@ -360,18 +360,12 @@ auto Halite::process_production() -> void {
 
 auto Halite::process_drag() -> void {
     // Update inertia/implement drag
-    const auto drag = hlt::GameConstants::get().DRAG;
     for (auto& player_ships : game_map.ships) {
         for (auto& pair : player_ships) {
             auto& ship = pair.second;
-
-            const auto magnitude = ship.velocity.magnitude();
-            if (magnitude <= drag) {
-                ship.velocity.vel_x = ship.velocity.vel_y = 0;
-            }
-            else {
-                ship.velocity.accelerate_by(drag, ship.velocity.angle() + M_PI);
-            }
+            // Just set velocity to 0 - ignore drag (if you want to
+            // re-enable drag, revert the relevant commit).
+            ship.velocity.vel_x = ship.velocity.vel_y = 0;
         }
     }
 }
