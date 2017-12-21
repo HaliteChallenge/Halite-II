@@ -86,7 +86,7 @@ The ships as extracted from player objects, and represented as follows:
 #### Planet
 The planet object is extracted following the complete player objects:
 1. Number of planets: "[(integer) number of planets]"
-2-32767 (this may be between 1 and 32767 items). Singple planet object containing planet id, x coordinate, y coordinate, health, radius, number of docking spots, current production, remaining production (deprecated), health, whether the planet is owned, planet owner, number of docked ships, and the ids of those ships: [(integer) planet id], [(floating point) x], [(floating point) y], [(integer) health], [(floating point) radius], [(integer) docking], [(integer) current], [(integer) remaining], [(integer) is owned], [(integer) owner id], [(integer) number of docked ships] [(integer) id of ship 0] ... [(integer) id of ship x]
+2-32767 (this may be between 1 and 32767 items). Single planet object containing planet id, x coordinate, y coordinate, health, radius, number of docking spots, current production, remaining production (deprecated), whether the planet is owned, planet owner, number of docked ships, and the ids of those ships: [(integer) planet id], [(floating point) x], [(floating point) y], [(integer) health], [(floating point) radius], [(integer) docking], [(integer) current], [(integer) remaining], [(integer) is owned], [(integer) owner id], [(integer) number of docked ships] [(integer) id of ship 0] ... [(integer) id of ship x]
 
 ### Move command format
 The move command, like all other commands, is space separated and each turn's command is distinct due to line delimiting. It is formatted as follows:
