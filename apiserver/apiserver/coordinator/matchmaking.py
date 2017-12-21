@@ -131,6 +131,7 @@ def serve_game_task(conn, has_gpu=False):
     } for player in players]
 
     if len(players) == player_count:
+        random.shuffle(players)
         return util.response_success({
             "type": "game",
             "width": map_width,
@@ -242,6 +243,7 @@ def find_challenge(conn, has_gpu=False):
         most_recent_game_task=sqlalchemy.sql.func.now(),
     ).where(model.challenges.c.id == challenge["id"]))
 
+    random.shuffle(players)
     return util.response_success({
         "type": "game",
         "width": map_width,
