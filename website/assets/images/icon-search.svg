@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="17px" viewBox="0 0 16 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="04_Challenge-a-Friend" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-839.000000, -592.000000)" opacity="0.800000012">
+        <g id="5" transform="translate(390.000000, 191.000000)" fill="#ECFFFB" fill-rule="nonzero">
+            <g id="Group-2" transform="translate(180.000000, 324.000000)">
+                <g id="Group-5" transform="translate(0.000000, 62.000000)">
+                    <g id="zoom-2" transform="translate(269.000000, 15.000000)">
+                        <path d="M12.7,11.3 C13.6,10.1 14.1,8.7 14.1,7.1 C14.1,3.2 11,0 7.1,0 C3.2,0 0,3.2 0,7.1 C0,11 3.2,14.2 7.1,14.2 C8.7,14.2 10.2,13.7 11.3,12.8 L14.3,15.8 C14.5,16 14.8,16.1 15,16.1 C15.2,16.1 15.5,16 15.7,15.8 C16.1,15.4 16.1,14.8 15.7,14.4 L12.7,11.3 Z M7.1,12.1 C4.3,12.1 2,9.9 2,7.1 C2,4.3 4.3,2 7.1,2 C9.9,2 12.2,4.3 12.2,7.1 C12.2,9.9 9.9,12.1 7.1,12.1 Z" id="Shape"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
