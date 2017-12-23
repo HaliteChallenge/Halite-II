@@ -79,6 +79,7 @@
             <th>Organization</th>
             <th>Language</th>
             <th>Last Submission</th>
+            <th>Challenge</th>
           </tr>
           </thead>
           <tbody>
@@ -103,6 +104,9 @@
             <td>{{ player.organization }}</td>
             <td>{{ player.language }}</td>
             <td>{{ getFormattedDate(player.update_time)  }}</td>
+            <td class="text-center">
+              <a @click="openChallengeModal(player.username)" class="toggle-challenge"><img :src="`${baseUrl}/assets/images/icon-challenge.svg`"></a>
+            </td>
           </tr>
           </tbody>
         </table>
@@ -115,6 +119,7 @@
           :changePage="this.changePage"
         />
       </div>
+      <div id="challenger-container"></div>
     </div>
     <div v-else class="zero-state-pane">
       <img src="/assets/images/leaderboard-zero-icon.png" alt="" />
@@ -125,7 +130,7 @@
 </template>
 
 <script>
-
+import Vue from 'vue'
 import * as api from '../api'
 import HalitePagination from './Pagination.vue'
 import TierPopover from './TierPopover.vue'
@@ -133,7 +138,8 @@ import {tierClass, countries_data} from '../utils'
 import vSelect from 'vue-select'
 import _ from 'lodash'
 import moment from 'moment'
- import dateformat from 'dateformat'
+import dateformat from 'dateformat'
+import ChallengeModal from './ChallengeModal.vue'
 
 const DEFAULT_LIMIT = 25
 
@@ -143,7 +149,8 @@ export default {
     components: {
       HalitePagination,
       vSelect,
-      TierPopover
+      TierPopover,
+      ChallengeModal
     },
     data: function () {
       const countries = countries_data
@@ -225,7 +232,8 @@ export default {
         ],
         filter_name: '',
         selected_filter: null,
-        build_params_count: 0
+        build_params_count: 0,
+        isChallengeModalOpen: false
       }
   },
     mounted: function () {
@@ -639,10 +647,39 @@ export default {
       getFormattedDate: function (date) {
         return moment(date).fromNow();
       },
+      openChallengeModal: function(username) {
+        const outerContainer = document.getElementById('challenger-container')
+        outerContainer.innerHTML = ""
+
+        let container = document.createElement('div')
+        outerContainer.appendChild(container)
+
+        this.isChallengeModalOpen = true
+
+        new Vue({
+          el: container,
+          render: (h) => h(ChallengeModal, {
+            props: {
+              baseUrl: this.baseUrl,
+              isOn: this.isChallengeModalOpen,
+              close: this.closeChallengeModal,
+              username: username
+            }
+          })
+        })
+      },
+      closeChallengeModal: function(e) {
+        this.isChallengeModalOpen = false
+      }
     }
   }
 </script>
 
 <style lang="scss" scoped>
-
+  .toggle-challenge{
+    img{
+      width: 15px;
+      height: 15px;
+    }
+  }
 </style>

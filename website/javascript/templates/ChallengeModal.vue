@@ -93,7 +93,7 @@ export default{
     let members = {}
 
     if (this.username){
-      this.friends.push(username)
+      this.friends.push(this.username)
     } else {
       this.friends.push("")
     }
