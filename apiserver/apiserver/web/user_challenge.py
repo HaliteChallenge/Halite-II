@@ -199,6 +199,7 @@ def create_challenge(intended_user, *, user_id):
         with conn.begin() as transaction:
             challenge_id = conn.execute(model.challenges.insert().values(
                 issuer=user_id,
+                num_games=0,
             )).inserted_primary_key[0]
 
             opponents.append(user_id)
@@ -206,6 +207,9 @@ def create_challenge(intended_user, *, user_id):
                 conn.execute(model.challenge_participants.insert().values(
                     challenge_id=challenge_id,
                     user_id=participant,
+                    points=0,
+                    ships_produced=0,
+                    attacks_made=0,
                 ))
 
         return util.response_success({
