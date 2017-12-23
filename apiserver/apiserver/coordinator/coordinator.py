@@ -365,6 +365,9 @@ def decode_replay(replay_file_obj):
     except zstd.ZstdError:
         # The replay file can't be decoded.
         return None
+    finally:
+        # Seek the replay file back to start so we can upload it.
+        replay_file_obj.seek(0)
 
 
 def parse_replay(replay):
