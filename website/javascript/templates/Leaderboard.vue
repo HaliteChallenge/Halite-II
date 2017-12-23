@@ -119,7 +119,7 @@
           :changePage="this.changePage"
         />
       </div>
-      <div id="challenger-container"></div>
+      <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="challengeUsername"></ChallengeModal>  
     </div>
     <div v-else class="zero-state-pane">
       <img src="/assets/images/leaderboard-zero-icon.png" alt="" />
@@ -233,7 +233,8 @@ export default {
         filter_name: '',
         selected_filter: null,
         build_params_count: 0,
-        isChallengeModalOpen: false
+        isChallengeModalOpen: false,
+        challengeUsername: ''
       }
   },
     mounted: function () {
@@ -648,25 +649,8 @@ export default {
         return moment(date).fromNow();
       },
       openChallengeModal: function(username) {
-        const outerContainer = document.getElementById('challenger-container')
-        outerContainer.innerHTML = ""
-
-        let container = document.createElement('div')
-        outerContainer.appendChild(container)
-
+        this.challengeUsername = username
         this.isChallengeModalOpen = true
-
-        new Vue({
-          el: container,
-          render: (h) => h(ChallengeModal, {
-            props: {
-              baseUrl: this.baseUrl,
-              isOn: this.isChallengeModalOpen,
-              close: this.closeChallengeModal,
-              username: username
-            }
-          })
-        })
       },
       closeChallengeModal: function(e) {
         this.isChallengeModalOpen = false

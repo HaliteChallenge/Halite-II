@@ -54,6 +54,7 @@
             <th class="text-center">Country</th>
             <th>Organization</th>
             <th>Last Submission</th>
+            <th>Challenge</th>
           </tr>
         </thead>
         <tbody>
@@ -77,25 +78,31 @@
             </td>
             <td>{{ player.organization }}</td>
             <td>{{ getFormattedDate(player.update_time)  }}</td>
+            <td class="text-center">
+              <a @click="openChallengeModal(player.username)" class="toggle-challenge"><img :src="`${baseUrl}/assets/images/icon-challenge.svg`"></a>
+            </td>
           </tr>
         </tbody>
       </table>
+      <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="challengeUsername"></ChallengeModal>  
     </div>
   </div>
 </template>
 
 <script>
+  import Vue from 'vue'
   import * as api from '../api'
   import moment from 'moment'
   import countries from 'i18n-iso-countries'
   import {tierClass, countries_data} from '../utils'
   import HaliteBreadcrumb from './Breadcrumb.vue'
   import _ from 'lodash'
+  import ChallengeModal from './ChallengeModal.vue'
 
   export default {
     name: "LeagueIndividual",
     props: ['baseUrl'],
-    components: { HaliteBreadcrumb },
+    components: { HaliteBreadcrumb, ChallengeModal },
     data: function(){
       return {
         path: [
@@ -108,7 +115,9 @@
         shareLink: window.location.href,
         leaderboard: [],
         tierClass: tierClass,
-        league: {}
+        league: {},
+        challengeUsername: '',
+        isChallengeModalOpen: false
       }
     },
     mounted: function(){
@@ -187,7 +196,23 @@
       },
       parentLink: function(){
         return encodeURI(`/leagues?category=${this.league.category}`)
+      },
+      openChallengeModal: function(username) {
+        this.challengeUsername = username
+        this.isChallengeModalOpen = true
+      },
+      closeChallengeModal: function(e) {
+        this.isChallengeModalOpen = false
       }
     }
   }
 </script>
+
+<style lang="scss" scoped>
+  .toggle-challenge{
+    img{
+      width: 15px;
+      height: 15px;
+    }
+  }
+</style>
