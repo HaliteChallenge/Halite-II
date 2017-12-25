@@ -57,6 +57,18 @@
 
     // #region entity
 
+    // Unit in space
+    type SpaceUnit = int
+
+    // Radius
+    type Radius = float
+
+    // Health
+    type Health = int
+
+    // Velocity
+    type Velocity = float
+
     // X coordinate
     type X = float
 
@@ -79,31 +91,31 @@
         OwnerId: int;
         X: X;
         Y: Y;
-        Radius: float;
-        Health: float;
+        Radius: Radius;
+        Health: Health;
     }
 
     // Ship is a player controlled Entity made for the purpose of doing combat and mining Halite
     type Ship = {
         Entity: Entity;
-        VelX: X;
-        VelY: Y;
+        VelX: Velocity;
+        VelY: Velocity;
         PlanetId: int;
         DockingStatus: DockingStatus;
-        DockingProgress: float;
-        WeaponCooldown: float;
+        DockingProgress: SpaceUnit;
+        WeaponCooldown: SpaceUnit;
     }
 
     // Planet object from which Halite is mined
     type Planet = {
         Entity: Entity;
-        NumDockingSpots: float;
-        NumDockedShips: float;
-        CurrentProduction: float;
-        RemainingResources: float;
+        NumDockingSpots: int;
+        NumDockedShips: int;
+        CurrentProduction: int;
+        RemainingResources: int;
         DockedShipIds: int[];
         DockedShips: Ship[] option;
-        Owned: float;
+        Owned: int;
     }
 
     // calculateDistanceTo returns a euclidean distance to the target
@@ -284,7 +296,7 @@
                         X = x1;
                         Y = y1;
                         OwnerId = 0;
-                        Health = 0.0;
+                        Health = 0;
                         Radius = 0.0;
                     }
                     let ob1 = obstaclesBetween gameMap ship.Entity intermediateTarget
@@ -326,7 +338,7 @@
         let targetedPlanet =
             planets
             |> Array.tryFind (fun planet -> 
-                (planet.Owned = 0.0 || planet.Entity.OwnerId = gameMap.MyId) && 
+                (planet.Owned = 0 || planet.Entity.OwnerId = gameMap.MyId) && 
                 planet.NumDockedShips < planet.NumDockingSpots && 
                 planet.Entity.Id % 2 = ship.Entity.Id % 2
             )
@@ -341,7 +353,7 @@
                         X = closestPoint.X;
                         Y = closestPoint.Y;
                         OwnerId = 0;
-                        Health = 0.0;
+                        Health = 0;
                         Radius = 0.0;
                     }
                     navigate ship closestEntity gameMap
@@ -357,13 +369,13 @@
         let shipId = tokens.[0] |> int
         let shipX = tokens.[1] |> float
         let shipY = tokens.[2] |> float
-        let shipHealth = tokens.[3] |> float
+        let shipHealth = tokens.[3] |> int
         let shipVelX = tokens.[4] |> float
         let shipVelY = tokens.[5] |> float
         let shipDockingStatus = tokens.[6] |> int
         let shipPlanetId = tokens.[7] |> int
-        let shipDockingProgress = tokens.[8] |> float
-        let shipWeaponCooldown = tokens.[9] |> float
+        let shipDockingProgress = tokens.[8] |> int
+        let shipWeaponCooldown = tokens.[9] |> int
 
         let shipEntity = {
             Id = shipId;
@@ -391,14 +403,14 @@
         let planetId = tokens.[0] |> int
         let planetX = tokens.[1] |> float
         let planetY = tokens.[2] |> float
-        let planetHealth = tokens.[3] |> float
+        let planetHealth = tokens.[3] |> int
         let planetRadius = tokens.[4] |> float
-        let planetNumDockingSpots = tokens.[5] |> float
-        let planetCurrentProduction = tokens.[6] |> float
-        let planetRemainingResources = tokens.[7] |> float
-        let planetOwned = tokens.[8] |> float
+        let planetNumDockingSpots = tokens.[5] |> int
+        let planetCurrentProduction = tokens.[6] |> int
+        let planetRemainingResources = tokens.[7] |> int
+        let planetOwned = tokens.[8] |> int
         let planetOwnerId = tokens.[9] |> int
-        let planetNumDockedShips = tokens.[10] |> float
+        let planetNumDockedShips = tokens.[10] |> int
 
         let planetEntity = {
             Id = planetId;
@@ -409,9 +421,8 @@
             OwnerId = planetOwnerId;
         }
 
-        let planetNumDockedShipsInt = planetNumDockedShips |> int
         let dockedShipIds = 
-            Array.init planetNumDockedShipsInt 
+            Array.init planetNumDockedShips
                 (fun i -> tokens.[11 + i] |> int)
 
         let planet = {
@@ -425,7 +436,7 @@
             Owned = planetOwned;
         }
 
-        (planet, tokens.[(11 + planetNumDockedShipsInt)..])
+        (planet, tokens.[(11 + planetNumDockedShips)..])
 
     // parsePlayer from a slice of game state tokens
     let parsePlayer (tokens: string[]) =
