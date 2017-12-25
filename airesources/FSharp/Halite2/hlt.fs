@@ -303,7 +303,7 @@
                     let ob2 = obstaclesBetween gameMap intermediateTarget target
                     let totdist = Math.Sqrt(Math.Pow(x1-x0, 2.0)+Math.Pow(y1-y0, 2.0)) + Math.Sqrt(Math.Pow(x1-x2, 2.0)+Math.Pow(y1-y2, 2.0))
 
-                    if ob1 && ob2 && totdist < bestdist
+                    if not ob1 && not ob2 && totdist < bestdist
                     then (
                         bestdist <- totdist
                         bestTarget <- intermediateTarget
