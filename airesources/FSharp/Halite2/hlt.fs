@@ -515,17 +515,17 @@
     let sendString (input: string) = 
         Console.WriteLine input
 
-    let getString =
+    let getString () =
         Console.ReadLine().Trim()
 
-    let getInt =
-        getString |> int            
+    let getInt () =
+        getString() |> int            
 
     // newConnection initializes a new connection for one of the bots
     // participating in a match
     let newConnection botName = 
-        let playerTag = getInt
-        let sizeInfo = getString.Split " "
+        let playerTag = getInt()
+        let sizeInfo = getString().Split " "
         let width = sizeInfo.[0] |> int
         let height = sizeInfo.[1] |> int
 
@@ -539,7 +539,7 @@
 
     // updateMap decodes the current turn's game state from a string
     let updateMap connection =
-        let gameString = getString
+        let gameString = getString()
         parseGameString connection gameString
 
     // submitCommands encodes the player's commands into a string
