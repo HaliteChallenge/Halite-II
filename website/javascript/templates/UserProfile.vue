@@ -70,7 +70,8 @@
                         <button class="btn" @click="openChallengeModal">
                             <span>CHALLENGE</span>
                         </button>
-                        <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="user.username"></ChallengeModal>
+                        <ChallengeModal v-if="is_my_page" :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" username=""></ChallengeModal>  
+                        <ChallengeModal v-else :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="user.username"></ChallengeModal>  
                         <!-- <button class="btn" @click="toggleShare">
                             <span>SHARE</span>
                         </button> -->
@@ -560,6 +561,14 @@
           this.fetchhistory()
           this.fetchHalite1Stats()
 
+          // switch to analysis tab if requested
+          const url = new URLSearchParams(location.search)
+          const view = url.get("view")
+          console.log(view)
+          if (view == 'analysis'){
+            $('a[href="#analysis"]').trigger('click')
+            this.setupStickyTable()
+          }
         }, (e) => {
           window.location.replace(`${this.baseUrl}/404`);
         })

@@ -52,7 +52,7 @@
         <p>We’ll let you know when your challenge is complete.</p>
         <div class="ha-button-container">
           <div>
-            <a class="ha-button" @click="close"><span>VIEW YOUR RESULTS</span></a>
+            <a class="ha-button" :href="`${baseUrl}/user/?user_id=${me.user_id}&view=analysis`"><span>VIEW YOUR RESULTS</span></a>
           </div>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default{
     let members = {}
 
     if (this.username){
-      this.friends.push(username)
+      this.friends.push(this.username)
     } else {
       this.friends.push("")
     }
@@ -113,6 +113,8 @@ export default{
     username: function(newUsername){
       if (newUsername){
         this.friends[0] = newUsername
+      } else {
+        this.friends[0] = ""
       }
     }
   },
@@ -128,8 +130,6 @@ export default{
       return this.emptyFields.indexOf(index) == -1
     },
     submit: function(){
-      // convert user name to 
-      // this.close
       let emptyFields = {}
       let hasError = false
       this.validated = true // enable showing error
@@ -197,6 +197,7 @@ export default{
   .v-select.dropdown{
     margin-right: 0;
     border: 1px solid transparent;
+
   }
   .select-item.empty{
     .v-select{
