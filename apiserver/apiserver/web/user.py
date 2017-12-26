@@ -509,8 +509,9 @@ def update_user(intended_user_id, *, user_id):
         if key not in columns:
             raise util.APIError(400, message="Cannot update '{}'".format(key))
 
-        if fields[key] is not None:
-            # Don't overwrite values with None/null
+        if (fields[key] is not None or
+            key in ("country_code", "country_subdivision_code")):
+            # Don't overwrite values with None/null (unless country code)
             update[columns[key]] = fields[key]
 
     # Validate new player level
