@@ -22,6 +22,16 @@ defmodule Elixirbot.Util do
       156
   """
   def angle_rad_to_deg_clipped(angle_rad) do
-    degUnclipped = (angle_rad_to_deg(angle_rad) |> round |> rem(360)) + 360 |> rem(360)
+    (angle_rad_to_deg(angle_rad) |> round |> rem(360)) + 360 |> rem(360)
+  end
+
+  def parse_int(nil), do: nil
+  def parse_int(str) do
+    str |> String.to_integer
+  end
+
+  def parse_float(nil), do: nil
+  def parse_float(str) do
+    str |> String.to_float
   end
 end
