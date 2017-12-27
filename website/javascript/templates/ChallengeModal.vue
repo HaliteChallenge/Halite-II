@@ -7,42 +7,48 @@
         <img class="ico" :src="`${baseUrl}/assets/images/icon-group.svg`">
         <h2 class="heading">CHALLENGE OTHER PLAYERS</h2>
         <p>You can choose one or three players from the leaderboard to challenge. You’ll be able to see how you stack up and we’ll let you know once the challenge is over.</p>
-        
-        <div class="user-search" v-if="me">
-          <div>
-            <div class="search-item" v-for="(friend, index) in friends">
-              <div v-if="!friend">
-                <div class="select-item" :class="{empty: validated && !emptyFields[index]}">
-                  <v-select
-                    placeholder="Select User"
-                    v-model="friends[index]"
-                    :options="options">
-                  </v-select>
+        <div v-if="me">
+          <div class="user-search">
+            <div>
+              <div class="search-item" v-for="(friend, index) in friends">
+                <div v-if="!friend">
+                  <div class="select-item" :class="{empty: validated && !emptyFields[index]}">
+                    <v-select
+                      placeholder="Select User"
+                      v-model="friends[index]"
+                      :options="options">
+                    </v-select>
+                  </div>
                 </div>
-              </div>
-              <div v-else-if="members[friends[index]]">
-                <div class="selected-friend">
-                  <a :href="'/user?user_id=' + members[friends[index]].user_id"><img width="30" height="30" :src="`https://github.com/${friends[index]}.png`" alt=""> {{friends[index]}}</a>
-                  <a class="close" @click="removeFriend(index)"><span class="icon-remove"></span></a>
+                <div v-else-if="members[friends[index]]">
+                  <div class="selected-friend">
+                    <a :href="'/user?user_id=' + members[friends[index]].user_id"><img width="30" height="30" :src="`https://github.com/${friends[index]}.png`" alt=""> {{friends[index]}}</a>
+                    <a class="close" @click="removeFriend(index)"><span class="icon-remove"></span></a>
+                  </div>
                 </div>
               </div>
             </div>
+            <a @click="addOpponent" class="add-more">
+              <span><img :src="`${baseUrl}/assets/images/icon-add.svg`" alt="">
+                Add more opponents</span>
+            </a>
           </div>
-          <a @click="addOpponent" class="add-more">
-            <span><img :src="`${baseUrl}/assets/images/icon-add.svg`" alt="">
-              Add more opponents</span>
-          </a>
+          <div class="error-message" v-if="errorMessage">
+            {{this.errorMessage}}
+          </div>
+          <div class="ha-button-container">
+            <div>
+              <a class="ha-button" @click="submit"><span>SEND CHALLENGE</span></a>
+            </div>
+          </div>
         </div>
-        <div class="user-search" v-else>
-          <p class="no-login">You have to log in first</p>
-        </div>
-        
-        <div class="error-message" v-if="errorMessage">
-          {{this.errorMessage}}
-        </div>
-        <div class="ha-button-container">
-          <div>
-            <a class="ha-button" @click="submit"><span>SEND CHALLENGE</span></a>
+        <div class="require-login" v-else>
+          <div class="no-login">You must sign in to challenge a player</div>
+
+          <div class="ha-button-container">
+            <div>
+              <a class="ha-button" href="https://api.halite.io/v1/login/github" onclick="javascript:handleOutboundLinkClicks('account', 'click-to-sign-up','navigation');return true;"><span>SIGN INTO HALITE</span></a>
+            </div>
           </div>
         </div>
       </div>
@@ -150,7 +156,7 @@ export default{
           return this.members[username].user_id
         })
         api.challenge(this.me.user_id, opponents).then((data) => {
-          this.showResult = true; 
+          this.showResult = true;
           console.log(data)
           console.log(`success send challenge`)
         }, (error) => {
@@ -180,6 +186,11 @@ export default{
   }
   .no-login{
     text-align: center;
+    border-top: 1px solid #363347;
+    border-bottom: 1px solid #363347;
+    padding: 20px 0;
+    margin: 20px 0;
+    color: #63CECA;
   }
   .search-item{
     border-top: 1px solid #363347;
