@@ -231,7 +231,6 @@ export default{
   .v-select.dropdown{
     margin-right: 0;
     border: 1px solid transparent;
-
   }
   .select-item.empty{
     .v-select{
@@ -241,7 +240,6 @@ export default{
   .selected-friend {
     display: flex;
     position: relative;
-    font-size: 18px;
     img{
       width: auto !important;
       margin-right: 10px;

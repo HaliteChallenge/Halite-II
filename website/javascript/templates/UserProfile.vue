@@ -67,14 +67,15 @@
                         </div>
                     </div>
                     <div>
-                        <button class="btn" @click="openChallengeModal">
-                            <span>CHALLENGE</span>
-                        </button>
-                        <ChallengeModal v-if="is_my_page" :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" username=""></ChallengeModal>  
-                        <ChallengeModal v-else :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="user.username"></ChallengeModal>  
-                        <!-- <button class="btn" @click="toggleShare">
+                        <div v-if="!is_my_page">
+                          <button class="btn" @click="openChallengeModal">
+                              <span>CHALLENGE</span>
+                          </button>
+                          <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="user.username"></ChallengeModal>
+                        </div>
+                        <button v-else class="btn" @click="toggleShare">
                             <span>SHARE</span>
-                        </button> -->
+                        </button>
                         <!-- <div class="user-profile-badge">
                             <i class="xline xline-top"></i>
                             <h2>Badges</h2>
