@@ -182,6 +182,7 @@ def list_matches():
         "planets_destroyed": model.game_stats.c.planets_destroyed,
         "ships_produced": model.game_stats.c.ships_produced,
         "ships_destroyed": model.game_stats.c.ships_destroyed,
+        "challenge_id": model.games.c.challenge_id,
     }, ["timed_out"])
 
     participant_clause = sqlalchemy.true()
