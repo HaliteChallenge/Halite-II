@@ -144,9 +144,6 @@ def upload_game():
         if not challenge:
             update_rankings(conn, users)
 
-    # Clean up old games
-    delete_old_games(users)
-
     return util.response_success()
 
 
@@ -585,27 +582,3 @@ def update_user_timeout(conn, game_id, user):
             },
             config.GAME_ERROR_MESSAGES,
             config.C_BOT_DISABLED)
-
-
-def delete_old_games(users):
-    """
-    Delete games older than 2 weeks for Bronze-tier players.
-    """
-    sqlfunc = sqlalchemy.sql.func
-    with model.engine.connect() as conn:
-        with conn.begin():
-            for user in users:
-                if user["tier"] != config.TIER_4_NAME:
-                    continue
-
-                cutoff_time = sqlfunc.adddate(sqlfunc.now(), -14)
-                # Delete all rows older than this in the various game tables
-                conn.execute(model.games.delete().where(
-                    sqlalchemy.sql.exists(
-                        model.game_participants.select().where(
-                            (model.game_participants.c.user_id == user["user_id"]) &
-                            (model.game_participants.c.game_id == model.games.c.id)
-                        )
-                    ) &
-                    (model.games.c.time_played < cutoff_time)
-                ))
