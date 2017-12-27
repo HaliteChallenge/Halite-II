@@ -105,6 +105,12 @@ export default{
           })
 
           return my_bot_present
+        }, () => {
+          // Could not extract zip
+          const error_message = 'Not a valid zip archive. Your bot must be contained in a zip file.'
+          this.showMessage('error', error_message)
+          this.errorMessage = error_message
+          return Promise.reject();
         }).then((my_bot_present) => {
           if (!my_bot_present) {
             this.gaData('play', 'submit-error-zip', 'play-submit-flow')

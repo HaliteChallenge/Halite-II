@@ -21,7 +21,7 @@ namespace hlt {
         unsigned int EXTRA_PLANETS = 4;
         unsigned int MAX_TURNS = 300;
 
-        double DRAG = 7.0;
+        double DRAG = 10.0;
         double MAX_SPEED = 7.0;
         double MAX_ACCELERATION = 7.0;
 

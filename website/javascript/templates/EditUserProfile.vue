@@ -253,7 +253,7 @@ export default {
         return this.selected_country ? this.selected_country.value : null
       },
       country_region_code: function () {
-        return this.selected_region ? this.selected_region.value : null
+        return (this.selected_country && this.selected_region) ? this.selected_region.value : null
       }
     },
     methods: {
@@ -288,9 +288,18 @@ export default {
             codes[iso3166.codes[code3]] = code3
           }
 
-          request['country_code'] = this.country_code
-          if (this.country_region_code !== '' && this.country_region_code !== 'NONE') {
-            request['country_subdivision_code'] = this.country_region_code
+          if (this.country_code !== '' && this.country_code !== 'NONE') {
+            request['country_code'] = this.country_code
+            if (this.country_region_code !== '' && this.country_region_code !== 'NONE') {
+              request['country_subdivision_code'] = this.country_region_code
+            }
+            else if (this.country_region_code === 'NONE') {
+              request['country_subdivision_code'] = null
+            }
+          }
+          else if (this.country_code === 'NONE') {
+            request['country_code'] = null
+            request['country_subdivision_code'] = null
           }
         }
 

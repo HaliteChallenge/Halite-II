@@ -36,10 +36,22 @@ def serve_game_task(conn, has_gpu=False):
     # Else, do not run games for players who qualify for one.
     total_players = conn.execute(model.total_ranked_users).first()[0]
     thresholds = util.tier_thresholds(total_players)
+    sqlfunc = sqlalchemy.sql.func
     ranked_users = model.ranked_users_query()
     if config.COMPETITION_FINALS_PAIRING:
-        rank_limit = (ranked_users.c.rank <=
-                      thresholds[config.FINALS_TIER_NAME])
+        last_game_id = conn.execute(sqlalchemy.sql.select([
+                sqlfunc.max(model.games.c.id)
+            ]).select_from(model.games)).first()[0]
+        try:
+            cur_final_games = last_game_id - config.LAST_OPEN_GAME
+        except TypeError:
+            raise Exception("Final open game id must be set in config.py.")
+        finals_rank_limit = total_players + 1
+        for start, cutoff in config.FINALS_CUTOFF_SCHEDULE:
+            if start > cur_final_games:
+                break
+            finals_rank_limit = cutoff
+        rank_limit = (ranked_users.c.rank <= finals_rank_limit)
     else:
         rank_limit = sqlalchemy.sql.expression.true()
 
@@ -74,7 +86,6 @@ def serve_game_task(conn, has_gpu=False):
     if not has_gpu:
         # if this isn't a gpu enabled worker filter out gpu only bots
         player_filter = (model.ranked_bots_users.c.is_gpu_enabled == False)
-    sqlfunc = sqlalchemy.sql.func
     close_players = sqlalchemy.sql.select([
         model.ranked_bots_users.c.user_id,
         model.ranked_bots_users.c.bot_id,
@@ -96,7 +107,6 @@ def serve_game_task(conn, has_gpu=False):
         (model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value) &
         (~((model.bots.c.user_id == seed_player["user_id"]) &
            (model.bots.c.id == seed_player["bot_id"]))) &
-        rank_limit &
         player_filter
     ).order_by(
         sqlalchemy.func.abs(model.bots.c.mu - seed_player["mu"])
@@ -414,10 +424,7 @@ def find_seed_player(conn, ranked_users, seed_filter):
         if result:
             return result
     else:
-        # For finals: take 15 players with least games played, and select one
-        total_players = conn.execute(model.total_ranked_users).first()[0]
-        thresholds = util.tier_thresholds(total_players)
-
+        # For finals take players with least games played
         least_played = sqlalchemy.sql.select([
             model.ranked_bots_users.c.user_id,
             model.ranked_bots_users.c.bot_id,
@@ -428,16 +435,21 @@ def find_seed_player(conn, ranked_users, seed_filter):
             model.ranked_bots_users.c.num_submissions.label("version_number"),
         ]).select_from(
             model.ranked_bots_users.join(
+                # This join should have no effect on the result but it makes
+                # the query 30-40 times faster.
+                model.bots,
+                (model.ranked_bots_users.c.user_id == model.bots.c.user_id) &
+                (model.ranked_bots_users.c.bot_id == model.bots.c.id)
+            ).join(
                 ranked_users,
                 (model.ranked_bots_users.c.user_id == ranked_users.c.user_id) &
                 seed_filter
             )
         ).where(
             model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value
-        ).order_by(model.bots.c.games_played.asc()).limit(15).alias("least_played")
-
-        query = least_played.select().order_by(
+        ).order_by(model.bots.c.games_played.asc()
+        ).limit(20).alias("least_played").select().order_by(
             sqlalchemy.sql.func.rand()
         ).limit(1)
 
-        return conn.execute(query).first()
+        return conn.execute(least_played).first()
