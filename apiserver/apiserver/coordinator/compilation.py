@@ -29,6 +29,7 @@ def serve_compilation_task(conn):
         find_compilation_task = model.bots.select() \
             .where(model.bots.c.compile_status ==
                    model.CompileStatus.UPLOADED.value) \
+            .with_for_update() \
             .order_by(model.bots.c.user_id.asc()) \
             .limit(1)
         bot = conn.execute(find_compilation_task).first()
