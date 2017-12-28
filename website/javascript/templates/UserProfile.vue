@@ -328,6 +328,9 @@
                                                     <tbody>
                                                         <tr v-for="challenge in challengeGames">
                                                             <td>
+                                                              <div class="info-icon-trophy" v-if="challenge.players[0].user_id == user.user_id">
+                                                                <span class="icon-trophy"></span>
+                                                              </div>
                                                               <a v-for="(player, index) in sortChallenge(challenge.players)" :href="`/user?user_id=${player.user_id}`" class="game-participant">
                                                                 <img :src="`https://github.com/${player.username}.png`" :alt="player.username">
                                                                 <span class="rank">{{index + 1}}</span>
