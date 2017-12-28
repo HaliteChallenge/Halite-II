@@ -283,7 +283,7 @@
                             <i class="xline xline-right"></i>
                             <div class="content">
                                 <p class="t3 c-wht font-headline">ABOUT THE COMPETITION</p>
-                                <p class="t5 c-gry">Halite is an AI programming challenge running October 23 - January 22, 2017. Created by two interns at <a href="https://twosigma.com" target="_blank">Two Sigma</a> in 2016, the first iteration of Halite was such a success that Halite II was built the summer of 2017.</p>
+                                <p class="t5 c-gry">Halite is an AI programming challenge running October 23 - January 22, 2018. Created by two interns at <a href="https://twosigma.com" target="_blank">Two Sigma</a> in 2016, the first iteration of Halite was such a success that Halite II was built the summer of 2017.</p>
                                 <div class="clear"></div>
                                 <div class="ha-button-container no-bg-button">
                                     <div>
