@@ -122,6 +122,7 @@ def leaderboard():
                 "organization_id": row["organization_id"],
                 "organization": row["organization_name"],
                 "version_number": int(row["num_submissions"]),
+                "compile_status": row["compile_status"],
                 "num_games": int(row["num_games"]),
                 "score": float(row["score"]),
                 "language": row["language"],

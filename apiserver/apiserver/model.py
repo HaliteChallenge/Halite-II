@@ -66,6 +66,7 @@ def ranked_bots_query(variable="rank", alias="ranked_bots"):
         bots.c.version_number,
         bots.c.language,
         bots.c.update_time,
+        bots.c.compile_status,
     ]).select_from(bots).select_from(sqlalchemy.sql.select([
         sqlalchemy.sql.text("@{}:=0".format(variable))
     ]).alias("rn")).order_by(bots.c.score.desc()).alias(alias)
@@ -163,6 +164,7 @@ ranked_bots_users = sqlalchemy.sql.select([
     ranked_bots.c.update_time,
     # Perform a no-op operation so we can label the column easily
     sqlalchemy.cast(sqlalchemy.sql.text("ranked_bots.bot_rank"), sqlalchemy.Integer).label("rank"),
+    ranked_bots.c.compile_status,
 ]).select_from(ranked_bots.join(
     users,
     ranked_bots.c.user_id == users.c.id,
@@ -229,6 +231,7 @@ def hackathon_ranked_bots_users_query(hackathon_id, *, alias="hackathon_ranked_b
         ranked_bots.c.update_time,
         # Perform a no-op operation so we can label the column easily
         sqlalchemy.cast(sqlalchemy.sql.text("local_rank.local_rank"), sqlalchemy.Integer).label("local_rank"),
+        ranked_bots.c.compile_status,
     ]).select_from(
         ranked_bots.join(
             users,
