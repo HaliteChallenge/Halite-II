@@ -240,13 +240,14 @@ def store_game_results(conn, game_output, stats, replay_key, bucket_class,
             sigma=user["sigma"]
         ))
 
-        # Increment number of games played
-        conn.execute(model.bots.update().where(
-            (model.bots.c.user_id == user["user_id"]) &
-            (model.bots.c.id == user["bot_id"])
-        ).values(
-            games_played=model.bots.c.games_played + 1,
-        ))
+        if not challenge:
+            # Increment number of games played
+            conn.execute(model.bots.update().where(
+                (model.bots.c.user_id == user["user_id"]) &
+                (model.bots.c.id == user["bot_id"])
+            ).values(
+                games_played=model.bots.c.games_played + 1,
+            ))
 
         # If this is the user's first timeout, let them know
         if user["timed_out"]:
