@@ -71,7 +71,7 @@
                           <button class="btn" @click="openChallengeModal">
                               <span>CHALLENGE</span>
                           </button>
-                          <div id="challenge_modal"></div>
+                          <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="user.username"></ChallengeModal>
                         </div>
                         <button v-else class="btn" @click="toggleShare">
                             <span>SHARE</span>
@@ -854,9 +854,9 @@
           }
         },
         /**
-             * @param  {e} event
-             * @return {void}
-             */
+         * @param  {e} event
+         * @return {void}
+         */
         copyToClipboard: function (e) {
           if (e) e.preventDefault()
           this.$refs.shareInput.select()
@@ -864,26 +864,8 @@
         },
         openChallengeModal: function(e) {
           this.isChallengeModalOpen = true;
-
-          // create a new vue instance
-          var outerContainer = document.getElementById('challenge_modal')
-          outerContainer.innerHTML = ""
-          var container = document.createElement('div')
-          outerContainer.appendChild(container)
-
-          let modal = new Vue({
-            el: container,
-            render: (h) => h(ChallengeModal, {
-              props:{
-                isOn: this.isChallengeModalOpen,
-                close: this.closeChallengeModel,
-                baseUrl: this.baseUrl,
-                username: this.user.username,
-              }
-            })
-          })
         },
-        closeChallengeModel: function(e) {
+        closeChallengeModal: function(e) {
             this.isChallengeModalOpen = false;
         }
       }

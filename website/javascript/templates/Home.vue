@@ -219,7 +219,7 @@
                                         <a @click="openChallengeModal" class="ha-button"><span>SEND A CHALLENGE</span></a>
                                     </div>
                                 </div>
-                                <div id="challenege_modal"></div>
+                                <ChallengeModal :baseUrl="baseUrl" :isOn="modalOpen" :close="closeChallengeModal" username=""></ChallengeModal>
                             </div>
                         </div>
                     </div>
@@ -392,29 +392,9 @@
          utils.gaEvent(category, action, label)
        },
        openChallengeModal: function(){
-        //
         this.modalOpen = true
-
-        // create a new vue instance
-        var outerContainer = document.getElementById('challenege_modal')
-        outerContainer.innerHTML = ""
-        var container = document.createElement('div')
-        outerContainer.appendChild(container)
-
-        let modal = new Vue({
-          el: container,
-          render: (h) => h(ChallengeModal, {
-            props:{
-              isOn: this.modalOpen,
-              close: this.closeChallengeModel,
-              baseUrl: this.baseUrl,
-              username: "",
-            }
-          })
-        })
-
        },
-       closeChallengeModel: function(){
+       closeChallengeModal: function(){
         this.modalOpen = false;
        }
      }

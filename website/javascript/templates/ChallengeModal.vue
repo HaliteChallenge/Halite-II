@@ -132,6 +132,11 @@ export default{
         options = options.filter((searchedUsername) => searchedUsername != username)
       })
       this.options = options
+    },
+    isOn: function(value){
+      if (value){
+        this.friends = this.username ? [this.username] : [""]
+      }
     }
   },
   methods: {
