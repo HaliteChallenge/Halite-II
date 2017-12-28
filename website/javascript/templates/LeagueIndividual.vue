@@ -11,14 +11,14 @@
     <div class="league-description">
       <p>{{league.description}}</p>
       <p><a :href="parentLink()"> {{league.category}} </a></p>
-  
+
       <div class="popup-share-container">
         <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>
           <div class="popup-container" v-show="sharePopup">
             <div class="popup-share">
               <label>Share as a link</label>
               <div class="form-inline-button">
-                <input ref="shareInput" type="text" :value="shareLink"> 
+                <input ref="shareInput" type="text" :value="shareLink">
                 <button class="btn" @click="copyToClipboard">
                   <span>Copy</span>
                 </button>
@@ -50,11 +50,11 @@
             <th>Player</th>
             <th>Rating</th>
             <th class="text-center">Tier</th>
+            <th>Challenge</th>
             <th>Academic Status</th>
             <th class="text-center">Country</th>
             <th>Organization</th>
             <th>Last Submission</th>
-            <th>Challenge</th>
           </tr>
         </thead>
         <tbody>
@@ -70,6 +70,9 @@
             <td class="text-center">
               <span :class="tierClass(player.tier || player.local_tier)"></span>
             </td>
+            <td class="text-center">
+              <a @click="openChallengeModal(player.username)" class="toggle-challenge"><img :src="`${baseUrl}/assets/images/icon-challenge.svg`"></a>
+            </td>
             <td>{{ player.level }}</td>
             <td class="text-center">
               <div>
@@ -78,13 +81,10 @@
             </td>
             <td>{{ player.organization }}</td>
             <td>{{ getFormattedDate(player.update_time)  }}</td>
-            <td class="text-center">
-              <a @click="openChallengeModal(player.username)" class="toggle-challenge"><img :src="`${baseUrl}/assets/images/icon-challenge.svg`"></a>
-            </td>
           </tr>
         </tbody>
       </table>
-      <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="challengeUsername"></ChallengeModal>  
+      <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="challengeUsername"></ChallengeModal>
     </div>
   </div>
 </template>

@@ -74,12 +74,12 @@
             <th>Player</th>
             <th>Rating</th>
             <th class="text-center">Tier</th>
+            <th>Challenge</th>
             <th>Level</th>
             <th class="text-center">Country</th>
             <th>Organization</th>
             <th>Language</th>
             <th>Last Submission</th>
-            <th>Challenge</th>
           </tr>
           </thead>
           <tbody>
@@ -95,6 +95,9 @@
             <td class="text-center tier-td">
               <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
             </td>
+            <td class="text-center">
+              <a @click="openChallengeModal(player.username)" class="toggle-challenge"><img :src="`${baseUrl}/assets/images/icon-challenge.svg`"></a>
+            </td>
             <td>{{ player.level }}</td>
             <td class="text-center">
               <div>
@@ -104,9 +107,6 @@
             <td>{{ player.organization }}</td>
             <td>{{ player.language }}</td>
             <td>{{ getFormattedDate(player.update_time)  }}</td>
-            <td class="text-center">
-              <a @click="openChallengeModal(player.username)" class="toggle-challenge"><img :src="`${baseUrl}/assets/images/icon-challenge.svg`"></a>
-            </td>
           </tr>
           </tbody>
         </table>
@@ -119,7 +119,7 @@
           :changePage="this.changePage"
         />
       </div>
-      <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="challengeUsername"></ChallengeModal>  
+      <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="challengeUsername"></ChallengeModal>
     </div>
     <div v-else class="zero-state-pane">
       <img src="/assets/images/leaderboard-zero-icon.png" alt="" />

@@ -212,14 +212,14 @@
                                         <br/>
                                     </div>
                                     <p id="invitestatus" class="t5 c-gry"></p> -->
-                                    
+
                                 </div>
                                 <div class="ha-button-container no-bg-button btn-bottom">
                                     <div>
                                         <a @click="openChallengeModal" class="ha-button"><span>SEND A CHALLENGE</span></a>
                                     </div>
                                 </div>
-                                <ChallengeModal :baseUrl="baseUrl" :isOn="modalOpen" :close="closeChallengeModel" username=""></ChallengeModal>
+                                <ChallengeModal :baseUrl="baseUrl" :isOn="modalOpen" :close="closeChallengeModal" username=""></ChallengeModal>
                             </div>
                         </div>
                     </div>
@@ -329,11 +329,12 @@
 </template>
 
 <script>
-   import * as api from '../api'
-    import * as utils from '../utils'
-    import ChallengeModal from './ChallengeModal.vue'
+  import Vue from 'vue'
+  import * as api from '../api'
+  import * as utils from '../utils'
+  import ChallengeModal from './ChallengeModal.vue'
 
-export default {
+  export default {
      name: 'home',
      props: ['baseUrl'],
      components: {ChallengeModal},
@@ -391,9 +392,9 @@ export default {
          utils.gaEvent(category, action, label)
        },
        openChallengeModal: function(){
-        this.modalOpen = !this.modalOpen;
+        this.modalOpen = true
        },
-       closeChallengeModel: function(){
+       closeChallengeModal: function(){
         this.modalOpen = false;
        }
      }

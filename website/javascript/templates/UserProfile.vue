@@ -67,14 +67,15 @@
                         </div>
                     </div>
                     <div>
-                        <button class="btn" @click="openChallengeModal">
-                            <span>CHALLENGE</span>
-                        </button>
-                        <ChallengeModal v-if="is_my_page" :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" username=""></ChallengeModal>  
-                        <ChallengeModal v-else :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="user.username"></ChallengeModal>  
-                        <!-- <button class="btn" @click="toggleShare">
+                        <div v-if="!is_my_page">
+                          <button class="btn" @click="openChallengeModal">
+                              <span>CHALLENGE</span>
+                          </button>
+                          <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="user.username"></ChallengeModal>
+                        </div>
+                        <button v-else class="btn" @click="toggleShare">
                             <span>SHARE</span>
-                        </button> -->
+                        </button>
                         <!-- <div class="user-profile-badge">
                             <i class="xline xline-top"></i>
                             <h2>Badges</h2>
@@ -294,6 +295,69 @@
                             <section class="profile-section">
                                 <h2>
                                     <i class="xline xline-bottom"></i>
+                                    Challenges
+                                    <span title="Players you most often lose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
+                                </h2>
+                                <div v-if="!nemesisList.length" class="section-empty">
+                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
+                                    <h2>No Challenge yet</h2>
+                                </div>
+                                <div v-if="nemesisList.length > 0">
+                                    <div class="table-sticky-container">
+                                        <div class="table-wrapper">
+                                            <table class="table table-leader table-sticky">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Challengers</th>
+                                                        <th class="text-center hidden-xs">Games</th>
+                                                        <th class="text-center">Date Initiated</th>
+                                                        <th class="text-center">Status</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                            <div class="table-scrollable-content">
+                                                <table class="table table-leader">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Challengers</th>
+                                                            <th class="text-center hidden-xs">Games</th>
+                                                            <th class="text-center">Date Initiated</th>
+                                                            <th class="text-center">Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="challenge in challengeGames">
+                                                            <td>
+                                                              <div class="info-icon-trophy" v-if="challenge.players[0].user_id == user.user_id">
+                                                                <span class="icon-trophy"></span>
+                                                              </div>
+                                                              <a v-for="(player, index) in sortChallenge(challenge.players)" :href="`/user?user_id=${player.user_id}`" class="game-participant">
+                                                                <img :src="`https://github.com/${player.username}.png`" :alt="player.username">
+                                                                <span class="rank">{{index + 1}}</span>
+                                                              </a>
+                                                            </td>
+                                                            <td class="text-center hidden-xs">
+                                                              {{challenge.num_games}}
+                                                            </td>
+                                                            <td class="text-center">
+                                                              {{getFormattedDateForGames(challenge.time_created, "N/A")}}
+                                                            </td>
+                                                            <td class="text-center">
+                                                              <span :class="{'text-success': challenge.finished}">
+                                                                {{challenge.finished ? "Completed" : "In Progress"}}
+                                                              </span>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="profile-section">
+                                <h2>
+                                    <i class="xline xline-bottom"></i>
                                     Nemesis
                                     <span title="Players you most often lose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
                                 </h2>
@@ -502,6 +566,7 @@
             'user_id': ''
           },
           games: [],
+          challengeGames: [],
           nemesisList: [],
           bots: [],
           error_games: [],
@@ -560,6 +625,7 @@
           this.fetchnemesis()
           this.fetchhistory()
           this.fetchHalite1Stats()
+          this.fetchChallengeGames()
 
           // switch to analysis tab if requested
           const url = new URLSearchParams(location.search)
@@ -614,8 +680,6 @@
 
           return new Promise((resolve, reject) => {
             $.get(url).then((data) => {
-                console.log(data);
-                console.log(data.length);
                 if ( data.length > 0 ){
                     this.games = data
                     for (let game of data) {
@@ -668,6 +732,23 @@
           }
           const location = `${state ? state + ', ' : ''}${country}`
           return location || ''
+        },
+        fetchChallengeGames: function(){
+          this.challengeGames = []
+          let url = `${api.API_SERVER_URL}/user/${this.user.user_id}/challenge`
+          return $.get(url).then((data) => {
+            this.challengeGames = data.map((challenge) => {
+              let newChallenge = challenge;
+              let players = [];
+              _.forEach(challenge.players, (player, id) => {
+                let p = player
+                p.user_id = id
+                players.push(p)
+              })
+              newChallenge.players = this.sortChallenge(newChallenge.players)
+              return newChallenge
+            })
+          })
         },
         fetchnemesis: function () {
           let query = `order_by=desc,time_played&offset=0&limit=${this.nemesisGameCount}`
@@ -852,17 +933,20 @@
               break
           }
         },
+        sortChallenge: function(players) {
+          return _.sortBy(players, (player) => -player.points)
+        },
         /**
-             * @param  {e} event
-             * @return {void}
-             */
+         * @param  {e} event
+         * @return {void}
+         */
         copyToClipboard: function (e) {
           if (e) e.preventDefault()
           this.$refs.shareInput.select()
           document.execCommand('copy')
         },
         openChallengeModal: function(e) {
-            this.isChallengeModalOpen = true;
+          this.isChallengeModalOpen = true;
         },
         closeChallengeModal: function(e) {
             this.isChallengeModalOpen = false;
