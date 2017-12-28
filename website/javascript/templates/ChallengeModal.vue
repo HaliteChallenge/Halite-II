@@ -36,7 +36,7 @@
             </div>
           </div>
 
-          <div class="error-message" v-if="errorMessage">
+          <div class="error-message" v-if="errorMessage && validated">
             {{this.errorMessage}}
           </div>
           <div class="ha-button-container">
@@ -87,7 +87,6 @@ export default{
       emptyFields: [],
       validated: false,
       showResult: false,
-      challengeCount: 0
     }
   },
   mounted: function(){
@@ -132,20 +131,27 @@ export default{
         options = options.filter((searchedUsername) => searchedUsername != username)
       })
       this.options = options
+      this.validated = false
     },
     isOn: function(value){
       if (value){
         this.friends = this.username ? [this.username] : [""]
+        this.errorMessage = ""
+        this.emptyFields = []
+        this.validated = false
+        this.showResult = false
       }
     }
   },
   methods: {
     addOpponent: function(){
+      this.validated = false
       while (this.friends.length < 3){
         this.friends.push("");
       }
     },
     removeFriend: function(index){
+      this.validated = false
       this.friends[index] = ""
       this.$forceUpdate()
     },
@@ -162,6 +168,7 @@ export default{
     submit: function(){
       let emptyFields = {}
       let hasError = false
+      this.errorMessage = ""
       this.validated = true // enable showing error
       this.friends.forEach((item, index) => {
         if (!item){
