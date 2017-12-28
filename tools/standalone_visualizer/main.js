@@ -16,10 +16,14 @@ function createWindow() {
         icon: path.join(__dirname, 'assets/icons/png/64x64.png')
     });
 
+    const passedFile = process.argv.find(arg => arg.endsWith('.hlt'));
+    const replayFile = passedFile ? path.join(__dirname, passedFile) : null;
+
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, "index.html"),
         protocol: "file:",
         slashes: true,
+        hash: replayFile,
     }));
 
     mainWindow.on("closed", function() {

@@ -141,6 +141,14 @@
      mounted: function () {
          // handle whole page drag and drop
          const ins = this
+         if (window.location.hash) {
+             const filename = window.location.hash.substring(1);
+             filesys.readFile(filename, (err, data) => {
+                 if (err) throw err;
+                 const blob = new File([data], filename);
+                 ins.play_replay([blob]);
+             });
+         }
          $('body').attr('draggable', 'true')
          $('body').on('drop dragdrop', function (e) {
              // get the bot uploader container
