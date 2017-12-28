@@ -21,6 +21,7 @@ def list_user_matches(intended_user):
     where_clause, order_clause, manual_sort = api_util.get_sort_filter({
         "game_id": model.games.c.id,
         "time_played": model.games.c.time_played,
+        "challenge_id": model.games.c.challenge_id,
     }, ["timed_out"])
 
     participant_clause = model.game_participants.c.user_id == intended_user

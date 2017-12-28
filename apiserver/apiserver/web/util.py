@@ -192,6 +192,15 @@ def parse_filter(filter_string):
     return field, operation, value
 
 
+def int_or_none(x):
+    """
+    A helper to allow filtering by an integer value or None.
+    """
+    if x.lower() in ("null", "none", ""):
+        return None
+    return int(x)
+
+
 def get_sort_filter(fields, false_fields=()):
     """
     Parse flask.request to create clauses for SQLAlchemy's order_by and where.
@@ -224,7 +233,7 @@ def get_sort_filter(fields, false_fields=()):
 
         column = fields[field]
         if isinstance(column.type, sqlalchemy.types.Integer):
-            conversion = int
+            conversion = int_or_none
         elif isinstance(column.type, sqlalchemy.types.DateTime):
             conversion = lambda x: arrow.get(x).datetime
         elif isinstance(column.type, sqlalchemy.types.Float):
