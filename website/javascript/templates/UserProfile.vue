@@ -169,12 +169,12 @@
                                         </thead>
                                         <tbody>
                                             <tr v-for="game in games">
-                                                <td>
+                                                <td v-bind:class="game.versions_back ? (game.versions_back % 2 ? 'old-bot-odd' : 'old-bot-even') : ''">
                                                     <a :href="'/play?game_id=' + game.game_id">
                                                         {{getFormattedDateForGames(game.time_played)}}
                                                     </a>
                                                 </td>
-                                                <td>
+                                                <td v-bind:class="{ 'challenge': game.challenge_id }">
                                                     <div class="info-icon-trophy" v-if="game.players[user.user_id].rank === 1">
                                                         <span class="icon-trophy"></span>
                                                     </div>
@@ -633,6 +633,10 @@
 
                         this.profile_images[player_id] = api.make_profile_image_url(username)
                         this.usernames[player_id] = username
+
+                        if (player_id == this.user.user_id) {
+                            game.versions_back = this.user.num_submissions - player.version_number
+                        }
                       }
 
                       const players = Object.values(game.players).sort((r1, r2) => {

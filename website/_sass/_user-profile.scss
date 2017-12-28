@@ -206,6 +206,15 @@
     tbody > tr > td {
       background-color: #000;
     }
+    tbody > tr > td.old-bot-odd{
+      background-color: #211f2e;
+    }
+    tbody > tr > td.old-bot-even{
+      background-color: #282538;
+    }
+    tbody > tr > td.challenge{
+      background-color: #1c1c13;
+    }
     .winner {
       color: #20A257;
     }
