@@ -1,6 +1,6 @@
 <template>
     <div class="home-container">
-        <div class="notification font-headline">Interested in Machine Learning? <a href="https://forums.halite.io/t/halite-team-is-awarding-300-google-cloud-vouchers/542" style="text-transform:underline !important; color:#25242f; font-weight:bold;">Apply for a $300 GPU Voucher.</a></div>
+        <div class="notification font-headline">Bot submissions close on January 22nd, 11:59 PM ET.  <a href="/learn-programming-challenge" style="text-transform:underline !important; color:#25242f; font-weight:bold;">Get Started Now!</a></div>
 
         <div class="row">
             <div class="col-md-12">
@@ -283,7 +283,7 @@
                             <i class="xline xline-right"></i>
                             <div class="content">
                                 <p class="t3 c-wht font-headline">ABOUT THE COMPETITION</p>
-                                <p class="t5 c-gry">Halite is an AI programming challenge running October 23 - January 26, 2017. Created by two interns at <a href="https://twosigma.com" target="_blank">Two Sigma</a> in 2016, the first iteration of Halite was such a success that Halite II was built the summer of 2017.</p>
+                                <p class="t5 c-gry">Halite is an AI programming challenge running October 23 - January 22, 2018. Created by two interns at <a href="https://twosigma.com" target="_blank">Two Sigma</a> in 2016, the first iteration of Halite was such a success that Halite II was built the summer of 2017.</p>
                                 <div class="clear"></div>
                                 <div class="ha-button-container no-bg-button">
                                     <div>
