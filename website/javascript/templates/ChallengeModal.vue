@@ -168,32 +168,40 @@ export default{
     submit: function(){
       let emptyFields = {}
       let hasError = false
-      this.errorMessage = ""
-      this.validated = true // enable showing error
-      this.friends.forEach((item, index) => {
-        if (!item){
-          emptyFields[index] = 0
-          hasError = true
-        } else {
-          emptyFields[index] = 1
-        }
-      });
+      try {
+        // reset
+        this.errorMessage = ""
+        this.validated = false
 
-      if (hasError){
-        this.errorMessage = "Please select at least one player to challenge";
-        this.emptyFields = emptyFields
-      } else {
-        let opponents = this.friends.map((username) => {
-          return this.members[username].user_id
-        })
-        api.challenge(this.me.user_id, opponents).then((data) => {
-          this.showResult = true;
-          console.log(data)
-          console.log(`success send challenge`)
-        }, (error) => {
-          this.showResult = false;
-          this.errorMessage = error.responseJSON.message;
-        })
+        let emptyCount = 0;
+        this.friends.forEach((item, index) => {
+          if (!item){
+            emptyFields[index] = 0
+            hasError = true
+            emptyCount++;
+          } else {
+            emptyFields[index] = 1
+          }
+        });
+
+        if (emptyCount == 0 || this.friends.length - emptyCount == 1){
+          let opponents = this.friends.filter((username) => username != "").map((username) => {
+            return this.members[username].user_id
+          })
+          api.challenge(this.me.user_id, opponents).then((data) => {
+            this.showResult = true;
+          }, (error) => {
+            this.showResult = false;
+            throw error.responseJSON.message;
+          })
+        } else {
+          this.emptyFields = emptyFields
+          throw emptyCount == this.friends.length ? "Please select at least one player to challenge" : "Please select one or three players to challenge"
+        }
+      } catch (err) {
+        console.log(err)
+        this.validated = true // enable showing error
+        this.errorMessage = err
       }
     }
   }
