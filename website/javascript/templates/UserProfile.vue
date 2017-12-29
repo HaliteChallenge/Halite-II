@@ -328,12 +328,12 @@
                                                     <tbody>
                                                         <tr v-for="challenge in challengeGames">
                                                             <td>
-                                                              <div class="info-icon-trophy" v-if="challenge.players[0].user_id == user.user_id">
+                                                              <div class="info-icon-trophy" v-if="challenge.players[0].rank == 0 && challenge.finished">
                                                                 <span class="icon-trophy"></span>
                                                               </div>
-                                                              <a v-for="(player, index) in sortChallenge(challenge.players)" :href="`/user?user_id=${player.user_id}`" class="game-participant">
+                                                              <a v-for="(player, index) in challenge.players" :href="`/user?user_id=${player.user_id}`" class="game-participant">
                                                                 <img :src="`https://github.com/${player.username}.png`" :alt="player.username">
-                                                                <span class="rank">{{index + 1}}</span>
+                                                                <span class="rank">{{player.rank + 1}}</span>
                                                               </a>
                                                             </td>
                                                             <td class="text-center hidden-xs">
@@ -741,17 +741,48 @@
           this.challengeGames = []
           let url = `${api.API_SERVER_URL}/user/${this.user.user_id}/challenge`
           return $.get(url).then((data) => {
-            this.challengeGames = data.map((challenge) => {
+            let challenges = data.map((challenge) => {
               let newChallenge = challenge;
               let players = [];
+              // add user id
               _.forEach(challenge.players, (player, id) => {
                 let p = player
                 p.user_id = id
                 players.push(p)
               })
-              newChallenge.players = this.sortChallenge(newChallenge.players)
+              newChallenge.players = players;
+
+              // sort
+              if (challenge.num_games > 0){
+                let sortedPlayers = _.orderBy(newChallenge.players, ['points'], ['desc'])
+                newChallenge.players.forEach((player, index) => {
+                  sortedPlayers.forEach((p, i) => {
+                    if (p.user_id == player.user_id){
+                      newChallenge.players[index].rank = i
+                      return false
+                    }
+                  })
+                })
+              } else {
+                // set rank to 1 if there is no game
+                newChallenge.players.forEach((player, index) => {
+                  newChallenge.players[index].rank = 0
+                })
+              }
+
+              // move current user up
+              newChallenge.players.forEach((p, i) => {
+                if (p.user_id == this.user.user_id){
+                  newChallenge.players.splice(i, 1);
+                  newChallenge.players.splice(0, 0, p);
+                  return false;
+                }
+              })
+
               return newChallenge
             })
+
+            this.challengeGames = _.orderBy(challenges, (challenge) => moment(challenge.time_created).valueOf(), ['desc'])
           })
         },
         fetchnemesis: function () {
