@@ -224,6 +224,12 @@ def find_challenge(conn, has_gpu=False):
         user_bots[bot["user_id"]].append(bot)
 
     if len(user_bots) < 2 or challenge["issuer"] not in user_bots:
+        # We had to skip this challenge, but give it a time anyways,
+        # so that we don't get stuck on it
+        conn.execute(model.challenges.update().values(
+            most_recent_game_task=sqlalchemy.sql.func.now(),
+        ).where(model.challenges.c.id == challenge["id"]))
+
         return None
 
     selected_bots = [random.choice(user_bots[challenge["issuer"]])]
