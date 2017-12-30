@@ -36,7 +36,7 @@
                 </a>
             </div></div>
             </td>
-            <td>
+            <td v-bind:class="{ 'challenge': game.challenge_id }">
             <div class="td-wrapper"><div>
                 <a v-for="player in game.playerSorted"
                 :href="'/user?user_id=' + player.id"
