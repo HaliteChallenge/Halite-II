@@ -2,7 +2,6 @@ import logging
 #import abc
 import math
 from enum import Enum
-from . import constants
 
 from . import constants
 from . cimport arithmetic
