@@ -10,7 +10,7 @@ sort_key: 0
 
 ## Map
 
-Space is a 2D grid, where grid cells (not grid points) are identified by an X and Y coordinate. The top-left cell is cell (0, 0), with positive X extending towards the right and positive Y extending toward the bottom. All distances are Euclidean `sqrt(dx^2 + dy^2)`. Note that this makes the coordinate system left-handed!
+Space is a 2D plane, where locations are identified by an X and Y coordinate. The top-left point is (0, 0), with positive X extending towards the right and positive Y extending toward the bottom. All distances are Euclidean `sqrt(dx^2 + dy^2)`. Note that this makes the coordinate system left-handed!
 
 <div class="static-container text-center">
     <img style="width: 60%;height: auto;" src="/assets/images//tutorial-images/map.png">
