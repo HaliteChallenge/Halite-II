@@ -219,7 +219,6 @@ export default {
       let delay = Math.max(500, next_played - queue_point)
       this.display_timer = setTimeout(this.display_next, delay)
       let backlog = since_update + this.most_recent - next_played + delay
-      console.log("game delay "+ delay +" backlog "+ backlog)
       if (backlog > 120000) {
         this.is_behind = true
       } else if (backlog < 70000) {
@@ -236,7 +235,6 @@ export default {
       }
     },
     skip_forward: function () {
-      console.log("Skippy")
       let cutoff = moment() - this.last_received + this.most_recent - 60000
       let cut_ix = 0;
       while (cut_ix < this.incoming_games.length &&
