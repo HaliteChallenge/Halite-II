@@ -21,7 +21,7 @@ def delete_old_games():
                 model.ranked_bots_users.c.user_id,
                 model.ranked_bots_users.c.rank,
             ]).where(
-                model.ranked_bots_users.c.rank >= thresholds[config.TIER_4_NAME]
+                model.ranked_bots_users.c.rank > thresholds[config.TIER_3_NAME]
             )
         ).fetchall()
 
