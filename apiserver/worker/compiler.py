@@ -364,6 +364,10 @@ comp_args = {
         ["yes", "|", "mix", "deps.get"],
         ["mix", "escript.build"],
     ],
+    "F#/.NET Core": [
+        ["dotnet", "restore"],
+        ["dotnet", "build", "-c", "Release", "-o", "."],
+    ],
     "Groovy": [
         ["groovyc"],
         ["jar", "cfe", BOT + ".jar", BOT],
@@ -501,6 +505,14 @@ languages = (
         "erl -hms"+ str(MEMORY_LIMIT) +"m -smp disable -noshell -s my_bot start -s init stop",
         ["*.beam"],
         [(["*.erl"], ExternalCompiler(["erlc"], out_ext=".beam"))]
+    ),
+    Language("F#/.NET Core", BOT + ".dll", "MyBot.fsproj",
+             "dotnet MyBot.dll",
+             [BOT + ".dll"],
+             [
+                 ([], ExternalCompiler(comp_args["F#/.NET Core"][0])),
+                 ([], ExternalCompiler(comp_args["F#/.NET Core"][1])),
+             ]
     ),
     Language("Go", BOT +".go", "MyBot.go",
         "export GOPATH=\"$(pwd)\"; go run MyBot.go",
