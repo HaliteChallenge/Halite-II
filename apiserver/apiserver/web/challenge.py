@@ -90,7 +90,11 @@ def list_challenges_helper(offset, limit, participant_clause,
             model.users,
             model.challenge_participants.c.user_id == model.users.c.id
         )).where(
-            where_clause
+            where_clause &
+            sqlalchemy.sql.exists(model.challenge_participants.select(
+                participant_clause &
+                (model.challenges.c.id == model.challenge_participants.c.challenge_id)
+            ).correlate(model.challenges))
         ).order_by(
             # Make sure rows with same challenge ID stay grouped
             *(order_clause + [model.challenges.c.id])
