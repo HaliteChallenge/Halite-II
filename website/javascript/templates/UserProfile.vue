@@ -795,7 +795,6 @@
                 };
               })
             })
-            console.log(participant_ids.length);
 
             // search for participants information
             (new Promise((resolve, reject) => {
@@ -804,7 +803,6 @@
               participant_ids.forEach((user_id) => {
                 // get user information
                 api.list_bots(user_id).then((bots) => {
-                  console.log(bots)
                   count++;
                   this.participants[user_id] = bots
                   if (count >= total){
@@ -891,7 +889,6 @@
         fetchHalite1Stats: function () {
           api.get_season1_stats(this.user.user_id).then(userDetails => {
             this.season1stats = userDetails;
-            console.log(this.season1stats);
           })
         },
         fetchHackathon: function () {
