@@ -89,7 +89,7 @@ class Planet(Entity):
     :ivar current_production: How much production the planet has generated at the moment. Once it reaches the threshold, a ship will spawn and this will be reset.
     :ivar remaining_resources: The remaining production capacity of the planet.
     :ivar health: The planet's health.
-    :ivar owner: The player ID of the owner, if any. If None, Entity is not owned.
+    :ivar owner: The Player object of the owner, if any. Else None if Planet is not owned.
 
     """
 
