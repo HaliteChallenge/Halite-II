@@ -296,7 +296,9 @@ def store_challenge_results(conn, users, challenge, stats):
 
     if challenge_row and \
        challenge_row["status"] == model.ChallengeStatus.FINISHED.value:
-        winner = conn.execute(model.challenge_participants.select().order_by(
+        winner = conn.execute(model.challenge_participants.select(
+            model.challenge_participants.c.challenge_id == challenge
+        ).order_by(
             model.challenge_participants.c.points.desc(),
             model.challenge_participants.c.ships_produced.desc(),
             model.challenge_participants.c.attacks_made.desc(),

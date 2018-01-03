@@ -9,8 +9,12 @@
     }
   }
   .table-leader {
-      table-layout: fixed;
-      white-space: nowrap;
+    table-layout: fixed;
+    white-space: nowrap;
+
+    tbody > tr> td.challenge{
+      background-color: #2e2e1f;
+    }
   }
   .timed-out {
     border-bottom-style: solid;
