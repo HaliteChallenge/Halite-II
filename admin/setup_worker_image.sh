@@ -204,6 +204,10 @@ EOF
 
 sudo systemctl enable cgroups.service
 
+## Disable fqdn in sudo. This prevents most DNS lookups, and hopefully
+## will avoid the `sudo: failed to resolve` error that comes up.
+echo 'Defaults !fqdn' | sudo tee /etc/sudoers.d/no-fqdn
+
 ## Print out packages installed.
 echo "Packages"
 for package in ${PACKAGES}; do
