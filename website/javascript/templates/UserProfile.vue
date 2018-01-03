@@ -813,11 +813,14 @@
                 })
               })
             })).then((data) => {
-              console.log('fetch done');
-              console.log(data);
               challenges.forEach((c, i) => {
                 c.players.forEach((p) => {
-                  if (this.participants[p.user_id] &&
+                  // no bots
+                  if (this.participants[p.user_id].length == 0){
+                    challenges[i].status = 'Paused'
+                  }
+                  // bots compilation is failed
+                  else if (this.participants[p.user_id] &&
                     this.participants[p.user_id][0].compilation_status !== 'Successful' &&
                     !c.finished){
                     challenges[i].status = 'Paused'
