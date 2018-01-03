@@ -328,7 +328,7 @@
                                                     <tbody>
                                                         <tr v-for="challenge in challengeGames">
                                                             <td>
-                                                              <div class="info-icon-trophy" v-if="challenge.players[0].rank == 0 && challenge.finished">
+                                                              <div class="info-icon-trophy" v-if="challenge.players[0].rank == 0 && challenge.status == 'Completed'">
                                                                 <span class="icon-trophy"></span>
                                                               </div>
                                                               <a v-for="(player, index) in challenge.players" :href="`/user?user_id=${player.user_id}`" class="game-participant">
@@ -344,7 +344,7 @@
                                                             </td>
                                                             <td class="text-center">
                                                               <span :class="{'text-success': challenge.finished}">
-                                                                {{challenge.finished ? "Completed" : "In Progress"}}
+                                                                {{challenge.status}}
                                                               </span>
                                                             </td>
                                                         </tr>
@@ -588,6 +588,7 @@
           messages: {
             hackathon: ''
           },
+          participants: {},
           isLastPage: false,
           isChallengeModalOpen: false,
         }
@@ -781,6 +782,53 @@
               })
 
               return newChallenge
+            })
+
+            // get all participant ids
+            let participant_ids = [];
+            challenges.forEach((c, i) => {
+              challenges[i].status = c.finished ? 'Completed' : 'In Progress'
+              c.players.forEach((p, i) => {
+                let participant = null
+                if (participant_ids.indexOf(p.user_id) === -1){
+                  participant_ids.push(p.user_id)
+                };
+              })
+            })
+            console.log(participant_ids.length);
+
+            // search for participants information
+            (new Promise((resolve, reject) => {
+              let total = participant_ids.length
+              let count = 0;
+              participant_ids.forEach((user_id) => {
+                // get user information
+                api.list_bots(user_id).then((bots) => {
+                  console.log(bots)
+                  count++;
+                  this.participants[user_id] = bots
+                  if (count >= total){
+                    resolve(this.participants);
+                  }
+                })
+              })
+            })).then((data) => {
+              challenges.forEach((c, i) => {
+                c.players.forEach((p) => {
+                  // no bots
+                  if (this.participants[p.user_id].length == 0){
+                    challenges[i].status = 'Paused'
+                  }
+                  // bots compilation is failed
+                  else if (this.participants[p.user_id] &&
+                    this.participants[p.user_id][0].compilation_status !== 'Successful' &&
+                    !c.finished){
+                    challenges[i].status = 'Paused'
+                  } else {
+                    challenges[i].status = c.finished ? 'Completed' : 'In Progress'
+                  }
+                });
+              })
             })
 
             this.challengeGames = _.orderBy(challenges, (challenge) => moment(challenge.time_created).valueOf(), ['desc'])
