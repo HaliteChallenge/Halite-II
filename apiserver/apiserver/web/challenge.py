@@ -2,6 +2,7 @@
 User challenge API endpoints - list user's challenges & issue new ones
 """
 import datetime
+import itertools
 
 import flask
 import sqlalchemy
@@ -77,29 +78,30 @@ def list_challenges_helper(offset, limit, participant_clause,
             model.challenges.c.num_games,
             model.challenges.c.issuer,
             model.challenges.c.winner,
+            model.challenge_participants.c.user_id,
+            model.challenge_participants.c.points,
+            model.challenge_participants.c.ships_produced,
+            model.challenge_participants.c.attacks_made,
+            model.users.c.username,
         ]).select_from(model.challenges.join(
             model.challenge_participants,
-            (model.challenges.c.id == model.challenge_participants.c.challenge_id) &
-            participant_clause
+            (model.challenges.c.id == model.challenge_participants.c.challenge_id)
+        ).join(
+            model.users,
+            model.challenge_participants.c.user_id == model.users.c.id
         )).where(
             where_clause
         ).order_by(
-            *order_clause
+            # Make sure rows with same challenge ID stay grouped
+            *(order_clause + [model.challenges.c.id])
         ).offset(offset).limit(limit).reduce_columns()
 
         challenges = conn.execute(query)
         result = []
-        for challenge in challenges.fetchall():
-            participants = conn.execute(
-                model.challenge_participants.join(
-                    model.users,
-                    model.challenge_participants.c.user_id == model.users.c.id
-                ).select(
-                    model.challenge_participants.c.challenge_id == challenge["id"]
-                )
-            )
-
-            result.append(make_challenge_record(challenge, participants))
+        for _, challenge in itertools.groupby(challenges.fetchall(),
+                                              key=lambda row: row["id"]):
+            rows = list(challenge)
+            result.append(make_challenge_record(rows[0], rows))
 
         return result
 
