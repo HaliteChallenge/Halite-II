@@ -795,7 +795,6 @@
                 };
               })
             })
-            console.log(participant_ids.length);
 
             // search for participants information
             (new Promise((resolve, reject) => {
@@ -804,7 +803,6 @@
               participant_ids.forEach((user_id) => {
                 // get user information
                 api.list_bots(user_id).then((bots) => {
-                  console.log(bots)
                   count++;
                   this.participants[user_id] = bots
                   if (count >= total){
@@ -814,18 +812,23 @@
               })
             })).then((data) => {
               challenges.forEach((c, i) => {
+                let flag = false
                 c.players.forEach((p) => {
-                  // no bots
-                  if (this.participants[p.user_id].length == 0){
-                    challenges[i].status = 'Paused'
-                  }
-                  // bots compilation is failed
-                  else if (this.participants[p.user_id] &&
-                    this.participants[p.user_id][0].compilation_status !== 'Successful' &&
-                    !c.finished){
-                    challenges[i].status = 'Paused'
-                  } else {
-                    challenges[i].status = c.finished ? 'Completed' : 'In Progress'
+                  if (!flag){
+                    // no bots
+                    if (this.participants[p.user_id].length == 0){
+                      challenges[i].status = 'Paused'
+                      flag = true
+                    }
+                    // bots compilation is failed
+                    else if (this.participants[p.user_id] &&
+                      this.participants[p.user_id][0].compilation_status !== 'Successful' &&
+                      !c.finished){
+                        challenges[i].status = 'Paused'
+                        flag = true
+                      } else {
+                        challenges[i].status = c.finished ? 'Completed' : 'In Progress'
+                      }
                   }
                 });
               })
@@ -886,7 +889,6 @@
         fetchHalite1Stats: function () {
           api.get_season1_stats(this.user.user_id).then(userDetails => {
             this.season1stats = userDetails;
-            console.log(this.season1stats);
           })
         },
         fetchHackathon: function () {
