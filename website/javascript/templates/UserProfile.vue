@@ -757,7 +757,7 @@
               // sort
               if (challenge.num_games > 0){
                 let sortedPlayers = _.orderBy(newChallenge.players, ['points'], ['desc'])
-                newChallenge.players.forEach((player, index) => {
+                _.forEach(newChallenge.players, (player, index) => {
                   sortedPlayers.forEach((p, i) => {
                     if (p.user_id == player.user_id){
                       newChallenge.players[index].rank = i
@@ -767,13 +767,13 @@
                 })
               } else {
                 // set rank to 1 if there is no game
-                newChallenge.players.forEach((player, index) => {
+                _.forEach(newChallenge.players, (player, index) => {
                   newChallenge.players[index].rank = 0
                 })
               }
 
               // move current user up
-              newChallenge.players.forEach((p, i) => {
+              _.forEach(newChallenge.players, (p, i) => {
                 if (p.user_id == this.user.user_id){
                   newChallenge.players.splice(i, 1);
                   newChallenge.players.splice(0, 0, p);
@@ -794,7 +794,9 @@
                   participant_ids.push(p.user_id)
                 };
               })
-            })
+            });
+            // ^ this semicolon is needed, else the IIFE below gets parsed as
+            // calling the result of challenges.forEach
 
             // search for participants information
             (new Promise((resolve, reject) => {
