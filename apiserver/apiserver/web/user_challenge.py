@@ -23,6 +23,7 @@ def list_user_challenges(intended_user):
         "created": model.challenges.c.created,
         "finished": model.challenges.c.finished,
         "num_games": model.challenges.c.num_games,
+        "winner": model.challenges.c.winner,
     }, ["finished"])
 
     participant_clause = model.challenge_participants.c.user_id == intended_user
