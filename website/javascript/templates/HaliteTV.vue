@@ -2,6 +2,7 @@
   <div class="visuallizer-container">
     <div class="row">
       <div class="col-md-8">
+        <h1 class="tv-heading">Watch out featured video</h1>
         <div class="game-heading">
           <i class="xline xline-top"></i>
           <i class="xline xline-bottom"></i>
@@ -45,19 +46,19 @@
             <div class="game-replay-btn-table">
               <div class="game-replay-btn-cell">
                 <span class="replay-btn">
-                  <a href="javascript:;"><span v-html="speedLabel"></span></a>
+                  <a href="javascript:;" @click="toggleSpeed"><span v-html="speedLabel"></span></a>
                 </span>
                 <span class="replay-btn">
-                  <a href="javascript:;"><span class="icon-prev"></span></a>
+                  <a href="javascript:;" @click="prevFrame"><span class="icon-prev"></span></a>
                 </span>
-                <span v-if="false" class="replay-btn" style="text-align: center">
-                  <a href="javascript:;"><span class="icon-play"></span></a>
+                <span v-if="playing" class="replay-btn" style="text-align: center">
+                  <a href="javascript:;" @click="playVideo"><span class="icon-play"></span></a>
                 </span>
-                <span v-if="true" class="replay-btn" style="text-align: center">
-                  <a href="javascript:;"><span class="icon-pause"></span></a>
+                <span v-if="!playing" class="replay-btn" style="text-align: center">
+                  <a href="javascript:;" @click="pauseVideo"><span class="icon-pause"></span></a>
                 </span>
                 <span class="replay-btn">
-                  <a href="javascript:;"><span class="icon-next"></span></a>
+                  <a href="javascript:;" @click="nextFrame"><span class="icon-next"></span></a>
                 </span>
                 <!-- <span class="replay-btn">
                   <span class="icon-volumn"></span>
@@ -67,7 +68,9 @@
               <div class="game-replay-progress">
                 <div class="game-replay-progress-inner">
                   <div>0</div>
-                  <div class="game-replay-progress-bar"><vue-slider v-model="frame" ref="slider" v-bind="sliderOptions" @callback="changeFrame"></vue-slider></div>
+                  <div class="game-replay-progress-bar">
+                    <vue-slider v-model="frame" ref="slider" v-bind="sliderOptions" @callback="changeFrame"></vue-slider>
+                  </div>
                   <div>{{sliderOptions.max}}</div>
                 </div>
               </div>
@@ -159,6 +162,7 @@
         game: null,
         playing: false,
         isDownloading: false,
+        isLoaded: false,
         speedIndex: 3,
         speedLabel: '3x',
         sharePopup: false,
@@ -373,12 +377,12 @@
     },
     computed: {
       shareLink: function () {
-        // const game_id = this.game.game_id;
-        // const replay_class = this.game.game.replay_class;
-        // const replay = this.game.game.replay;
         return window.location.href
       // return window.location `?game_id=${game_id}&replay_class=${replay_class}&replay_name=${encodeURIComponent(replay)}`
       },
+      topPlayer: function(){
+
+      }
     },
     methods: {
       // download and load game
@@ -390,7 +394,7 @@
             // this.progress = Math.floor(100 * progress)
           }
         }).then((game) => {
-          window.history.replaceState(null, '', `?game_id=${game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`)
+          // window.history.replaceState(null, '', `?game_id=${game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`)
           this.loadGame(game)
           console.log(game);
         }, () => {
@@ -415,7 +419,7 @@
         })
       },
       loadGame: function(game){
-        this.game = game;
+        this.game = game.game;
         // if (visualizer && visualizer.getVisualizer) {
         //   visualizer.getVisualizer().destroy()
         // }
@@ -429,6 +433,9 @@
           // parse game here
           const storedSpeedIndex = sessionStorage.getItem('halite-replaySpeed')
 
+          // playerS
+          this.getSortedPlayers()
+
           if (storedSpeedIndex) {
             const speedIndex = parseInt(storedSpeedIndex)
             const value = Object.keys(speedList)[speedIndex]
@@ -440,8 +447,14 @@
           } else {
             visualizer.playSpeed = 6
           }
-          // this.stats = visualizer.stats
 
+          // slider
+          this.sliderOptions = Object.assign(this.sliderOptions, {
+            max: this.replay.num_frames - 1,
+            value: this.frame
+          })
+
+          // this.stats = visualizer.stats
           visualizer.onUpdate = () => {
             this.frame = visualizer.frame
             this.time = visualizer.time
@@ -455,6 +468,7 @@
           visualizer.attach('.game-replay-viewer')
           // play the replay - delay a bit to make sure assets load/are rendered
           window.setTimeout(function() { visualizer.play() }, 500);
+          this.isLoaded = true
         })
       },
       userlink: function (user_id) {
@@ -513,16 +527,65 @@
         return botname.replace(/\sv\d+$/, '')
       },
       playVideo: function (event) {
+        if (this.visualizer) {
+          this.visualizer.pause()
+        }
+        this.gaData('visualizer', 'click-pause', 'gameplay')
       },
       pauseVideo: function (event) {
+        if (this.visualizer) {
+          if (this.frame >= this.replay.num_frames - 1) {
+            this.visualizer.frame = 0
+            this.visualizer.time = 0.0
+            this.frame = 0
+            this.time = 0.0
+          }
+          this.visualizer.play()
+          this.gaData('visualizer', 'click-play', 'gameplay')
+        }
       },
-      toggleSpeed: function (event) {
+      changeSpeed(speed) {
+        this.speedIndex = speed
+        if (this.speedIndex >= Object.keys(speedList).length) this.speedIndex = 0
+
+        const value = Object.keys(speedList)[this.speedIndex]
+        const label = speedList[value]
+        this.speedLabel = label
+
+        if (this.visualizer) {
+          this.visualizer.playSpeed = value
+        }
+
+        this.gaData('visualizer', 'click-speed', 'gameplay')
+
+        sessionStorage.setItem('halite-replaySpeed', this.speedIndex)
       },
-      prevFrame: function () {
+      toggleSpeed(e) {
+        this.changeSpeed(this.speedIndex + 1);
       },
-      nextFrame: function () {
+      prevFrame() {
+        if (this.visualizer && this.frame > 0) {
+          this.visualizer.scrub(this.frame + -1, 0)
+        }
+
+        this.gaData('visualizer', 'click-back', 'gameplay')
       },
-      changeFrame: function (event) {
+      nextFrame() {
+        if (this.visualizer && this.frame < this.replay.num_frames - 1) {
+          this.visualizer.scrub(this.frame + 1, 0)
+        }
+
+        this.gaData('visualizer', 'click-forward', 'gameplay')
+      },
+      changeFrame(event) {
+        // waiting for the slider dot finish to move
+        setTimeout(() => {
+          if (this.visualizer) {
+            this.visualizer.scrub(this.frame, 0)
+          }
+        }, 200)
+
+        this.gaData('visualizer', 'click-slider', 'gameplay')
       },
       initChart: function () {
         if (this.showChart) return
@@ -569,5 +632,13 @@
   }
 </script>
 
-<style>
+<style lang="scss" scoped>
+  .tv-heading{
+    font-family: 'Teko';
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 24px;
+    color: #E37222;
+    letter-spacing: 2px;
+  }
 </style>
