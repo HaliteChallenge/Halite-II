@@ -110,41 +110,21 @@
       <div class="col-md-4 sidebar hidden-xs hidden-sm" v-if="!isMobile">
         <div class="videos-feed-container">
           <h3>Recent Video</h3>
-          <div class="videos-feed">
-            <div class="vfeed-item">
+          <div class="videos-feed" v-if="recentVideos.length">
+            <div class="vfeed-item" :key="video.game_id" v-for="video in recentVideos">
               <div class="vfeed-item-thumb">
-                <a href="#"><img src="/assets/images/video-play.svg"></a>
+                <a @click="play(video.game_id)"><img src="/assets/images/video-play.svg"></a>
               </div>
               <div class="vfeed-item-content">
-                <h4 class="vfeed-item-heading">11/12/17 12:49:14</h4>
-                <p>cannon-fodder (340) v24 defeats Rhendz (279) v3, reket1990 (282) v7, marufas (274) v12</p>
-              </div>
-            </div>
-            <div class="vfeed-item">
-              <div class="vfeed-item-thumb">
-                <a href="#"><img src="/assets/images/video-play.svg"></a>
-              </div>
-              <div class="vfeed-item-content">
-                <h4 class="vfeed-item-heading">11/12/17 12:49:14</h4>
-                <p>cannon-fodder (340) v24 defeats Rhendz (279) v3, reket1990 (282) v7, marufas (274) v12</p>
-              </div>
-            </div>
-            <div class="vfeed-item">
-              <div class="vfeed-item-thumb">
-                <a href="#"><img src="/assets/images/video-play.svg"></a>
-              </div>
-              <div class="vfeed-item-content">
-                <h4 class="vfeed-item-heading">11/12/17 12:49:14</h4>
-                <p>cannon-fodder (340) v24 defeats Rhendz (279) v3, reket1990 (282) v7, marufas (274) v12</p>
-              </div>
-            </div>
-            <div class="vfeed-item">
-              <div class="vfeed-item-thumb">
-                <a href="#"><img src="/assets/images/video-play.svg"></a>
-              </div>
-              <div class="vfeed-item-content">
-                <h4 class="vfeed-item-heading">11/12/17 12:49:14</h4>
-                <p>cannon-fodder (340) v24 defeats Rhendz (279) v3, reket1990 (282) v7, marufas (274) v12</p>
+                <h4 class="vfeed-item-heading">
+                  <a @click="play(video.game_id)">{{video.time_played | moment("MM/DD/YY HH:mm:ss")}}</a>
+                </h4>
+                <p>
+                  <span v-for="player in video.players" :key="player.user_id">
+                    <img width="16" height="16" :src="getProfileImage(player.username)" :alt="player.username">
+                    {{getPlayerText(player)}}
+                  </span>
+                </p>
               </div>
             </div>
           </div>
@@ -231,7 +211,9 @@
         },
         players: [],
         sortedPlayers: [],
-        selectedPlayers: []
+        selectedPlayers: [],
+        recentVideos: [],
+        videos: []
       }
     },
     components: {
@@ -239,7 +221,7 @@
       TierPopover
     },
     mounted: function () {
-      this.downloadGame(6791233)
+      this.play(6791233)
 
       // keybinding
       document.addEventListener('keyup', (e) => {
@@ -266,6 +248,9 @@
       }
       this.scaleCanvas();
       $(window).on('resize', _.throttle(this.scaleCanvas, 150));
+
+      // Fetch new feeds
+      this.getVideoFeeds();
 
       //
       // this.getSortedPlayers()
@@ -357,8 +342,49 @@
       }
     },
     methods: {
+      getPlayerText(player){
+        return `(${player.leaderboard_rank}) ${player.username}`;
+      },
+      getProfileImage(username) {
+        return `https://github.com/${username}.png`
+      },
+      fetch(customQueryObject = {}) {
+        let query = ''; //`order_by=desc,game_id&limit=4`
+        let queryObj = {
+          order_by: 'desc,game_id',
+          limit: 10
+        };
+        queryObj = Object.assign({}, queryObj, customQueryObject);
+        _.forEach(queryObj, (value, key) => {
+          query += query == '' ? '' : '&'
+          query += `${key}=${value}`
+        })
+        console.log(query);
+
+        const url = `${api.API_SERVER_URL}/match?${query}`
+
+        return new Promise((resolve, reject) => {
+          $.get(url).then((data) => {
+            resolve(data);
+          }, (error) => {
+            console.log(error);
+            reject('Unable to fetch');
+          })
+        });
+      },
+      // recentVideos
+      getVideoFeeds() {
+        this.fetch().then((data) => {
+          console.log(data)
+          this.recentVideos = data.slice(0, 4)
+          this.videos = data
+        });
+      },
       // download and load game
-      downloadGame(game_id) {
+      play(game_id) {
+        console.log('start video');
+        console.log(game_id);
+
         this.isLoading = true;
         api.get_replay(game_id, (loaded, total) => {
           if (total !== 0) {
@@ -368,6 +394,9 @@
           }
         }).then((game) => {
           // window.history.replaceState(null, '', `?game_id=${game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`)
+          if (this.visualizer && this.visualizer.destroy){
+            this.visualizer.destroy();
+          }
           this.loadGame(game)
         }, () => {
           this.isLoading = false; // return error;
@@ -399,7 +428,6 @@
 
         const buffer = game.replay
         return libhaliteviz.parseReplay(buffer).then((replay) => {
-          console.log(replay);
           this.replay = Object.freeze(replay);
           let visualizer = new HaliteVisualizer(this.replay)
           this.visualizer = visualizer
@@ -438,6 +466,7 @@
           visualizer.onPause = () => {
             this.playing = false
           }
+          $('.game-replay-viewer').html('');
           visualizer.attach('.game-replay-viewer')
           // play the replay - delay a bit to make sure assets load/are rendered
           window.setTimeout(function() { visualizer.play() }, 500);
