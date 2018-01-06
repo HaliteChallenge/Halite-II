@@ -757,7 +757,7 @@
               // sort
               if (challenge.num_games > 0){
                 let sortedPlayers = _.orderBy(newChallenge.players, ['points'], ['desc'])
-                newChallenge.players.forEach((player, index) => {
+                _.forEach(newChallenge.players, (player, index) => {
                   sortedPlayers.forEach((p, i) => {
                     if (p.user_id == player.user_id){
                       newChallenge.players[index].rank = i
@@ -767,13 +767,13 @@
                 })
               } else {
                 // set rank to 1 if there is no game
-                newChallenge.players.forEach((player, index) => {
+                _.forEach(newChallenge.players, (player, index) => {
                   newChallenge.players[index].rank = 0
                 })
               }
 
               // move current user up
-              newChallenge.players.forEach((p, i) => {
+              _.forEach(newChallenge.players, (p, i) => {
                 if (p.user_id == this.user.user_id){
                   newChallenge.players.splice(i, 1);
                   newChallenge.players.splice(0, 0, p);
@@ -794,8 +794,9 @@
                   participant_ids.push(p.user_id)
                 };
               })
-            })
-            console.log(participant_ids.length);
+            });
+            // ^ this semicolon is needed, else the IIFE below gets parsed as
+            // calling the result of challenges.forEach
 
             // search for participants information
             (new Promise((resolve, reject) => {
@@ -804,7 +805,6 @@
               participant_ids.forEach((user_id) => {
                 // get user information
                 api.list_bots(user_id).then((bots) => {
-                  console.log(bots)
                   count++;
                   this.participants[user_id] = bots
                   if (count >= total){
@@ -814,18 +814,23 @@
               })
             })).then((data) => {
               challenges.forEach((c, i) => {
+                let flag = false
                 c.players.forEach((p) => {
-                  // no bots
-                  if (this.participants[p.user_id].length == 0){
-                    challenges[i].status = 'Paused'
-                  }
-                  // bots compilation is failed
-                  else if (this.participants[p.user_id] &&
-                    this.participants[p.user_id][0].compilation_status !== 'Successful' &&
-                    !c.finished){
-                    challenges[i].status = 'Paused'
-                  } else {
-                    challenges[i].status = c.finished ? 'Completed' : 'In Progress'
+                  if (!flag){
+                    // no bots
+                    if (this.participants[p.user_id].length == 0){
+                      challenges[i].status = 'Paused'
+                      flag = true
+                    }
+                    // bots compilation is failed
+                    else if (this.participants[p.user_id] &&
+                      this.participants[p.user_id][0].compilation_status !== 'Successful' &&
+                      !c.finished){
+                        challenges[i].status = 'Paused'
+                        flag = true
+                      } else {
+                        challenges[i].status = c.finished ? 'Completed' : 'In Progress'
+                      }
                   }
                 });
               })
@@ -886,7 +891,6 @@
         fetchHalite1Stats: function () {
           api.get_season1_stats(this.user.user_id).then(userDetails => {
             this.season1stats = userDetails;
-            console.log(this.season1stats);
           })
         },
         fetchHackathon: function () {

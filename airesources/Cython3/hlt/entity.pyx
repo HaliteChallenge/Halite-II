@@ -1,11 +1,15 @@
 import logging
-import abc
+#import abc
 import math
 from enum import Enum
+
 from . import constants
+from . cimport arithmetic
 
+from cpython cimport bool
+from libc.math cimport cos, sin
 
-class Entity:
+cdef class Entity:
     """
     Then entity abstract base-class represents all game entities possible. As a base all entities possess
     a position, radius, health, an owner and an id. Note that ease of interoperability, Position inherits from
@@ -18,7 +22,7 @@ class Entity:
     :ivar health: The entity's health.
     :ivar owner: The player ID of the owner, if any. If None, Entity is not owned.
     """
-    __metaclass__ = abc.ABCMeta
+    #__metaclass__ = abc.ABCMeta
 
     def __init__(self, x, y, radius, health, player, entity_id):
         self.x = x
@@ -28,7 +32,7 @@ class Entity:
         self.owner = player
         self.id = entity_id
 
-    def calculate_distance_between(self, target):
+    cpdef double calculate_distance_between(self, Entity target):
         """
         Calculates the distance between this object and the target.
 
@@ -36,9 +40,9 @@ class Entity:
         :return: distance
         :rtype: float
         """
-        return math.sqrt((target.x - self.x) ** 2 + (target.y - self.y) ** 2)
+        return arithmetic.distance(self.x,target.x,self.y,target.y)
 
-    def calculate_angle_between(self, target):
+    cpdef double calculate_angle_between(self, Entity target):
         """
         Calculates the angle between this object and the target in degrees.
 
@@ -46,9 +50,10 @@ class Entity:
         :return: Angle between entities in degrees
         :rtype: float
         """
-        return math.degrees(math.atan2(target.y - self.y, target.x - self.x)) % 360
+        return arithmetic.calculate_angle_between(self.x,target.x,self.y,target.y)
+        #return math.degrees(math.atan2(target.y - self.y, target.x - self.x)) % 360
 
-    def closest_point_to(self, target, min_distance=3):
+    cpdef Position closest_point_to(self, Entity target, int min_distance=3):
         """
         Find the closest point to the given ship near the given target, outside its given radius,
         with an added fudge of min_distance.
@@ -58,14 +63,15 @@ class Entity:
         :return: The closest point's coordinates
         :rtype: Position
         """
+        cdef double angle, radius, x, y
         angle = target.calculate_angle_between(self)
         radius = target.radius + min_distance
-        x = target.x + radius * math.cos(math.radians(angle))
-        y = target.y + radius * math.sin(math.radians(angle))
+        x = target.x + radius * cos(arithmetic.degToRad(angle))
+        y = target.y + radius * sin(arithmetic.degToRad(angle))
 
         return Position(x, y)
 
-    @abc.abstractmethod
+    #@abc.abstractmethod
     def _link(self, players, planets):
         pass
 
@@ -89,7 +95,7 @@ class Planet(Entity):
     :ivar current_production: How much production the planet has generated at the moment. Once it reaches the threshold, a ship will spawn and this will be reset.
     :ivar remaining_resources: The remaining production capacity of the planet.
     :ivar health: The planet's health.
-    :ivar owner: The Player object of the owner, if any. Else None if Planet is not owned.
+    :ivar owner: The player ID of the owner, if any. If None, Entity is not owned.
 
     """
 
@@ -269,8 +275,8 @@ class Ship(Entity):
         """
         return "u {}".format(self.id)
 
-    def navigate(self, target, game_map, speed, avoid_obstacles=True, max_corrections=90, angular_step=1,
-                 ignore_ships=False, ignore_planets=False):
+    def navigate(self, Entity target, object game_map, double speed, bool avoid_obstacles=True, int max_corrections=90, double angular_step=1,
+                 bool ignore_ships=False, bool ignore_planets=False):
         """
         Move a ship to a specific target position (Entity). It is recommended to place the position
         itself here, else navigate will crash into the target. If avoid_obstacles is set to True (default)
@@ -291,6 +297,8 @@ class Ship(Entity):
         :rtype: str
         """
         # Assumes a position, not planet (as it would go to the center of the planet otherwise)
+        cdef double distance, angle, new_target_dx, new_target_dy
+        cdef Position new_target
         if max_corrections <= 0:
             return None
         distance = self.calculate_distance_between(target)
@@ -300,8 +308,8 @@ class Ship(Entity):
             else Planet if (ignore_planets and not ignore_ships) \
             else Entity
         if avoid_obstacles and game_map.obstacles_between(self, target, ignore):
-            new_target_dx = math.cos(math.radians(angle + angular_step)) * distance
-            new_target_dy = math.sin(math.radians(angle + angular_step)) * distance
+            new_target_dx = cos(arithmetic.degToRad(angle + angular_step)) * distance
+            new_target_dy = sin(arithmetic.degToRad(angle + angular_step)) * distance
             new_target = Position(self.x + new_target_dx, self.y + new_target_dy)
             return self.navigate(new_target, game_map, speed, True, max_corrections - 1, angular_step)
         speed = speed if (distance >= speed) else distance
@@ -372,7 +380,7 @@ class Ship(Entity):
         return ships, remainder
 
 
-class Position(Entity):
+cdef class Position(Entity):
     """
     A simple wrapper for a coordinate. Intended to be passed to some functions in place of a ship or planet.
 

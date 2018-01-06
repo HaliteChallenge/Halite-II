@@ -9,32 +9,9 @@ import sqlalchemy
 from .. import model, util
 
 from . import match as match_api
+from . import challenge as challenge_api
 from . import util as api_util
 from .blueprint import web_api
-
-
-def make_challenge_record(challenge, participants):
-    result = {
-        "challenge_id": challenge["id"],
-        "time_created": challenge["created"],
-        "time_finished": challenge["finished"],
-        "num_games": challenge["num_games"],
-        "issuer": challenge["issuer"],
-        "winner": challenge["winner"],
-        "finished": bool(challenge["finished"]),
-        "players": {},
-    }
-
-    for participant in participants:
-        result["players"][participant["user_id"]] = {
-            "username": participant["username"],
-            "points": participant["points"],
-            "ships_produced": participant["ships_produced"],
-            "attacks_made": participant["attacks_made"],
-            "is_issuer": participant["user_id"] == result["issuer"],
-        }
-
-    return result
 
 
 @web_api.route("/user/<int:intended_user>/challenge", methods=["GET"])
@@ -46,6 +23,7 @@ def list_user_challenges(intended_user):
         "created": model.challenges.c.created,
         "finished": model.challenges.c.finished,
         "num_games": model.challenges.c.num_games,
+        "winner": model.challenges.c.winner,
     }, ["finished"])
 
     participant_clause = model.challenge_participants.c.user_id == intended_user
@@ -53,72 +31,17 @@ def list_user_challenges(intended_user):
         if field == "finished":
             where_clause &= model.challenges.c.status == "finished"
 
-    with model.engine.connect() as conn:
-        query = sqlalchemy.sql.select([
-            model.challenges.c.id,
-            model.challenges.c.created,
-            model.challenges.c.finished,
-            model.challenges.c.num_games,
-            model.challenges.c.issuer,
-            model.challenges.c.winner,
-        ]).select_from(model.challenges.join(
-            model.challenge_participants,
-            (model.challenges.c.id == model.challenge_participants.c.challenge_id) &
-            participant_clause
-        )).where(
-            where_clause
-        ).order_by(
-            *order_clause
-        ).offset(offset).limit(limit).reduce_columns()
-
-        challenges = conn.execute(query)
-        result = []
-        for challenge in challenges.fetchall():
-            participants = conn.execute(
-                model.challenge_participants.join(
-                    model.users,
-                    model.challenge_participants.c.user_id == model.users.c.id
-                ).select(
-                    model.challenge_participants.c.challenge_id == challenge["id"]
-                )
-            )
-
-            result.append(make_challenge_record(challenge, participants))
-
-        return flask.jsonify(result)
+    result = challenge_api.list_challenges_helper(offset, limit,
+                                                  participant_clause,
+                                                  where_clause, order_clause)
+    return flask.jsonify(result)
 
 
 @web_api.route("/user/<int:intended_user>/challenge/<int:challenge_id>", methods=["GET"])
 @util.cross_origin(methods=["GET"])
 def get_user_challenge(intended_user, challenge_id):
-    participant_clause = model.challenge_participants.c.user_id == intended_user
-    with model.engine.connect() as conn:
-        query = sqlalchemy.sql.select([
-            model.challenges.c.id,
-            model.challenges.c.created,
-            model.challenges.c.finished,
-            model.challenges.c.num_games,
-            model.challenges.c.issuer,
-            model.challenges.c.winner,
-        ]).select_from(model.challenges).where(
-            model.challenges.c.id == challenge_id
-        ).reduce_columns()
-
-        challenge = conn.execute(query).first()
-        if not challenge:
-            raise util.APIError(
-                404,
-                message="Challenge {} not found.".format(challenge_id))
-
-        participants = conn.execute(
-            model.challenge_participants.join(
-                model.users,
-                model.challenge_participants.c.user_id == model.users.c.id
-            ).select(
-                model.challenge_participants.c.challenge_id == challenge["id"]
-            )
-        )
-        return flask.jsonify(make_challenge_record(challenge, participants))
+    result = challenge_api.get_challenge_helper(challenge_id)
+    return flask.jsonify(result)
 
 
 @web_api.route("/user/<int:intended_user>/challenge/<int:challenge_id>/match", methods=["GET"])
