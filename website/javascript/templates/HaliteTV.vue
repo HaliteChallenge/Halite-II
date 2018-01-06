@@ -86,12 +86,9 @@
                       </button>
                     </div>
                     <div class="share-socials">
-                      <a :href="shareSocial('facebook')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
-     target="_blank"><i class="fa fa-facebook-official"></i></a>
-                      <a :href="shareSocial('twitter')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
-     target="_blank"><i class="fa fa-twitter"></i></a>
-                      <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
-     target="_blank"><i class="fa fa-linkedin"></i></a>
+                      <a :href="shareSocial('facebook')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" arget="_blank"><i class="fa fa-facebook-official"></i></a>
+                      <a :href="shareSocial('twitter')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank"><i class="fa fa-twitter"></i></a>
+                      <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank"><i class="fa fa-linkedin"></i></a>
                     </div>
                   </div>
                 </div>
@@ -111,7 +108,47 @@
         </div>
       </div>
       <div class="col-md-4 sidebar hidden-xs hidden-sm" v-if="!isMobile">
-
+        <div class="videos-feed-container">
+          <h3>Recent Video</h3>
+          <div class="videos-feed">
+            <div class="vfeed-item">
+              <div class="vfeed-item-thumb">
+                <a href="#"><img src="/assets/images/video-play.svg"></a>
+              </div>
+              <div class="vfeed-item-content">
+                <h4 class="vfeed-item-heading">11/12/17 12:49:14</h4>
+                <p>cannon-fodder (340) v24 defeats Rhendz (279) v3, reket1990 (282) v7, marufas (274) v12</p>
+              </div>
+            </div>
+            <div class="vfeed-item">
+              <div class="vfeed-item-thumb">
+                <a href="#"><img src="/assets/images/video-play.svg"></a>
+              </div>
+              <div class="vfeed-item-content">
+                <h4 class="vfeed-item-heading">11/12/17 12:49:14</h4>
+                <p>cannon-fodder (340) v24 defeats Rhendz (279) v3, reket1990 (282) v7, marufas (274) v12</p>
+              </div>
+            </div>
+            <div class="vfeed-item">
+              <div class="vfeed-item-thumb">
+                <a href="#"><img src="/assets/images/video-play.svg"></a>
+              </div>
+              <div class="vfeed-item-content">
+                <h4 class="vfeed-item-heading">11/12/17 12:49:14</h4>
+                <p>cannon-fodder (340) v24 defeats Rhendz (279) v3, reket1990 (282) v7, marufas (274) v12</p>
+              </div>
+            </div>
+            <div class="vfeed-item">
+              <div class="vfeed-item-thumb">
+                <a href="#"><img src="/assets/images/video-play.svg"></a>
+              </div>
+              <div class="vfeed-item-content">
+                <h4 class="vfeed-item-heading">11/12/17 12:49:14</h4>
+                <p>cannon-fodder (340) v24 defeats Rhendz (279) v3, reket1990 (282) v7, marufas (274) v12</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -161,7 +198,7 @@
         time: 0,
         game: null,
         playing: false,
-        isDownloading: false,
+        isLoading: false,
         isLoaded: false,
         speedIndex: 3,
         speedLabel: '3x',
@@ -203,6 +240,33 @@
     },
     mounted: function () {
       this.downloadGame(6791233)
+
+      // keybinding
+      document.addEventListener('keyup', (e) => {
+        if (this.visualizer){
+          const code = e.which;
+          let speed;
+          if (code >= 49 && code <= 58){
+            this.changeSpeed(code - 48); // subtract 48 from code to get the speed. for example, 49 => 1, 50 => 2 and so on
+          } else if (code == 48){
+            this.changeSpeed(10);
+          }
+        }
+      });
+
+      this.scaleCanvas = () => {
+        const viewWidth = $('.game-replay-viewer').width()
+        const canvasWidth = 690
+        const canvasHeight = 460
+        let scale = viewWidth/canvasWidth
+        if(viewWidth >= canvasWidth){
+          scale = 1
+        }
+        $('.game-replay-viewer').find('>canvas').css('zoom', scale)
+      }
+      this.scaleCanvas();
+      $(window).on('resize', _.throttle(this.scaleCanvas, 150));
+
       //
       // this.getSortedPlayers()
       // this.sliderOptions = Object.assign(this.sliderOptions, {
@@ -248,87 +312,7 @@
       // visualizer.onPause = () => {
       //   this.playing = false
       // }
-      // visualizer.onSelect = (kind, args) => {
-      //   this.selected.kind = kind
-      //   this.selected.id = args.id
-      //   this.selected.owner = args.owner
-      //   this.selected.x = args.x
-      //   this.selected.y = args.y
-      //   this.showObjectPanel = true
-      //   visualizer.onUpdate()
-      //   this.$forceUpdate()
-      //   this.gaData('visualizer', 'click-map-objects', 'gameplay')
-      // }
-      // visualizer.attach('.game-replay-viewer')
-      // // play the replay - delay a bit to make sure assets load/are rendered
-      // window.setTimeout(function() { visualizer.play() }, 500);
       //
-      // // action
-      // this.playVideo = (e) => {
-      //   if (visualizer) {
-      //     if (this.frame >= this.replay.num_frames - 1) {
-      //       visualizer.frame = 0
-      //       visualizer.time = 0.0
-      //       this.frame = 0
-      //       this.time = 0.0
-      //     }
-      //     visualizer.play()
-      //     this.gaData('visualizer', 'click-play', 'gameplay')
-      //   }
-      // }
-      // this.pauseVideo = (e) => {
-      //   if (visualizer) {
-      //     visualizer.pause()
-      //   }
-      //
-      //   this.gaData('visualizer', 'click-pause', 'gameplay')
-      // }
-      //
-      // const changeSpeed = (speed) => {
-      //   this.speedIndex = speed
-      //   if (this.speedIndex >= Object.keys(speedList).length) this.speedIndex = 0
-      //
-      //   const value = Object.keys(speedList)[this.speedIndex]
-      //   const label = speedList[value]
-      //   this.speedLabel = label
-      //
-      //   if (visualizer) {
-      //     visualizer.playSpeed = value
-      //   }
-      //
-      //   this.gaData('visualizer', 'click-speed', 'gameplay')
-      //
-      //   sessionStorage.setItem('halite-replaySpeed', this.speedIndex)
-      // }
-      //
-      // this.toggleSpeed = (e) => {
-      //   changeSpeed(this.speedIndex + 1);
-      // }
-      //
-      // this.prevFrame = () => {
-      //   if (visualizer && this.frame > 0) {
-      //     visualizer.scrub(this.frame + -1, 0)
-      //   }
-      //
-      //   this.gaData('visualizer', 'click-back', 'gameplay')
-      // }
-      // this.nextFrame = () => {
-      //   if (visualizer && this.frame < this.replay.num_frames - 1) {
-      //     visualizer.scrub(this.frame + 1, 0)
-      //   }
-      //
-      //   this.gaData('visualizer', 'click-forward', 'gameplay')
-      // }
-      // this.changeFrame = (event) => {
-      //   // waiting for the slider dot finish to move
-      //   setTimeout(() => {
-      //     if (visualizer) {
-      //       visualizer.scrub(this.frame, 0)
-      //     }
-      //   }, 200)
-      //
-      //   this.gaData('visualizer', 'click-slider', 'gameplay')
-      // }
       //
       // this.toggleHoliday = function() {
       //   if (window.localStorage['holiday'] === undefined || window.localStorage['holiday'] === 'true') {
@@ -357,18 +341,6 @@
       //
       // // disable text select on safari
       // document.onselectstart = function(){ return false; };
-      // this.scaleCanvas = () => {
-      //   const viewWidth = $('.game-replay-viewer').width()
-      //   const canvasWidth = 690
-      //   const canvasHeight = 460
-      //   let scale = viewWidth/canvasWidth
-      //   if(viewWidth >= canvasWidth){
-      //     scale = 1
-      //   }
-      //   $('.game-replay-viewer').find('>canvas').css('zoom', scale)
-      // }
-      // this.scaleCanvas();
-      // $(window).on('resize', _.throttle(this.scaleCanvas, 150));
       //
       // setTimeout(() => {
       //   this.$refs.slider.refresh();
@@ -387,6 +359,7 @@
     methods: {
       // download and load game
       downloadGame(game_id) {
+        this.isLoading = true;
         api.get_replay(game_id, (loaded, total) => {
           if (total !== 0) {
             const progress = loaded / total
@@ -396,8 +369,8 @@
         }).then((game) => {
           // window.history.replaceState(null, '', `?game_id=${game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`)
           this.loadGame(game)
-          console.log(game);
         }, () => {
+          this.isLoading = false; // return error;
           // if (params.has('replay_class') && params.has('replay_name')) {
           //   const replay_class = params.get('replay_class')
           //   const replay_name = params.get('replay_name')
@@ -469,6 +442,12 @@
           // play the replay - delay a bit to make sure assets load/are rendered
           window.setTimeout(function() { visualizer.play() }, 500);
           this.isLoaded = true
+
+          // scale
+          this.scaleCanvas();
+
+          // finish loading
+          this.isLoading = true;
         })
       },
       userlink: function (user_id) {
