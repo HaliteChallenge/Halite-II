@@ -32,7 +32,7 @@ def _count_leaderboard_query(where_clause):
 def leaderboard():
     result = []
     offset, limit = api_util.get_offset_limit(default_limit=250,
-                                              max_limit=5000)
+                                              max_limit=10000)
 
     where_clause, order_clause, manual_sort = api_util.get_sort_filter({
         "user_id": model.ranked_bots_users.c.user_id,
