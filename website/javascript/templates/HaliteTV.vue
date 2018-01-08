@@ -131,6 +131,77 @@
         </div>
       </div>
     </div>
+
+    <div class="video-filter-container">
+      <div class="video-filter-heading">
+        <h3>
+          FILTER FOR ALL GAMES
+        </h3>
+      </div>
+      <div class="video-filter-inputs">
+        <v-select
+          multiple
+          placeholder="Usernames"
+          :options="['username 1','usernam 2']">
+        </v-select>
+        <v-select
+          multiple
+          placeholder="Tier"
+          :options="['username 1','usernam 2']">
+        </v-select>
+        <v-select
+          multiple
+          placeholder="Level"
+          :options="['username 1','usernam 2']">
+        </v-select>
+        <v-select
+          multiple
+          placeholder="Organization"
+          :options="['username 1','usernam 2']">
+        </v-select>
+        <v-select
+          multiple
+          placeholder="Country"
+          :options="['username 1','usernam 2']">
+        </v-select>
+        <v-select
+          multiple
+          placeholder="Languages"
+          :options="['username 1','usernam 2']">
+        </v-select>
+      </div>
+      <div class="video-list">
+        <div class="table-container">
+          <table class="table table-leader leaderboard-table">
+            <thead>
+              <tr>
+                <th>Watch Game</th>
+                <th>Result</th>
+                <th>Destroyed Ships</th>
+                <th>Map Size</th>
+                <th>Turns</th>
+                <th>Challenge?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="video in videos" :key="video.game_id">
+                <td><a @click="play(video.game_id)">{{video.time_played | moment("MM/DD/YY HH:mm:ss")}}</a></td>
+                <td>
+                  <span v-for="player in video.players" :key="player.user_id">
+                    <img width="16" height="16" :src="getProfileImage(player.username)" :alt="player.username">
+                    {{getPlayerText(player)}}
+                  </span>
+                </td>
+                <td>{{video.ships_destroyed}}/{{video.ships_produced}}</td>
+                <td>{{video.map_width}}x{{video.map_height}}</td>
+                <td>{{video.turns_total}}</td>
+                <td>{{video.challenge_id ? "Yes" : ""}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -141,6 +212,7 @@
   import * as utils from '../utils'
   import moment from 'vue-moment'
   import vueSlider from 'vue-slider-component'
+  import vSelect from 'vue-select'
   import TierPopover from './TierPopover.vue'
   import {tierClass} from '../utils'
   import _ from 'lodash'
@@ -213,16 +285,21 @@
         sortedPlayers: [],
         selectedPlayers: [],
         recentVideos: [],
-        videos: []
+        videos: [],
+        filter_name: '',
+        filter_tier: '',
+        filter_level: '',
+        filter_org: '',
+        filter_country: '',
+        filter_language: ''
       }
     },
     components: {
       vueSlider,
-      TierPopover
+      TierPopover,
+      vSelect
     },
     mounted: function () {
-      this.play(6791233)
-
       // keybinding
       document.addEventListener('keyup', (e) => {
         if (this.visualizer){
@@ -252,13 +329,6 @@
       // Fetch new feeds
       this.getVideoFeeds();
 
-      //
-      // this.getSortedPlayers()
-      // this.sliderOptions = Object.assign(this.sliderOptions, {
-      //   max: this.replay.num_frames - 1,
-      //   value: this.frame
-      // })
-      //
       // this.showHoliday = libhaliteviz.isHoliday();
       //
       // // current user
@@ -271,31 +341,6 @@
       // }
       // else{
       //   this.isHoliday = false;
-      // }
-      //
-      // const visualizer = new HaliteVisualizer(this.replay)
-      // const storedSpeedIndex = sessionStorage.getItem('halite-replaySpeed')
-      // if (storedSpeedIndex) {
-      //   const speedIndex = parseInt(storedSpeedIndex)
-      //   this.speedIndex = speedIndex
-      //   const value = Object.keys(speedList)[speedIndex]
-      //   const label = speedList[value]
-      //   this.speedLabel = label
-      //   visualizer.playSpeed = value
-      // } else {
-      //   visualizer.playSpeed = 6
-      // }
-      // this.stats = visualizer.stats
-      //
-      // visualizer.onUpdate = () => {
-      //   this.frame = visualizer.frame
-      //   this.time = visualizer.time
-      // }
-      // visualizer.onPlay = () => {
-      //   this.playing = true
-      // }
-      // visualizer.onPause = () => {
-      //   this.playing = false
       // }
       //
       //
@@ -311,21 +356,6 @@
       //
       //   this.$forceUpdate();
       // };
-      //
-      // // keybinding
-      // document.addEventListener('keyup', (e) => {
-      //   console.log(e.which);
-      //   const code = e.which;
-      //   let speed;
-      //   if (code >= 49 && code <= 58){
-      //     changeSpeed(code - 48); // subtract 48 from code to get the speed. for example, 49 => 1, 50 => 2 and so on
-      //   } else if (code == 48){
-      //     changeSpeed(10);
-      //   }
-      // });
-      //
-      // // disable text select on safari
-      // document.onselectstart = function(){ return false; };
       //
       // setTimeout(() => {
       //   this.$refs.slider.refresh();
@@ -372,10 +402,15 @@
           })
         });
       },
-      // recentVideos
+      // recentVideos: for first load
       getVideoFeeds() {
         this.fetch().then((data) => {
           console.log(data)
+          // play the first video
+          if (data.length && data[0].game_id){
+            this.play(data[0].game_id);
+          }
+          // 
           this.recentVideos = data.slice(0, 4)
           this.videos = data
         });
@@ -648,5 +683,8 @@
     font-size: 24px;
     color: #E37222;
     letter-spacing: 2px;
+  }
+  .video-filter-container{
+    margin-top: 40px;
   }
 </style>

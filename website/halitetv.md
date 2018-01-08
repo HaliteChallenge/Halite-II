@@ -2,7 +2,7 @@
 layout: default
 toc: false
 full_width: true
-menu: play
+menu: halite-tv
 mount_views: ["HaliteTV"]
 additional_js: []
 permalink: /halite-tv
