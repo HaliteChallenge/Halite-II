@@ -172,8 +172,10 @@ class ExternalCompiler(Compiler):
     """
     A compiler that calls an external process.
     """
-    def __init__(self, args, separate=False, out_files=[], out_ext=None):
+    def __init__(self, args, separate=False, out_files=[], out_ext=None, trailing_args=[]):
         self.args = args
+        # Arguments that must follow the filename (e.g. `-lm` for C compilers)
+        self.trailing_args = trailing_args
         self.separate = separate
         self.out_files = out_files
         self.out_ext = out_ext
@@ -194,7 +196,7 @@ class ExternalCompiler(Compiler):
             if self.separate:
                 for filename in files:
                     print("file: " + filename)
-                    cmdline = " ".join(self.args + [filename])
+                    cmdline = " ".join(self.args + [filename] + self.trailing_args)
                     cmd_out, cmd_errors, returncode = _run_cmd(cmdline, bot_dir, timelimit)
                     cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors, returncode)
                     if not cmd_errors:
@@ -209,7 +211,7 @@ class ExternalCompiler(Compiler):
                         errors += cmd_errors
                         return False
             else:
-                cmdline = " ".join(self.args + files)
+                cmdline = " ".join(self.args + files + self.trailing_args)
                 print("Files: " + " ".join(files))
                 cmd_out, cmd_errors, returncode = _run_cmd(cmdline, bot_dir, timelimit)
                 cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors, returncode)
@@ -444,7 +446,7 @@ languages = (
         "./MyBot",
         ["*.o", BOT],
         [(["*.c"], TargetCompiler(comp_args["C"][0], targets["C"])),
-            (["*.o"], ExternalCompiler(comp_args["C"][1]))]
+         (["*.o"], ExternalCompiler(comp_args["C"][1], trailing_args=["-lm"]))]
     ),
     Language("C#/.NET Core", BOT + ".dll", "MyBot.csproj",
              "dotnet MyBot.dll",
