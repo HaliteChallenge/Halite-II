@@ -674,7 +674,6 @@
         },
         fetch: function () {
           let query = `order_by=desc,time_played&offset=${this.offset}&limit=${this.limit}`
-          query += `&filter=challenge_id,=,null`
           if (this.only_timed_out) {
             query += `&filter=timed_out,=,${this.user.user_id}`
           }
