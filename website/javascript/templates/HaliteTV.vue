@@ -187,15 +187,17 @@
               <tr v-for="video in videos" :key="video.game_id">
                 <td><a @click="play(video.game_id)">{{video.time_played | moment("MM/DD/YY HH:mm:ss")}}</a></td>
                 <td>
-                  <span v-for="player in video.players" :key="player.user_id">
+                  <a :href="`${baseUrl}/user?user_id=${player.user_id}`" target="_blank" v-for="player in video.players" :key="player.user_id">
                     <img width="16" height="16" :src="getProfileImage(player.username)" :alt="player.username">
-                    {{getPlayerText(player)}}
-                  </span>
+                    {{player.rank}}
+                  </a>
                 </td>
-                <td>{{video.ships_destroyed}}/{{video.ships_produced}}</td>
+                <td>{{video.ships_destroyed}} of {{video.ships_produced}}</td>
                 <td>{{video.map_width}}x{{video.map_height}}</td>
                 <td>{{video.turns_total}}</td>
-                <td>{{video.challenge_id ? "Yes" : ""}}</td>
+                <td>
+                  <img v-if="video.challenge_id" width="16" height="16" :src="`${baseUrl}/assets/images/icon-challenge.svg`" alt="Yes">
+                </td>
               </tr>
             </tbody>
           </table>
@@ -281,6 +283,7 @@
             backgroundColor: '#23242b'
           }
         },
+        me: null,
         players: [],
         sortedPlayers: [],
         selectedPlayers: [],
@@ -329,6 +332,11 @@
       // Fetch new feeds
       this.getVideoFeeds();
 
+      api.me().then((data) => {
+        this.me = data
+        this.refinedPLayers()
+      });
+
       // this.showHoliday = libhaliteviz.isHoliday();
       //
       // // current user
@@ -366,9 +374,6 @@
       shareLink: function () {
         return window.location.href
       // return window.location `?game_id=${game_id}&replay_class=${replay_class}&replay_name=${encodeURIComponent(replay)}`
-      },
-      topPlayer: function(){
-
       }
     },
     methods: {
@@ -378,18 +383,43 @@
       getProfileImage(username) {
         return `https://github.com/${username}.png`
       },
+      refinedPLayers: function(players){
+        this.videos.forEach((video, videoIndex) => {
+          const players = video.players
+
+          let ids = Object.keys(players);
+          let newPlayers = Object.values(players);
+          let index = false;
+
+          newPlayers.forEach((player, i) => {
+            newPlayers[i].user_id = ids[i];
+            if (ids[i] == this.me.user_id){
+              index = i
+            }
+          });
+
+          if (index){
+            let user = Object.assign({}, newPlayers[index]);
+            newPlayers.splice(index, 1);
+            newPlayers.splice(0, 0, user);
+            console.log(user);
+          }
+
+          // assign back
+          this.videos[videoIndex].players = newPlayers;
+        })
+      },
       fetch(customQueryObject = {}) {
         let query = ''; //`order_by=desc,game_id&limit=4`
         let queryObj = {
           order_by: 'desc,game_id',
-          limit: 10
+          limit: 50
         };
         queryObj = Object.assign({}, queryObj, customQueryObject);
         _.forEach(queryObj, (value, key) => {
           query += query == '' ? '' : '&'
           query += `${key}=${value}`
         })
-        console.log(query);
 
         const url = `${api.API_SERVER_URL}/match?${query}`
 
@@ -405,7 +435,6 @@
       // recentVideos: for first load
       getVideoFeeds() {
         this.fetch().then((data) => {
-          console.log(data)
           // play the first video
           if (data.length && data[0].game_id){
             this.play(data[0].game_id);
