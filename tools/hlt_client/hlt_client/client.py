@@ -184,7 +184,7 @@ def _parse_arguments():
                                     help='Number of replays to fetch')
     replay_user_parser.add_argument('-d', '--destination', dest='destination', action='store', type=str, required=True,
                                     help="In which folder to store all resulting replay files.")
-    replay_regex_parser.add_argument('-t', '--date', action='store', type=str, dest='date', required=True,
+    replay_user_parser.add_argument('-t', '--date', action='store', type=str, dest='date', required=True,
                                      help="Fetch replay files matching the specified date. To fetch a day's files user"
                                           "the YYYYMMDD format.")
     # .Modes.Replay.Modes.Date
