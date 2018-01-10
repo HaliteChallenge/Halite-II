@@ -92,7 +92,13 @@ window.views = {
   Visualizer: function () {
     new Vue({
       el: '#visualizer-container',
-      render: (h) => h(VisualizerContainer)
+      render: (h) => h(VisualizerContainer, { props: { baseUrl: _global.baseUrl } })
+    })
+  },
+  Visualizer2: function() {
+    new Vue({
+      el: '#halitetv-container',
+      render: (h) => h(VisualizerContainer, { props: { baseUrl: _global.baseUrl } })
     })
   },
   HaliteTV: function () {

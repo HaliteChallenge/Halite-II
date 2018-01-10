@@ -39,7 +39,13 @@
         <div class="game-replay">
           <i class="xline xline-left"></i>
           <i class="xline xline-right"></i>
-          <div class="game-replay-viewer"></div>
+          <div class="game-replay-container">
+            <a class="game-replay-expand" target="_blank" v-if="!isLoading" :href="`${baseUrl}/play?game_id=${game.game_id}`">
+              <img :src="`${baseUrl}/assets/images/icon-expand.svg`" alt="expand">
+            </a>
+            <div class="game-replay-viewer"></div>
+          </div>
+
           <div class="game-replay-controller">
             <i class="xline xline-top"></i>
             <i class="xline xline-bottom"></i>
@@ -253,7 +259,6 @@
         game: null,
         playing: false,
         isLoading: false,
-        isLoaded: false,
         speedIndex: 3,
         speedLabel: '3x',
         sharePopup: false,
@@ -534,13 +539,10 @@
           visualizer.attach('.game-replay-viewer')
           // play the replay - delay a bit to make sure assets load/are rendered
           window.setTimeout(function() { visualizer.play() }, 500);
-          this.isLoaded = true
+          this.isLoading = false;
 
           // scale
           this.scaleCanvas();
-
-          // finish loading
-          this.isLoading = true;
         })
       },
       userlink: function (user_id) {
