@@ -3,7 +3,7 @@ layout: default
 title: Play
 full_width: true
 menu: play
-mount_view: HaliteTV
+mount_view: ["Visualizer2"]
 title: Halite AI Programming Challenge Videos
 image: assets/images/opengraph.png
 content: website

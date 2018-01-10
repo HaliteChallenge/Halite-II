@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="44px" height="44px" viewBox="0 0 44 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>video-play</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="02_Halite_TV" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-983.000000, -312.000000)">
+        <g id="1" transform="translate(931.000000, 259.000000)" fill="#FFBE00">
+            <g id="video-play" transform="translate(52.000000, 53.000000)">
+                <circle id="Oval" opacity="0.100000001" cx="22" cy="22" r="22"></circle>
+                <path d="M28.6,21.2001908 L18.6,14.2001908 C17.9,13.7001908 17,14.2001908 17,15.0001908 L17,29.0001908 C17,29.8001908 17.9,30.3001908 18.6,29.8001908 L28.6,22.8001908 C29.1,22.4001908 29.1,21.6001908 28.6,21.2001908 Z" id="Shape" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>

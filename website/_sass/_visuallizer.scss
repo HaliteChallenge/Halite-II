@@ -25,7 +25,7 @@
     }
   }
   &-date{
-    margin-bottom: 0;
+    margin-bottom: 5px;
   }
   &-players{
     font-family: $font-heading;
@@ -142,6 +142,25 @@
     text-align: center;
     padding: 20px 30px;
     cursor: pointer;
+  }
+  .game-replay-container{
+    padding: 20px 30px;
+    position: relative;
+    .game-replay-viewer{
+      padding: 0;  
+    }
+    .game-replay-expand{
+      position: absolute;
+      display: block;
+      top: 30px;
+      right: 40px;
+      padding: 10px;
+      background-color: rgba(0,0,0,0.20);
+      img{
+        width: 20px;
+        height: 20px;
+      }
+    }
   }
 
   .game-replay-controller {

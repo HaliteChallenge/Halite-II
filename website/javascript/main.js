@@ -15,6 +15,7 @@ import UserProfileBar from './templates/UserProfileBar.vue'
 import EditUserProfile from './templates/EditUserProfile.vue'
 import VerifyEmail from './templates/VerifyEmail.vue'
 import VisualizerContainer from './templates/VisualizerContainer.vue'
+import HaliteTV from './templates/HaliteTV.vue'
 import Home from './templates/Home.vue'
 import HackathonPortal from './templates/HackathonPortal.vue'
 import HackathonIndividual from './templates/HackathonIndividual.vue'
@@ -98,13 +99,19 @@ window.views = {
   Visualizer: function () {
     new Vue({
       el: '#visualizer-container',
-      render: (h) => h(VisualizerContainer)
+      render: (h) => h(VisualizerContainer, { props: { baseUrl: _global.baseUrl } })
+    })
+  },
+  Visualizer2: function() {
+    new Vue({
+      el: '#halitetv-container',
+      render: (h) => h(VisualizerContainer, { props: { baseUrl: _global.baseUrl } })
     })
   },
   HaliteTV: function () {
     new Vue({
-      el: '#halitetv-container',
-      render: (h) => h(VisualizerContainer, { props: { baseUrl: _global.baseUrl } })
+      el: '#halite-tv-container',
+      render: (h) => h(HaliteTV, { props: { baseUrl: _global.baseUrl } })
     })
   },
   Home: function () {
