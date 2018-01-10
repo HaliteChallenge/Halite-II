@@ -5,6 +5,7 @@ import 'url-search-params-polyfill'
 import 'element-ui/lib/theme-default/index.css'
 import Associate from './templates/Associate.vue'
 import BotEditor from './templates/BotEditor.vue'
+import FinalsStatus from './templates/FinalsStatus.vue'
 import GameFeed from './templates/GameFeed.vue'
 import HackathonLeaderboard from './templates/HackathonLeaderboard.vue'
 import LeaderboardContainer from './templates/LeaderboardContainer.vue'
@@ -44,6 +45,12 @@ window.views = {
     new Vue({
       el: '#bot-editor-container',
       render: (h) => h(BotEditor)
+    })
+  },
+  FinalsStatus: function () {
+    new Vue({
+      el: '#finals-status',
+      render: (h) => h(FinalsStatus, { props: { baseUrl: _global.baseUrl } })
     })
   },
   GameFeed: function () {
