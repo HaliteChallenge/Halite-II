@@ -1,6 +1,7 @@
 import os
 import zstd
 import re
+import datetime
 
 import requests
 import multiprocessing
@@ -125,6 +126,7 @@ class DatedGameDownloader(GameDownloader):
 
 class UserGameDownloader(GameDownloader):
     _USER_BOT_URI = 'https://api.halite.io/v1/api/user/{}/match?limit={}&offset={}'
+    _DATE_BOT_URI = 'https://api.halite.io/v1/api/user/{}/match?limit={}&filter=time_played,>=,{}&filter=time_played,<,{}'
     _FETCH_THRESHOLD = 250
     _BUCKETS = []
 
@@ -150,19 +152,15 @@ class UserGameDownloader(GameDownloader):
         print('Fetching Metadata')
         current = 0
         result_set = []
-        while current <= limit:
-            if date is None:
+        if date is None:
+            while current <= limit:
                 current_limit = self._FETCH_THRESHOLD if ((limit - current) >= self._FETCH_THRESHOLD) else (limit - current)
                 result_set += requests.get(self._USER_BOT_URI.format(user_id, current_limit, current)).json()
                 current += self._FETCH_THRESHOLD
-            else:
-                if requests.get(self._USER_BOT_URI.format(user_id, 1, current)).json()[0]["replay"].split("-")[1] != date:
-                    current += 1
-                    limit   += 1
-                    continue
-                else:
-                    result_set += requests.get(self._USER_BOT_URI.format(user_id, 1, current)).json()
-                    current += 1
+        else:
+            current_date = datetime.datetime.strptime(date,'%Y%m%d').strftime('%Y-%m-%dT00:00')
+            next_date = (datetime.datetime.strptime(date,'%Y%m%d')+datetime.timedelta(days=1)).strftime('%Y-%m-%dT00:00')
+            result_set += requests.get(self._DATE_BOT_URI.format(user_id, limit, current_date, next_date)).json()
         print('Finished metadata fetch. Found {} game files.'.format(len(result_set)))
         return result_set
 
