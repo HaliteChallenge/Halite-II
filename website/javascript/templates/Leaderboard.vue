@@ -106,7 +106,7 @@
             </td>
             <td>{{ player.organization }}</td>
             <td>{{ player.language }}</td>
-            <td :title="`${player.num_games} games`">{{ getFormattedDate(player.update_time)  }}</td>
+            <td :title="`${player.num_games} games`">{{ getFormattedDate(player.update_time)  }} {{ player.compile_status == "Successful" ? "v"+player.version_number : player.compile_status }}</td>
           </tr>
           </tbody>
         </table>
