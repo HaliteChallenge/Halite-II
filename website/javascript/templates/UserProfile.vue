@@ -883,7 +883,7 @@
             }
 
             this.nemesisList.sort(function (a, b) { return b.losses - a.losses })
-            this.nemesisList = this.nemesisList.slice(1, this.nemesisLimit)
+            this.nemesisList = this.nemesisList.slice(0, this.nemesisLimit)
             this.refreshStickyTable()
           })
         },
