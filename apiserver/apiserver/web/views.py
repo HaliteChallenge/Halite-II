@@ -8,6 +8,7 @@ import hmac
 import urllib.parse
 
 import flask
+import sqlalchemy
 
 from .. import config, model, util
 
@@ -72,3 +73,19 @@ def discourse_sso():
     return flask.redirect(
         config.DISCOURSE_URL +
         "?sso={}&sig={}".format(encoded_payload.decode("utf-8"), new_signature))
+
+@web_api.route("/finals", methods=["GET"])
+@util.cross_origin(methods=["GET"])
+def status():
+    with model.engine.connect() as conn:
+        last_game_id = conn.execute(sqlalchemy.sql.select([
+                    sqlalchemy.sql.func.max(model.games.c.id)
+                ]).select_from(model.games)).first()[0]
+    result = {
+            'submissions_open': config.COMPETITION_OPEN,
+            'finals_pairing': config.COMPETITION_FINALS_PAIRING,
+            'current_game': last_game_id,
+            'last_open_game': config.LAST_OPEN_GAME,
+            'cutoff_schedule': config.FINALS_CUTOFF_SCHEDULE,
+            }
+    return flask.jsonify(result)
