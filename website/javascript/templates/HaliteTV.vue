@@ -40,7 +40,7 @@
           <i class="xline xline-left"></i>
           <i class="xline xline-right"></i>
           <div class="game-replay-container">
-            <a class="game-replay-expand" target="_blank" v-if="!isLoading" :href="`${baseUrl}/play?game_id=${game.game_id}`">
+            <a class="game-replay-expand" target="_blank" v-if="!isLoading && game" :href="`${baseUrl}/play?game_id=${game.game_id}`">
               <img :src="`${baseUrl}/assets/images/icon-expand.svg`" alt="expand">
             </a>
             <div class="game-replay-viewer"></div>
@@ -146,34 +146,10 @@
       </div>
       <div class="video-filter-inputs">
         <v-select
-          multiple
           placeholder="Usernames"
-          :options="['username 1','usernam 2']">
-        </v-select>
-        <v-select
-          multiple
-          placeholder="Tier"
-          :options="['username 1','usernam 2']">
-        </v-select>
-        <v-select
-          multiple
-          placeholder="Level"
-          :options="['username 1','usernam 2']">
-        </v-select>
-        <v-select
-          multiple
-          placeholder="Organization"
-          :options="['username 1','usernam 2']">
-        </v-select>
-        <v-select
-          multiple
-          placeholder="Country"
-          :options="['username 1','usernam 2']">
-        </v-select>
-        <v-select
-          multiple
-          placeholder="Languages"
-          :options="['username 1','usernam 2']">
+          v-model="filter_user"
+          label="username"
+          :options="users">
         </v-select>
       </div>
       <div class="video-list">
@@ -294,12 +270,8 @@
         selectedPlayers: [],
         recentVideos: [],
         videos: [],
-        filter_name: '',
-        filter_tier: '',
-        filter_level: '',
-        filter_org: '',
-        filter_country: '',
-        filter_language: ''
+        users: [],
+        filter_user: null,
       }
     },
     components: {
@@ -332,15 +304,19 @@
         $('.game-replay-viewer').find('>canvas').css('zoom', scale)
       }
       this.scaleCanvas();
-      $(window).on('resize', _.throttle(this.scaleCanvas, 150));
+      $(window).on('resize', _.throttle(this.scaleCanvas, 150))
 
       // Fetch new feeds
       this.getVideoFeeds();
+      //automatically refresh feeds
+      setInterval(this.refreshVideoFeeds, 5000)
 
       api.me().then((data) => {
         this.me = data
         this.refinedPLayers()
-      });
+      })
+      this.getUsers()
+      
 
       // this.showHoliday = libhaliteviz.isHoliday();
       //
@@ -381,6 +357,21 @@
       // return window.location `?game_id=${game_id}&replay_class=${replay_class}&replay_name=${encodeURIComponent(replay)}`
       }
     },
+    watch: {
+      filter_user(newValue) {
+        if (newValue){
+          $.get(`${api.API_SERVER_URL}/user/${newValue.user_id}/match`)
+            .then((matches) => {
+              this.videos = matches;
+              this.refinedPLayers();
+            });
+        } else {
+          this.fetch().then((data) => {
+            this.videos = data
+          });
+        }
+      }
+    },
     methods: {
       getPlayerText(player){
         return `(${player.leaderboard_rank}) ${player.username}`;
@@ -388,17 +379,31 @@
       getProfileImage(username) {
         return `https://github.com/${username}.png`
       },
-      refinedPLayers: function(players){
+      getUsers(){
+        api.leaderboard([], null, 0, 9999).then((data) => {
+          let users = data.map((player) => {
+            return {
+              user_id: player.user_id,
+              username: player.username
+            }
+          });
+          this.users = users;
+        }, (err) => {
+          console.log('has error while get users')
+        });
+      },
+      refinedPLayers: function(){
         this.videos.forEach((video, videoIndex) => {
           const players = video.players
 
           let ids = Object.keys(players);
           let newPlayers = Object.values(players);
           let index = false;
+          const compareUserId = this.filter_user ? this.filter_user.user_id : this.me.user_id;
 
           newPlayers.forEach((player, i) => {
             newPlayers[i].user_id = ids[i];
-            if (ids[i] == this.me.user_id){
+            if (ids[i] == compareUserId){
               index = i
             }
           });
@@ -407,7 +412,6 @@
             let user = Object.assign({}, newPlayers[index]);
             newPlayers.splice(index, 1);
             newPlayers.splice(0, 0, user);
-            console.log(user);
           }
 
           // assign back
@@ -430,11 +434,16 @@
 
         return new Promise((resolve, reject) => {
           $.get(url).then((data) => {
-            resolve(data);
+            resolve(data)
           }, (error) => {
-            console.log(error);
-            reject('Unable to fetch');
+            console.log(error)
+            reject('Unable to fetch')
           })
+        });
+      },
+      refreshVideoFeeds(){
+        this.fetch({limit: 4}).then((matches) => {
+          this.recentVideos = matches
         });
       },
       // recentVideos: for first load
@@ -452,7 +461,6 @@
       // download and load game
       play(game_id) {
         console.log('start video');
-        console.log(game_id);
 
         this.isLoading = true;
         api.get_replay(game_id, (loaded, total) => {
