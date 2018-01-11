@@ -81,3 +81,7 @@ def upload(bot_path):
     if result.status_code != client.SUCCESS:
         raise IOError("Unable to upload bot: {}".format(result.text))
     print("Successfully uploaded bot with version {}".format(_get_bot_version(config.user_id)))
+
+    response = result.json()
+    if "message" in response:
+        print("Message from server:", response["message"])
