@@ -470,7 +470,7 @@
             // this.progress = Math.floor(100 * progress)
           }
         }).then((game) => {
-          // window.history.replaceState(null, '', `?game_id=${game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`)
+          window.history.replaceState(null, '', `?game_id=${game.game.game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`)
           if (this.visualizer && this.visualizer.destroy){
             this.visualizer.destroy();
           }
