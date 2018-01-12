@@ -126,7 +126,7 @@ class DatedGameDownloader(GameDownloader):
 
 class UserGameDownloader(GameDownloader):
     _USER_BOT_URI = 'https://api.halite.io/v1/api/user/{}/match?limit={}&offset={}'
-    _DATE_BOT_URI = 'https://api.halite.io/v1/api/user/{}/match?limit={}&filter=time_played,>=,{}&filter=time_played,<,{}'
+    _DATE_BOT_URI = 'https://api.halite.io/v1/api/user/{}/match?limit={}&offset={}&filter=time_played,>=,{}'
     _FETCH_THRESHOLD = 250
     _BUCKETS = []
 
@@ -152,15 +152,15 @@ class UserGameDownloader(GameDownloader):
         print('Fetching Metadata')
         current = 0
         result_set = []
-        if date is None:
-            while current <= limit:
-                current_limit = self._FETCH_THRESHOLD if ((limit - current) >= self._FETCH_THRESHOLD) else (limit - current)
+        while current <= limit:
+            current_limit = self._FETCH_THRESHOLD if ((limit - current) >= self._FETCH_THRESHOLD) else (limit - current)
+            if date is None:
                 result_set += requests.get(self._USER_BOT_URI.format(user_id, current_limit, current)).json()
-                current += self._FETCH_THRESHOLD
-        else:
-            current_date = datetime.datetime.strptime(date,'%Y%m%d').strftime('%Y-%m-%dT00:00')
-            next_date = (datetime.datetime.strptime(date,'%Y%m%d')+datetime.timedelta(days=1)).strftime('%Y-%m-%dT00:00')
-            result_set += requests.get(self._DATE_BOT_URI.format(user_id, limit, current_date, next_date)).json()
+            else:
+                requested_date = datetime.datetime.strptime(date,'%Y%m%d').strftime('%Y-%m-%dT00:00')
+                result_set += [ replay for replay in requests.get(self._DATE_BOT_URI.format(user_id, current_limit, current, current_date)).json() \
+                                if datetime.datetime.strptime(replay["time_played"],'%a, %d %b %Y %H:%M:%S GMT').strftime('%Y-%m-%dT00:00') == requested_date ]
+            current += self._FETCH_THRESHOLD
         print('Finished metadata fetch. Found {} game files.'.format(len(result_set)))
         return result_set
 
