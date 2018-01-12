@@ -157,9 +157,9 @@ class UserGameDownloader(GameDownloader):
             if date is None:
                 result_set += requests.get(self._USER_BOT_URI.format(user_id, current_limit, current)).json()
             else:
-                requested_date = datetime.datetime.strptime(date,'%Y%m%d').strftime('%Y-%m-%dT00:00')
+                requested_date = datetime.datetime.strptime(date,'%Y%m%d').strftime('%Y-%m-%d')
                 result_set += [ replay for replay in requests.get(self._DATE_BOT_URI.format(user_id, current_limit, current, requested_date)).json() \
-                                if datetime.datetime.strptime(replay["time_played"],'%a, %d %b %Y %H:%M:%S GMT').strftime('%Y-%m-%dT00:00') == requested_date ]
+                                if datetime.datetime.strptime(replay["time_played"],'%a, %d %b %Y %H:%M:%S GMT').strftime('%Y-%m-%d') == requested_date ]
             current += self._FETCH_THRESHOLD
         print('Finished metadata fetch. Found {} game files.'.format(len(result_set)))
         return result_set
