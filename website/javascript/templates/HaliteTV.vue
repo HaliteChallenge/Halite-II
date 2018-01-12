@@ -117,22 +117,24 @@
         <div class="videos-feed-container">
           <h3>Recent Video</h3>
           <div class="videos-feed" v-if="recentVideos.length">
-            <div class="vfeed-item" :key="video.game_id" v-for="video in recentVideos">
-              <div class="vfeed-item-thumb">
-                <a @click="play(video.game_id)"><img src="/assets/images/video-play.svg"></a>
+            <transition-group name="list" tag="div">
+              <div class="vfeed-item" :key="video.game_id" v-for="video in recentVideos">
+                <div class="vfeed-item-thumb">
+                  <a @click="play(video.game_id)"><img src="/assets/images/video-play.svg"></a>
+                </div>
+                <div class="vfeed-item-content">
+                  <h4 class="vfeed-item-heading">
+                    <a @click="play(video.game_id)">{{video.time_played | moment("MM/DD/YY HH:mm:ss")}}</a>
+                  </h4>
+                  <p>
+                    <span v-for="player in video.players" :key="player.user_id">
+                      <img width="16" height="16" :src="getProfileImage(player.username)" :alt="player.username">
+                      {{getPlayerText(player)}}
+                    </span>
+                  </p>
+                </div>
               </div>
-              <div class="vfeed-item-content">
-                <h4 class="vfeed-item-heading">
-                  <a @click="play(video.game_id)">{{video.time_played | moment("MM/DD/YY HH:mm:ss")}}</a>
-                </h4>
-                <p>
-                  <span v-for="player in video.players" :key="player.user_id">
-                    <img width="16" height="16" :src="getProfileImage(player.username)" :alt="player.username">
-                    {{getPlayerText(player)}}
-                  </span>
-                </p>
-              </div>
-            </div>
+            </transition-group>
           </div>
         </div>
       </div>
@@ -269,6 +271,7 @@
         sortedPlayers: [],
         selectedPlayers: [],
         recentVideos: [],
+        incomingGames: [],
         videos: [],
         users: [],
         filter_user: null,
@@ -309,14 +312,14 @@
       // Fetch new feeds
       this.getVideoFeeds();
       //automatically refresh feeds
-      setInterval(this.refreshVideoFeeds, 5000)
+      setInterval(this.refreshVideoFeeds, 1000)
+      setInterval(this.fetchFeeds, 5000)
 
       api.me().then((data) => {
         this.me = data
         this.refinedPLayers()
       })
       this.getUsers()
-      
 
       // this.showHoliday = libhaliteviz.isHoliday();
       //
@@ -442,13 +445,32 @@
         });
       },
       refreshVideoFeeds(){
-        this.fetch({limit: 4}).then((matches) => {
-          this.recentVideos = matches
+        if (this.incomingGames.length){
+          // add to the top
+          const incomingVideo = this.incomingGames.slice(-1)
+          this.incomingGames = this.incomingGames.slice(0, this.incomingGames - 1)
+          this.recentVideos = incomingVideo.concat(this.recentVideos)
+          this.recentVideos = this.recentVideos.slice(0, this.recentVideos.length - 1);
+        }
+      },
+      fetchFeeds(){
+        let query = {order_by: 'desc,game_id', limit: 10}
+        let max_id = null
+        if ( this.incomingGames.length > 0 ){
+          max_id = this.incomingGames[0].game_id
+        } else {
+          max_id = this.recentVideos[0].game_id
+        }
+        query.filter = `game_id,>,${max_id}`
+        this.fetch(query).then((matches) => {
+          this.incomingGames = matches.concat(this.incomingGames)
+        }, (err) => {
+          console.log(err)
         });
       },
       // recentVideos: for first load
       getVideoFeeds() {
-        this.fetch().then((data) => {
+        this.fetch({order_by: 'desc,game_id'}).then((data) => {
           // play the first video
           if (data.length && data[0].game_id){
             this.play(data[0].game_id);
