@@ -227,6 +227,16 @@
       libhaliteviz.setAssetRoot('/assets/js/')
   }
 
+  const getParameterByName = (name, url) => {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  }
+
   export default {
     name: 'HaliteTV',
     props: ['baseUrl'],
@@ -439,7 +449,6 @@
           $.get(url).then((data) => {
             resolve(data)
           }, (error) => {
-            console.log(error)
             reject('Unable to fetch')
           })
         });
@@ -465,15 +474,21 @@
         this.fetch(query).then((matches) => {
           this.incomingGames = matches.concat(this.incomingGames)
         }, (err) => {
-          console.log(err)
+          console.log('unable to fetch feeds')
         });
       },
       // recentVideos: for first load
       getVideoFeeds() {
         this.fetch({order_by: 'desc,game_id'}).then((data) => {
           // play the first video
-          if (data.length && data[0].game_id){
-            this.play(data[0].game_id);
+          // 
+          const urlGameId = getParameterByName('game_id')
+          console.log(urlGameId)
+
+          if (urlGameId){
+            this.play(urlGameId)
+          } else if (data.length && data[0].game_id){
+            this.play(data[0].game_id)
           }
           // 
           this.recentVideos = data.slice(0, 4)
