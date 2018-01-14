@@ -115,7 +115,7 @@
       </div>
       <div class="col-md-4 sidebar hidden-xs hidden-sm" v-if="!isMobile">
         <div class="videos-feed-container">
-          <h3>Recent Video</h3>
+          <h3>Recent Videos</h3>
           <div class="videos-feed" v-if="recentVideos.length">
             <transition-group name="list" tag="div">
               <div class="vfeed-item" :key="video.game_id" v-for="video in recentVideos">
