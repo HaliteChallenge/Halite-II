@@ -43,7 +43,7 @@ sudo apt-get update
 sudo apt-get -y upgrade
 
 ## List the packages to install for running bots.
-PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-sdk-2.0.3 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc esl-erlang coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy cython clang libicu-dev elixir sbt"
+PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-sdk-2.0.3 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc esl-erlang coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy cython clang libicu-dev elixir sbt libboost-python-dev libboost-all-dev"
 
 ## List the packages to install for the worker itself.
 WORKER_PACKAGES="virtualenv cgroup-tools unzip iptables-persistent"
