@@ -40,7 +40,7 @@
           <i class="xline xline-left"></i>
           <i class="xline xline-right"></i>
           <div class="game-replay-container">
-            <a class="game-replay-expand" target="_blank" v-if="!isLoading" :href="`${baseUrl}/play?game_id=${game.game_id}`">
+            <a class="game-replay-expand" target="_blank" v-if="!isLoading && game" :href="`${baseUrl}/play?game_id=${game.game_id}`">
               <img :src="`${baseUrl}/assets/images/icon-expand.svg`" alt="expand">
             </a>
             <div class="game-replay-viewer"></div>
@@ -117,22 +117,24 @@
         <div class="videos-feed-container">
           <h3>Recent Video</h3>
           <div class="videos-feed" v-if="recentVideos.length">
-            <div class="vfeed-item" :key="video.game_id" v-for="video in recentVideos">
-              <div class="vfeed-item-thumb">
-                <a @click="play(video.game_id)"><img src="/assets/images/video-play.svg"></a>
+            <transition-group name="list" tag="div">
+              <div class="vfeed-item" :key="video.game_id" v-for="video in recentVideos">
+                <div class="vfeed-item-thumb">
+                  <a @click="play(video.game_id)"><img src="/assets/images/video-play.svg"></a>
+                </div>
+                <div class="vfeed-item-content">
+                  <h4 class="vfeed-item-heading">
+                    <a @click="play(video.game_id)">{{video.time_played | moment("MM/DD/YY HH:mm:ss")}}</a>
+                  </h4>
+                  <p>
+                    <span v-for="player in video.players" :key="player.user_id">
+                      <img width="16" height="16" :src="getProfileImage(player.username)" :alt="player.username">
+                      {{getPlayerText(player)}}
+                    </span>
+                  </p>
+                </div>
               </div>
-              <div class="vfeed-item-content">
-                <h4 class="vfeed-item-heading">
-                  <a @click="play(video.game_id)">{{video.time_played | moment("MM/DD/YY HH:mm:ss")}}</a>
-                </h4>
-                <p>
-                  <span v-for="player in video.players" :key="player.user_id">
-                    <img width="16" height="16" :src="getProfileImage(player.username)" :alt="player.username">
-                    {{getPlayerText(player)}}
-                  </span>
-                </p>
-              </div>
-            </div>
+            </transition-group>
           </div>
         </div>
       </div>
@@ -146,34 +148,10 @@
       </div>
       <div class="video-filter-inputs">
         <v-select
-          multiple
           placeholder="Usernames"
-          :options="['username 1','usernam 2']">
-        </v-select>
-        <v-select
-          multiple
-          placeholder="Tier"
-          :options="['username 1','usernam 2']">
-        </v-select>
-        <v-select
-          multiple
-          placeholder="Level"
-          :options="['username 1','usernam 2']">
-        </v-select>
-        <v-select
-          multiple
-          placeholder="Organization"
-          :options="['username 1','usernam 2']">
-        </v-select>
-        <v-select
-          multiple
-          placeholder="Country"
-          :options="['username 1','usernam 2']">
-        </v-select>
-        <v-select
-          multiple
-          placeholder="Languages"
-          :options="['username 1','usernam 2']">
+          v-model="filter_user"
+          label="username"
+          :options="users">
         </v-select>
       </div>
       <div class="video-list">
@@ -249,6 +227,16 @@
       libhaliteviz.setAssetRoot('/assets/js/')
   }
 
+  const getParameterByName = (name, url) => {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  }
+
   export default {
     name: 'HaliteTV',
     props: ['baseUrl'],
@@ -293,13 +281,10 @@
         sortedPlayers: [],
         selectedPlayers: [],
         recentVideos: [],
+        incomingGames: [],
         videos: [],
-        filter_name: '',
-        filter_tier: '',
-        filter_level: '',
-        filter_org: '',
-        filter_country: '',
-        filter_language: ''
+        users: [],
+        filter_user: null,
       }
     },
     components: {
@@ -332,15 +317,19 @@
         $('.game-replay-viewer').find('>canvas').css('zoom', scale)
       }
       this.scaleCanvas();
-      $(window).on('resize', _.throttle(this.scaleCanvas, 150));
+      $(window).on('resize', _.throttle(this.scaleCanvas, 150))
 
       // Fetch new feeds
       this.getVideoFeeds();
+      //automatically refresh feeds
+      setInterval(this.refreshVideoFeeds, 1000)
+      setInterval(this.fetchFeeds, 5000)
 
       api.me().then((data) => {
         this.me = data
         this.refinedPLayers()
-      });
+      })
+      this.getUsers()
 
       // this.showHoliday = libhaliteviz.isHoliday();
       //
@@ -381,6 +370,21 @@
       // return window.location `?game_id=${game_id}&replay_class=${replay_class}&replay_name=${encodeURIComponent(replay)}`
       }
     },
+    watch: {
+      filter_user(newValue) {
+        if (newValue){
+          $.get(`${api.API_SERVER_URL}/user/${newValue.user_id}/match`)
+            .then((matches) => {
+              this.videos = matches;
+              this.refinedPLayers();
+            });
+        } else {
+          this.fetch().then((data) => {
+            this.videos = data
+          });
+        }
+      }
+    },
     methods: {
       getPlayerText(player){
         return `(${player.leaderboard_rank}) ${player.username}`;
@@ -388,17 +392,31 @@
       getProfileImage(username) {
         return `https://github.com/${username}.png`
       },
-      refinedPLayers: function(players){
+      getUsers(){
+        api.leaderboard([], null, 0, 9999).then((data) => {
+          let users = data.map((player) => {
+            return {
+              user_id: player.user_id,
+              username: player.username
+            }
+          });
+          this.users = users;
+        }, (err) => {
+          console.log('has error while get users')
+        });
+      },
+      refinedPLayers: function(){
         this.videos.forEach((video, videoIndex) => {
           const players = video.players
 
           let ids = Object.keys(players);
           let newPlayers = Object.values(players);
           let index = false;
+          const compareUserId = this.filter_user ? this.filter_user.user_id : this.me.user_id;
 
           newPlayers.forEach((player, i) => {
             newPlayers[i].user_id = ids[i];
-            if (ids[i] == this.me.user_id){
+            if (ids[i] == compareUserId){
               index = i
             }
           });
@@ -407,7 +425,6 @@
             let user = Object.assign({}, newPlayers[index]);
             newPlayers.splice(index, 1);
             newPlayers.splice(0, 0, user);
-            console.log(user);
           }
 
           // assign back
@@ -430,19 +447,48 @@
 
         return new Promise((resolve, reject) => {
           $.get(url).then((data) => {
-            resolve(data);
+            resolve(data)
           }, (error) => {
-            console.log(error);
-            reject('Unable to fetch');
+            reject('Unable to fetch')
           })
+        });
+      },
+      refreshVideoFeeds(){
+        if (this.incomingGames.length){
+          // add to the top
+          const incomingVideo = this.incomingGames.slice(-1)
+          this.incomingGames = this.incomingGames.slice(0, this.incomingGames - 1)
+          this.recentVideos = incomingVideo.concat(this.recentVideos)
+          this.recentVideos = this.recentVideos.slice(0, this.recentVideos.length - 1);
+        }
+      },
+      fetchFeeds(){
+        let query = {order_by: 'desc,game_id', limit: 10}
+        let max_id = null
+        if ( this.incomingGames.length > 0 ){
+          max_id = this.incomingGames[0].game_id
+        } else {
+          max_id = this.recentVideos[0].game_id
+        }
+        query.filter = `game_id,>,${max_id}`
+        this.fetch(query).then((matches) => {
+          this.incomingGames = matches.concat(this.incomingGames)
+        }, (err) => {
+          console.log('unable to fetch feeds')
         });
       },
       // recentVideos: for first load
       getVideoFeeds() {
-        this.fetch().then((data) => {
+        this.fetch({order_by: 'desc,game_id'}).then((data) => {
           // play the first video
-          if (data.length && data[0].game_id){
-            this.play(data[0].game_id);
+          // 
+          const urlGameId = getParameterByName('game_id')
+          console.log(urlGameId)
+
+          if (urlGameId){
+            this.play(urlGameId)
+          } else if (data.length && data[0].game_id){
+            this.play(data[0].game_id)
           }
           // 
           this.recentVideos = data.slice(0, 4)
@@ -452,7 +498,6 @@
       // download and load game
       play(game_id) {
         console.log('start video');
-        console.log(game_id);
 
         this.isLoading = true;
         api.get_replay(game_id, (loaded, total) => {
@@ -462,7 +507,7 @@
             // this.progress = Math.floor(100 * progress)
           }
         }).then((game) => {
-          // window.history.replaceState(null, '', `?game_id=${game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`)
+          window.history.replaceState(null, '', `?game_id=${game.game.game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`)
           if (this.visualizer && this.visualizer.destroy){
             this.visualizer.destroy();
           }
