@@ -91,7 +91,7 @@
                 {{ player.username }}
               </a>
             </td>
-            <td>{{ Math.round(100 * player.score) / 100 }}</td>
+            <td :title="`${player.rating_components}`">{{ Math.round(100 * player.score) / 100 }}</td>
             <td class="text-center tier-td">
               <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
             </td>
@@ -106,7 +106,7 @@
             </td>
             <td>{{ player.organization }}</td>
             <td>{{ player.language }}</td>
-            <td>{{ getFormattedDate(player.update_time)  }}</td>
+            <td :title="`${player.num_games} games`">{{ getFormattedDate(player.update_time)  }} {{ player.compile_status == "Successful" ? "v"+player.version_number : player.compile_status }}</td>
           </tr>
           </tbody>
         </table>
@@ -600,6 +600,11 @@ export default {
         }
 
         const handleLeaderboard = leaderboard => {
+          for (const user of leaderboard) {
+            let mu_round = Math.round(user.mu * 100) / 100
+            let sigma_round = Math.round(user.sigma * 1000) / 1000
+            user.rating_components = `${mu_round}μ${sigma_round}σ`
+          }
           this.leaderboard = leaderboard;
           // scroll to user
           if (this.show_user) {
