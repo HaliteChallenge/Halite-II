@@ -131,19 +131,27 @@ def update_compilation_status():
                     ]).select_from(model.users)
                 ).first()[0]
 
-                conn.execute(
-                    model.bot_history.insert().values(
-                        user_id=user_id,
-                        bot_id=bot_id,
-                        version_number=bot["version_number"],
-                        # User is unranked if this is their first bot
+                try:
+                    conn.execute(
+                        model.bot_history.insert().values(
+                            user_id=user_id,
+                            bot_id=bot_id,
+                            version_number=bot["version_number"],
+                            # User is unranked if this is their first bot
                         last_rank=bot_rank[0] if bot_rank else None,
-                        last_score=bot["score"],
-                        last_num_players=num_active_users,
-                        last_games_played=bot["games_played"],
-                        language=bot["language"],
+                            last_score=bot["score"],
+                            last_num_players=num_active_users,
+                            last_games_played=bot["games_played"],
+                            language=bot["language"],
+                        )
                     )
-                )
+                except sqlalchemy.exc.IntegrityError:
+                    # If this happens, then we're trying to insert a
+                    # row with a duplicate version number - something
+                    # previously prevented us from incrementing
+                    # it. Instead of dying here, silence the exception
+                    # so that we can increment the version number now.
+                    pass
 
             # We do not reset the bot rank for new submissions now.
             conn.execute(
