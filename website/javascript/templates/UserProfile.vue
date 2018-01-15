@@ -296,7 +296,7 @@
                                 <h2>
                                     <i class="xline xline-bottom"></i>
                                     Challenges
-                                    <span title="Players who have challenged you or who you have challenged to play about 30 matches. Does not affect your rating or theirs." class="info-icon icon-info pull-right"></span>
+                                    <span title="A challenge will run for 30 games. Challenge games will not affect your score and will never make up more than 10% of total games running while the competition is live. You can initiate up to three challenges per day." class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!challengeGames.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
