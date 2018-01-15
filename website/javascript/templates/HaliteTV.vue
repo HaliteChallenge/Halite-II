@@ -159,12 +159,12 @@
           <table class="table table-leader leaderboard-table">
             <thead>
               <tr>
-                <th>Watch Game</th>
+                <th>Watch</th>
                 <th>Result</th>
-                <th>Destroyed Ships</th>
-                <th>Map Size</th>
-                <th>Turns</th>
-                <th>Challenge?</th>
+                <th class="hidden-xs hidden-sm">Destroyed Ships</th>
+                <th class="hidden-xs hidden-sm">Map Size</th>
+                <th class="hidden-xs hidden-sm">Turns</th>
+                <th class="hidden-xs hidden-sm">Challenge?</th>
               </tr>
             </thead>
             <tbody>
@@ -176,10 +176,10 @@
                     {{player.rank}}
                   </a>
                 </td>
-                <td>{{video.ships_destroyed}} of {{video.ships_produced}}</td>
-                <td>{{video.map_width}}x{{video.map_height}}</td>
-                <td>{{video.turns_total}}</td>
-                <td>
+                <td class="hidden-xs hidden-sm">{{video.ships_destroyed}} of {{video.ships_produced}}</td>
+                <td class="hidden-xs hidden-sm">{{video.map_width}}x{{video.map_height}}</td>
+                <td class="hidden-xs hidden-sm">{{video.turns_total}}</td>
+                <td class="hidden-xs hidden-sm">
                   <img v-if="video.challenge_id" width="16" height="16" :src="`${baseUrl}/assets/images/icon-challenge.svg`" alt="Yes">
                 </td>
               </tr>
