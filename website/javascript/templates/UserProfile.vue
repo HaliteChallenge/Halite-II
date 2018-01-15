@@ -740,7 +740,7 @@
         },
         fetchChallengeGames: function(){
           this.challengeGames = []
-          let url = `${api.API_SERVER_URL}/user/${this.user.user_id}/challenge`
+          let url = `${api.API_SERVER_URL}/user/${this.user.user_id}/challenge?limit=250&order_by=desc,created`
           return $.get(url).then((data) => {
             let challenges = data.map((challenge) => {
               let newChallenge = challenge;
@@ -835,7 +835,7 @@
               })
             })
 
-            this.challengeGames = _.orderBy(challenges, (challenge) => moment(challenge.time_created).valueOf(), ['desc'])
+            this.challengeGames = challenges
           })
         },
         fetchnemesis: function () {
