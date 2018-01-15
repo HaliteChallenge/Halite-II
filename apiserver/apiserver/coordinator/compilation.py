@@ -65,7 +65,7 @@ def update_compilation_status():
     if user_id is None:
         raise util.APIError(400, message="Must provide user ID.")
 
-    with model.engine.connect() as conn:
+    with model.engine.begin() as conn:
         user = conn.execute(sqlalchemy.sql.select([
             model.users.c.id,
             model.users.c.username,
