@@ -298,11 +298,11 @@
                                     Challenges
                                     <span title="Players you most often lose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
                                 </h2>
-                                <div v-if="!nemesisList.length" class="section-empty">
+                                <div v-if="!challengeGames.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No Challenge yet</h2>
                                 </div>
-                                <div v-if="nemesisList.length > 0">
+                                <div v-if="challengeGames.length > 0">
                                     <div class="table-sticky-container">
                                         <div class="table-wrapper">
                                             <table class="table table-leader table-sticky">
