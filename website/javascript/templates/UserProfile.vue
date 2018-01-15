@@ -296,7 +296,7 @@
                                 <h2>
                                     <i class="xline xline-bottom"></i>
                                     Challenges
-                                    <span title="Players you most often lose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
+                                    <span title="Players who have challenged you or who you have challenged to play about 30 matches. Does not affect your rating or theirs." class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!challengeGames.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
