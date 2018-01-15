@@ -199,6 +199,7 @@ def find_challenge(conn, has_gpu=False):
         model.ranked_bots_users.c.bot_id,
         model.ranked_bots_users.c.username,
         model.ranked_bots_users.c.rank,
+        model.ranked_bots_users.c.compile_status,
         model.ranked_bots_users.c.num_submissions.label("version_number"),
     ]).select_from(
         model.ranked_bots_users.join(
@@ -207,7 +208,6 @@ def find_challenge(conn, has_gpu=False):
             (model.ranked_bots_users.c.bot_id == model.bots.c.id)
         )
     ).where(
-        (model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value) &
         sqlalchemy.sql.exists(
             model.challenge_participants.select(
                 (model.ranked_bots.c.user_id == model.challenge_participants.c.user_id) &
@@ -220,10 +220,13 @@ def find_challenge(conn, has_gpu=False):
     bots = conn.execute(bots_query).fetchall()
 
     user_bots = collections.defaultdict(list)
+    all_successful = True
     for bot in bots:
         user_bots[bot["user_id"]].append(bot)
+        if bot["compile_status"] != model.CompileStatus.SUCCESSFUL.value:
+            all_successful = False
 
-    if len(user_bots) < 2 or challenge["issuer"] not in user_bots:
+    if len(user_bots) < 2 or challenge["issuer"] not in user_bots or not all_successful:
         # We had to skip this challenge, but give it a time anyways,
         # so that we don't get stuck on it
         conn.execute(model.challenges.update().values(
