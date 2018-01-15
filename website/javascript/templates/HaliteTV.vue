@@ -2,7 +2,7 @@
   <div class="visuallizer-container">
     <div class="row">
       <div class="col-md-8">
-        <h1 class="tv-heading">Watch out featured video</h1>
+        <h1 class="tv-heading">WATCH THE LATEST VIDEOS</h1>
         <div class="game-heading">
           <i class="xline xline-top"></i>
           <i class="xline xline-bottom"></i>
@@ -143,12 +143,12 @@
     <div class="video-filter-container">
       <div class="video-filter-heading">
         <h3>
-          FILTER FOR ALL GAMES
+          FILTER VIDEOS BY PLAYER
         </h3>
       </div>
       <div class="video-filter-inputs">
         <v-select
-          placeholder="Usernames"
+          placeholder="Select a Username"
           v-model="filter_user"
           label="username"
           :options="users">
@@ -285,6 +285,7 @@
         videos: [],
         users: [],
         filter_user: null,
+        // shareLink: ''
       }
     },
     components: {
@@ -365,10 +366,30 @@
 
     },
     computed: {
-      shareLink: function () {
-        return window.location.href
-      // return window.location `?game_id=${game_id}&replay_class=${replay_class}&replay_name=${encodeURIComponent(replay)}`
-      }
+      // shareLink: function () {
+      //   return window.location.href
+      // // return window.location `?game_id=${game_id}&replay_class=${replay_class}&replay_name=${encodeURIComponent(replay)}`
+      // },
+      shareLink: function (social) {
+        let text = 'Halite Game Replay - '
+        let tags = 'halitegame'
+        let link = window.location.href;
+        console.log(social);
+        switch (social) {
+          case 'facebook':
+            return 'https://www.facebook.com/sharer.php?u=' + encodeURIComponent(window.location.href)
+            break
+          case 'twitter':
+            return 'https://twitter.com/intent/tweet?text=' + text + '&url=' + encodeURIComponent(window.location.href) + '&hashtags=' + tags + '&via=haliteAI'
+            break
+          case 'linkedin':
+            return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}`
+            break
+          default:
+            return link;
+            break;
+        }
+      },
     },
     watch: {
       filter_user(newValue) {
@@ -497,14 +518,17 @@
       },
       // download and load game
       play(game_id) {
-        console.log('start video');
+        // move to top
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
 
+        // turn the flag on
         this.isLoading = true;
+
+        // get the replay from api
         api.get_replay(game_id, (loaded, total) => {
           if (total !== 0) {
             const progress = loaded / total
-            // this.is_downloading = true
-            // this.progress = Math.floor(100 * progress)
           }
         }).then((game) => {
           window.history.replaceState(null, '', `?game_id=${game.game.game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`)
