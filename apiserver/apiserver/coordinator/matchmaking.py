@@ -170,15 +170,30 @@ def find_challenge(conn, has_gpu=False):
     # Reset any stuck challenges
     reset_challenges(conn)
 
+    extra_clause = sqlalchemy.sql.expression.true()
+    if not has_gpu:
+        # Don't pick up challenges involving GPU bots
+        extra_clause = ~sqlalchemy.sql.exists(
+            sqlalchemy.sql.select(["*"]).select_from(
+                model.challenge_participants.join(
+                    model.users,
+                    model.challenge_participants.c.user_id == model.users.c.id
+                )
+            ).where(
+                (model.challenge_participants.c.challenge_id == model.challenges.c.id) &
+                (model.users.c.is_gpu_enabled == True)
+            ).correlate(model.challenges)
+        )
+
     challenge = conn.execute(
         model.challenges.select(
-            (model.challenges.c.status == model.ChallengeStatus.CREATED.value) |
-            # Also pick up any stuck challenges
-            (
-                (model.challenges.c.status == model.ChallengeStatus.PLAYING_GAME.value) &
-                (model.challenges.c.most_recent_game_task <
-                 datetime.datetime.now() - datetime.timedelta(minutes=30))
-            )
+            ((model.challenges.c.status == model.ChallengeStatus.CREATED.value) |
+             # Also pick up any stuck challenges
+             (
+                 (model.challenges.c.status == model.ChallengeStatus.PLAYING_GAME.value) &
+                 (model.challenges.c.most_recent_game_task <
+                  datetime.datetime.now() - datetime.timedelta(minutes=30))
+             )) & extra_clause
         ).order_by(
             model.challenges.c.most_recent_game_task.asc()
         )
