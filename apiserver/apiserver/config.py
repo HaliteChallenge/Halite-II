@@ -2,6 +2,8 @@ from passlib.context import CryptContext
 
 # General coordinator settings
 COMPETITION_OPEN = True
+# If True, only challenge games are issued, and rankings are not updated.
+COMPETITION_CHALLENGE_MODE = False
 # Original PHP: "compState", "finalsPairing"
 COMPETITION_FINALS_PAIRING = False
 # Final open game id, set this to the id of last game played in the open stage

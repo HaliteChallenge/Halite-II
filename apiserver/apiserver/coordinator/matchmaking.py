@@ -24,9 +24,10 @@ def rand_map_size():
 
 def serve_game_task(conn, has_gpu=False):
     """Try to find a set of players to play a game together."""
-    if random.random() < 0.1:
+    # In challenge mode, don't serve regular games.
+    if config.COMPETITION_CHALLENGE_MODE or random.random() < 0.1:
         result = find_challenge(conn, has_gpu)
-        if result:
+        if config.COMPETITION_CHALLENGE_MODE or result:
             return result
 
     # Only allow 2 or 4 player games

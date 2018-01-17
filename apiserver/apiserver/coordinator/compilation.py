@@ -153,6 +153,12 @@ def update_compilation_status():
                     # so that we can increment the version number now.
                     pass
 
+            # In challenge mode, do not reset sigma.
+            if config.COMPETITION_CHALLENGE_MODE:
+                new_sigma = model.bots.c.sigma
+            else:
+                new_sigma = 8.333
+
             # We do not reset the bot rank for new submissions now.
             conn.execute(
                 model.bots.update().where(
@@ -162,7 +168,7 @@ def update_compilation_status():
                     language=language,
                     version_number=model.bots.c.version_number + 1,
                     games_played=0,
-                    sigma=8.333,
+                    sigma=new_sigma,
                 )
             )
 

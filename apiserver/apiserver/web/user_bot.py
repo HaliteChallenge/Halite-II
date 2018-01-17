@@ -9,7 +9,7 @@ import sqlalchemy
 import google.cloud.storage as gcloud_storage
 import google.cloud.exceptions as gcloud_exceptions
 
-from .. import model, util
+from .. import config, model, util
 
 from . import util as api_util
 from .blueprint import web_api
@@ -182,7 +182,12 @@ def store_user_bot(user_id, intended_user, bot_id):
             )
         conn.execute(update)
 
-    return util.response_success()
+    if config.COMPETITION_CHALLENGE_MODE:
+        return util.response_success({
+            "message": "Only challenge games are being played, so make sure to issue a challenge."
+        })
+    else:
+        return util.response_success()
 
 
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["DELETE"])

@@ -141,7 +141,7 @@ def upload_game():
         # Store game stats in database
         store_game_stats(conn, game_output, stats, game_id, users)
         # Update rankings
-        if not challenge:
+        if not challenge and not config.COMPETITION_CHALLENGE_MODE:
             update_rankings(conn, users)
 
     return util.response_success()
