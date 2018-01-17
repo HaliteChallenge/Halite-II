@@ -85,6 +85,9 @@ def create_challenge(intended_user, *, user_id):
     if len(opponents) not in (1, 3):
         raise util.APIError(400, message="Must provide 1 or 3 opponents.")
 
+    if config.COMPETITION_FINALS_PAIRING:
+        raise util.APIError(400, message="Sorry, challenges are closed for the competition finals.")
+
     with model.engine.connect() as conn:
         sqlfunc = sqlalchemy.sql.func
 
