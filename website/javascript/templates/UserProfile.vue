@@ -296,13 +296,13 @@
                                 <h2>
                                     <i class="xline xline-bottom"></i>
                                     Challenges
-                                    <span title="Players you most often lose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
+                                    <span title="A challenge will run for 30 games. Challenge games will not affect your score and will never make up more than 10% of total games running while the competition is live. You can initiate up to three challenges per day." class="info-icon icon-info pull-right"></span>
                                 </h2>
-                                <div v-if="!nemesisList.length" class="section-empty">
+                                <div v-if="!challengeGames.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No Challenge yet</h2>
                                 </div>
-                                <div v-if="nemesisList.length > 0">
+                                <div v-if="challengeGames.length > 0">
                                     <div class="table-sticky-container">
                                         <div class="table-wrapper">
                                             <table class="table table-leader table-sticky">
@@ -740,7 +740,7 @@
         },
         fetchChallengeGames: function(){
           this.challengeGames = []
-          let url = `${api.API_SERVER_URL}/user/${this.user.user_id}/challenge`
+          let url = `${api.API_SERVER_URL}/user/${this.user.user_id}/challenge?limit=250&order_by=desc,created`
           return $.get(url).then((data) => {
             let challenges = data.map((challenge) => {
               let newChallenge = challenge;
@@ -835,7 +835,7 @@
               })
             })
 
-            this.challengeGames = _.orderBy(challenges, (challenge) => moment(challenge.time_created).valueOf(), ['desc'])
+            this.challengeGames = challenges
           })
         },
         fetchnemesis: function () {
