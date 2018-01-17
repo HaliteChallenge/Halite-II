@@ -82,7 +82,9 @@
   .video-filter-inputs{
     padding: 10px 0;
     margin: 0;
-    // display: flex;
     margin-bottom: 20px;
+    .dropdown{
+      max-width: 300px;
+    }
   }
 }
