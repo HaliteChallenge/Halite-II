@@ -100,7 +100,7 @@
           </tr>
         </tbody>
       </table>
-      <p>* Note that the highlighted group is the next group to be removed from the competition</p>
+      <p v-if="finals_pairing">* Note that the highlighted group is the next group to be removed from the competition</p>
     </div>
   </div>
 </template>
