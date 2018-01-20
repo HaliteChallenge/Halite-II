@@ -336,8 +336,8 @@ def main():
         except Exception as e:
             logging.exception("Error on get task %s\n" % str(e))
 
-        logging.debug("Sleeping...\n")
-        sleep(random.randint(4, 10))
+            logging.debug("Sleeping...\n")
+            sleep(random.randint(1, 4))
 
 
 if __name__ == "__main__":

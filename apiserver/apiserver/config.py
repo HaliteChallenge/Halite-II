@@ -9,29 +9,17 @@ LAST_OPEN_GAME = None
 # Rank cutoff schedule during finals
 # In each entry the first value is number of games to start the cutoff and
 # second value is the rank cutoff to use.
-# Following schedule is based on ~4000 bots for 6 days of ~3000 games per hour
-FINALS_CUTOFF_SCHEDULE = [
-    (0, 4500),     # cutoff initially higher than total number of bots
-    (42000, 3500), # All bots should now have 30 games at 14 hours in
-    (66000, 2600), # At the start of this phase remaining bots have 50 games
-    (75000, 1700), # end of starter bots, 60 games, 25 hours
-    (127000, 1000), # 150 games, 42 hours
-    (178000, 500), # 300 games, 2.5 days
-    (229000, 250), # 600 games, 3 days
-    (280000, 150), # 1200 games, 4 days
-] # at 6 days the top bots should have 4200+ games with 432000 games in finals
-# Alternative example schedule for 5000 bots
-_5000_schedule = [ # For 5000 bots, 6 days, 3000 gph
-    (0, 5500),
-    (53000, 4000), # All bots should now have 30 games at 17.5 hours in
-    (81000, 3000), # At the start of this phase remaining bots have 50 games
-    (92000, 2000), # end of starter bots, 60 games, 30 hours
-    (120000, 1000), # 100 games, 40 hours
-    (188000, 500), # 200 games, 2.5 days
-    (222000, 250), # 400 games, 3 days
-    (255000, 175), # 800 games, 3.5 days
-] # silver and up should have 3700+ games by end
-
+FINALS_CUTOFF_SCHEDULE = [ # For 6000 bots
+    (0, 6500),      # Everyone starts
+    (84000, 5200),  # When everyone has ~40 games
+    (102000, 4000), # 50 games
+    (116000, 2700), # 60 games, starter bots end
+    (172000, 1500), # 120 games
+    (214000, 1000), # 200 games
+    (282000, 500),  # 400 games
+    (384000, 250), # 1000 games
+    (469000, 125), # 2000 games
+]
 
 # Max number of games a bot version can error out in before being
 # stopped from playing

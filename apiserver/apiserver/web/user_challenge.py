@@ -24,6 +24,8 @@ def list_user_challenges(intended_user):
         "finished": model.challenges.c.finished,
         "num_games": model.challenges.c.num_games,
         "winner": model.challenges.c.winner,
+        "status": model.challenges.c.status,
+        "id": model.challenges.c.id,
     }, ["finished"])
 
     participant_clause = model.challenge_participants.c.user_id == intended_user
@@ -82,6 +84,9 @@ def create_challenge(intended_user, *, user_id):
         raise util.APIError(400, message="You can't challenge yourself.")
     if len(opponents) not in (1, 3):
         raise util.APIError(400, message="Must provide 1 or 3 opponents.")
+
+    if config.COMPETITION_FINALS_PAIRING:
+        raise util.APIError(400, message="Sorry, challenges are closed for the competition finals.")
 
     with model.engine.connect() as conn:
         sqlfunc = sqlalchemy.sql.func
