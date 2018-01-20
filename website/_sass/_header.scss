@@ -1,3 +1,5 @@
+$mobile-breakpoint: 1160px;
+
 header.unloaded{
   opacity: 0;
   transition: 200ms opacity;
@@ -26,10 +28,14 @@ header.unloaded{
   }
 }
 .navbar-header{
-  @media (max-width: $screen-sm-max){
+  @media (max-width: $mobile-breakpoint){
+    margin-right: -15px !important;
+    margin-left: -15px !important;
     transform: translateY(5px);
+    float: none;
   }
 }
+
 #navbar{
   .navbar-nav{
     @media (max-width: $screen-sm-max){
@@ -46,6 +52,18 @@ header.unloaded{
 .navbar-fixed-top .navbar-collapse, .navbar-fixed-bottom .navbar-collapse{
   max-height: 540px;
 }
+
+@media (max-width: $mobile-breakpoint){
+  .navbar-collapse.collapse {
+    display: none !important;
+    padding-bottom: 0;
+    overflow: auto !important; 
+  }
+  .navbar-toggle{
+    display: block;
+  }
+}
+
 .navbar-inverse{
   $g-color: #b9b8b8;
   background-color: $gray-bg;
@@ -97,6 +115,11 @@ header.navbar{
   @media (min-width: $screen-md-min){
     min-height: 50px;
   }
+  @media (max-width: $mobile-breakpoint){
+    #submitbutton{
+      display: none !important;   
+    }
+  }
   .not-logged-in{
     background-size: 200px 40px !important;
     >li{
@@ -117,7 +140,7 @@ header.navbar{
     position: absolute;
     top: 0;
     right: 60px;
-    @media (min-width: $screen-md-min){
+    @media (min-width: $mobile-breakpoint + 1){
       right: 20px;
     }
     .navbar-right{
