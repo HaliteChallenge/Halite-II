@@ -6,7 +6,7 @@ import datetime
 import flask
 import sqlalchemy
 
-from .. import model, util
+from .. import config, model, util
 
 from . import match as match_api
 from . import challenge as challenge_api
