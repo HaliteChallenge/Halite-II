@@ -1,6 +1,6 @@
 <template>
     <div class="home-container">
-        <div class="notification font-headline">Bot submissions close on January 22nd, 11:59 PM ET.  <a href="/learn-programming-challenge" style="text-transform:underline !important; color:#25242f; font-weight:bold;">Get Started Now!</a></div>
+        <div class="notification font-headline">Bot submissions close on January 22nd, 11:59 PM ET.  <a href="/finals-status" style="text-transform:underline !important; color:#25242f; font-weight:bold;">Check out the plan for finals.</a></div>
 
         <div class="row">
             <div class="col-md-12">
