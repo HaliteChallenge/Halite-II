@@ -33,15 +33,16 @@ def task():
             if response:
                 return response
 
-        # Otherwise, play a game
-        # If the worker has a GPU, try really hard to give it some work to do
-        tries = 0
-        while tries == 0 or ((has_gpu or config.COMPETITION_FINALS_PAIRING)
-                             and tries < 10):
-            response = serve_game_task(conn, has_gpu=has_gpu)
-            if response:
-                return response
-            tries += 1
+        if config.COMPETITION_FINALS_PAIRING or config.COMPETITION_OPEN:
+            # Otherwise, play a game
+            # If the worker has a GPU, try really hard to give it some work to do
+            tries = 0
+            while tries == 0 or ((has_gpu or config.COMPETITION_FINALS_PAIRING)
+                                 and tries < 10):
+                response = serve_game_task(conn, has_gpu=has_gpu)
+                if response:
+                    return response
+                tries += 1
 
     return util.response_success({
         "type": "notask",
