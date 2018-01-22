@@ -19,8 +19,8 @@ end
 function closest_point_to(e1::Entity, e2::Entity, min_distance::Float64 = 3.0)
     angle = angle_between(e1, e2)
     r = radius(e2) + min_distance
-    x = e2.x + r * cos(deg2rad(angle))
-    y = e2.y + r * sin(deg2rad(angle))
+    x = e2.x - r * cos(deg2rad(angle))
+    y = e2.y - r * sin(deg2rad(angle))
     return Position(x, y)
 end
 

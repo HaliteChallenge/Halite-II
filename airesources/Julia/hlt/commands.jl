@@ -55,9 +55,3 @@ function navigate(game_map::GameMap, mobile, target;
     speed = dist >= speed ? speed : floor(Int, dist)
     return thrust(mobile, speed, angle)
 end
-
-function setup_logger(name, id)
-    add_handler(logger, DefaultHandler(open("$id-$name.log", "w"), 
-                    DefaultFormatter("[{date} | {level} | {name}]: {msg}"))) 
-    remove_handler(logger, "console")
-end
