@@ -153,11 +153,11 @@
                                     <span title="Games played by your bot, replay files are kept forever, but games data might be deleted every 2 weeks" class="info-icon icon-info pull-right"></span>
                                 </h2>
 
-                                <div v-if="!games.length" class="section-empty">
+                                <!-- <div v-if="!games.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
                                     <h2>No games played yet</h2>
                                     <p v-if="is_my_page">Complete your first game and view replays. <br/> <a href="/play-programming-challenge">Play here</a></p>
-                                </div>
+                                </div> -->
                                 <div v-if="games.length">
                                     <table class="table table-leader">
                                         <thead>
@@ -272,11 +272,11 @@
                                     Rating Analysis
                                     <span title="Rating is calculated as mu - 3 * sigma;" class="info-icon icon-info pull-right"></span>
                                 </h2>
-                                <div v-if="!user.mu" class="section-empty">
+                                <!-- <div v-if="!user.mu" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No rating analysis</h2>
                                     <p v-if="is_my_page">Submit your first bot to get your rating. <br/> <a href="/play-programming-challenge">Play here</a></p>
-                                </div>
+                                </div> -->
                                 <div v-if="user.mu" class="user-profile-rank-stats">
                                     <div class="stats-item">
                                         <h3>Rating</h3>
@@ -361,11 +361,11 @@
                                     Nemesis
                                     <span title="Players you most often lose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
                                 </h2>
-                                <div v-if="!nemesisList.length" class="section-empty">
+                                <!-- <div v-if="!nemesisList.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No nemesis yet</h2>
                                     <p v-if="is_my_page">Submit your first bot to uncover your nemesis. <br/><a href="/play-programming-challenge">Play here</a></p>
-                                </div>
+                                </div> -->
                                 <div v-if="nemesisList.length > 0">
                                     <div class="table-sticky-container">
                                         <div class="table-wrapper">
@@ -423,11 +423,11 @@
                                     History
                                     <span title="Rank/Rating history of your bots, the rank/rating is the last rating or rank achieved before the bot was retired." class="info-icon icon-info pull-right"></span>
                                 </h2>
-                                <div v-if="!userHistory.length" class="section-empty">
+                                <!-- <div v-if="!userHistory.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No history</h2>
                                     <p v-if="is_my_page">Submit your first bot to see your history.<br/> <a href="/play-programming-challenge">Play here</a></p>
-                                </div>
+                                </div> -->
                                 <div v-if="userHistory.length > 0">
                                     <div class="table-sticky-container">
                                         <div class="table-wrapper">

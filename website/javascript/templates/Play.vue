@@ -20,7 +20,13 @@
       </div>
       <div class="row play-upload-section">
         <div class="col-sm-6">
-          <div class="upload-container" id="bot-upload-container">
+          <div data-v-2c45658c="" id="bot-upload-container" class="upload-container">
+            <div data-v-2c45658c="" class="upload-desc text-center">
+              <h2 data-v-2c45658c="">Submissions have closed</h2> 
+              <p data-v-2c45658c="">The 2017-2018 season of Halite has ended. But you can still<a data-v-8c5003f2="" href="https://api.halite.io/v1/login/github"> sign up </a>to join our newsletter to be the first to know about future competitions.</p>
+            </div> 
+          </div>
+          <!-- <div class="upload-container" id="bot-upload-container">
             <div class="upload-desc text-center">
               <h2>Submit a bot</h2>
               <p>To play a Halite bot in the competition, submit a .zip file here. Bot submissions need to adhere to specific guidelines</p>
@@ -31,7 +37,7 @@
               <h2>advanced submission options</h2>
               <p>You can also submit a bot using our <a href="/learn-programming-challenge/halite-cli-and-tools/halite-client-tools">Halite Client Tools</a></p>
             </div>
-          </div>
+          </div> -->
           
         </div>
         <div class="col-sm-6">

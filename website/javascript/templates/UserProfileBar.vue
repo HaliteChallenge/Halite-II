@@ -1,10 +1,10 @@
 <template>
     <div class="logged-in">
-        <ul id="submitbutton" v-if="!isMobile && !isCreateAccount" class="nav navbar-nav navbar-right submit-bot hidden-xs hidden-sm">
+        <!-- <ul id="submitbutton" v-if="!isMobile && !isCreateAccount" class="nav navbar-nav navbar-right submit-bot hidden-xs hidden-sm">
             <li>
                 <a href="/play-programming-challenge"><i class="fa fa-arrow-up"></i>Submit a Bot</a>
             </li>
-        </ul>
+        </ul> -->
         <div id="profile" class="profile-container">
             <a v-on:click.stop="slide_profile">
                 <img :src="profile_image + '?size=40'" :title="username + '\'s Profile'" :alt="username + '\'s profile image'" />
