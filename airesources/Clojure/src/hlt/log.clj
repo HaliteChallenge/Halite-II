@@ -21,7 +21,7 @@
 
 (defn log-game-map
   [turn game-map]
-  (let [{:keys [com.grzm.halite2.log/dirname bot-name]} @config
+  (let [{:keys [hlt.log/dirname bot-name]} @config
         game-map-file (format "%s/%s-game-map-%03d.edn" dirname bot-name turn)]
     (spit game-map-file game-map)))
 
