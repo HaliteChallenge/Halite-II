@@ -32,7 +32,7 @@ Rankings are based on the outcome of organized games where bots play against eac
 
 Bot rankings are computed using a Bayesian algorithm variant of the Glicko system, specifically using the TrueSkill Python library with some adjustments. The game coordinator picks groups of 2 or 4 bots to compete against each other at a time, and uses TrueSkill to update the bot ranking based on the match outcome. In Halite I, when a player submitted a bot, their rating was completely reset, for Halite II, we only reduce the rating by a constant factor and not to zero.
 
-Tiers are based on the percentile rank. The top 1/512 players are considered Platinum;the next 1/256 are considered Diamond, then the next 1/128 are Gold, 1/64 are Silver, and the rest are Bronze.
+Tiers are based on the percentile rank. The top 1/512 players are considered Diamond;the next 1/256 are considered Platinum, then the next 1/128 are Gold, 1/64 are Silver, and the rest are Bronze.
 
 ### How are the winners decided?
 
