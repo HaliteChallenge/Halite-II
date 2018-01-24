@@ -1,43 +1,18 @@
 (ns hlt.networking
-  (:require [clojure.string :as str]
-            [hlt.entity :as e]
-            [hlt.game-map :as gm]
-            [hlt.math :as math]
-            [hlt.utils :as utils]))
-
-(def ^:private undock-key "u")
-(def ^:private dock-key "d")
-(def ^:private thrust-key "t")
-
-(defmulti move-segments :type)
-
-(defmethod move-segments :undock [move]
-  [undock-key (-> move :ship :id)])
-
-(defmethod move-segments :dock [move]
-  [dock-key (-> move :ship :id) (-> move :planet :id)])
-
-(defmethod move-segments :thrust [move]
-  [thrust-key (-> move :ship :id) (:thrust move) (:angle move)])
-
-(defn send-moves
-  "Sends the moves to the game engine."
-  ([moves] (send-moves *out* moves))
-  ([stream moves]
-   (binding [*out* stream]
-     (let [move-seq (mapcat move-segments moves)]
-       (apply utils/log move-seq)
-       (apply println move-seq)))))
+  (:require
+   [clojure.string :as str]
+   [hlt.entity :as e]
+   [hlt.math :as math]))
 
 (defn read-prelude
-  ([] (read-prelude *in*))
-  ([stream]
-   (let [player-id (read stream)
-         width (read stream)
-         height (read stream)]
-     {:player-id player-id
-      :map-size [width height]})))
+  [{:keys [in]}]
+  (let [player-id (read in)
+        width (read in)
+        height (read in)]
+    {:player-id player-id
+     :map-size [width height]}))
 
+;; decoding game map
 (defn- to-docking-status
   [docking-status]
   (case docking-status
@@ -122,16 +97,41 @@
                  (inc cur-planet)))))))
 
 (defn read-map
-  ([]
-   (read-map *in*))
-  ([stream]
-   (let [ships (parse-all-ships stream)
-         planets (parse-all-planets stream)]
-     (assoc ships :planets planets))))
+  [{:keys [in]}]
+  (let [ships   (parse-all-ships in)
+        planets (parse-all-planets in)]
+    (assoc ships :planets planets)))
+
+;; finish initialization
 
 (defn send-done-initialized
   "Notifies the game engine that this bot has been initialized."
-  ([] (send-done-initialized *out*))
-  ([stream]
-   (binding [*out* stream]
-     (println gm/*bot-name*))))
+  [{:keys [out]} bot-name]
+  (doto out
+    (.write (str bot-name "\n"))
+    (.flush)))
+
+;; encoding moves
+
+(def ^:private undock-key "u")
+(def ^:private dock-key "d")
+(def ^:private thrust-key "t")
+
+(defmulti move-segments :type)
+
+(defmethod move-segments :undock [move]
+  [undock-key (-> move :ship :id)])
+
+(defmethod move-segments :dock [move]
+  [dock-key (-> move :ship :id) (-> move :planet :id)])
+
+(defmethod move-segments :thrust [move]
+  [thrust-key (-> move :ship :id) (:thrust move) (:angle move)])
+
+(defn send-moves
+  "Sends the moves to the game engine."
+  [{:keys [out]} moves & r]
+  (let [move-seq (mapcat move-segments moves)]
+    (doto out
+      (.write (str (str/join " " move-seq) "\n"))
+      (.flush))))
