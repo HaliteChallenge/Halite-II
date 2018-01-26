@@ -57,12 +57,13 @@
                 <span class="replay-btn">
                   <a href="javascript:;" @click="prevFrame"><span class="icon-prev"></span></a>
                 </span>
-                <span v-if="playing" class="replay-btn" style="text-align: center">
+                <span v-if="!playing" class="replay-btn" style="text-align: center">
                   <a href="javascript:;" @click="playVideo"><span class="icon-play"></span></a>
                 </span>
-                <span v-if="!playing" class="replay-btn" style="text-align: center">
+                <span v-if="playing" class="replay-btn" style="text-align: center">
                   <a href="javascript:;" @click="pauseVideo"><span class="icon-pause"></span></a>
                 </span>
+                
                 <span class="replay-btn">
                   <a href="javascript:;" @click="nextFrame"><span class="icon-next"></span></a>
                 </span>
