@@ -9,8 +9,8 @@ MACHINE_TYPE="custom-4-6144"
 GPU_MACHINE_TYPE=${MACHINE_TYPE}
 IMAGE="halite-worker"
 GPU_IMAGE="halite-gpu-worker"
-WEBSITE_IMAGE="website-image-1"
+WEBSITE_IMAGE="website-image-xiii"
 
 SERVICE_ACCOUNT="apiserver"
-COORDINATOR_URL=""
+COORDINATOR_URL="http://10.142.0.5:5001/v1/coordinator/"
 SECRET_FOLDER=""

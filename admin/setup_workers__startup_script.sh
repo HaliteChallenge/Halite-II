@@ -7,7 +7,7 @@ cd
 # Fetch the worker script
 while [ ! -f ./Halite.tgz ]; do
     sleep 5
-    curl -v http://COORDINATOR_BALANCER:5001/v1/coordinator/download/worker --output Halite.tgz
+    curl -v http://10.142.0.5:5001/v1/coordinator/download/worker --output Halite.tgz
 done
 
 tar xvzf Halite.tgz
