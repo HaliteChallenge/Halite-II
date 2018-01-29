@@ -1,6 +1,6 @@
 <template>
     <div class="home-container">
-        <div class="notification font-headline">Submissions for the 2017-2018 are closed. <a href="/finals-status" style="text-transform:underline !important; color:#25242f; font-weight:bold;">Check out the finals in progress.</a></div>
+        <div class="notification font-headline">The 2017-2018 season has ended. <a href="/programming-competition-leaderboard" style="text-transform:underline !important; color:#25242f; font-weight:bold;">Check out this year's winners!</a></div>
         <div class="row">
             <div class="col-md-12">
                 <p class="t1 c-wht font-headline">HALITE II</p>
