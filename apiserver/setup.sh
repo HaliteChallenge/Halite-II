@@ -28,4 +28,5 @@ screen -S badge_daemon -d -m /bin/bash -c \
 
 # Run game deletion job at 8 AM UTC = midnight PST (DOES NOT account
 # for DST)
-{ crontab -l -u worker; echo "0 8 * * * $(pwd)/delete_old_games.sh"; } | crontab -u worker -
+# Disabled after finals ended
+# { crontab -l -u worker; echo "0 8 * * * $(pwd)/delete_old_games.sh"; } | crontab -u worker -
