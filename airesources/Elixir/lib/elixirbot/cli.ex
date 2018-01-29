@@ -1,6 +1,6 @@
 defmodule Elixirbot.CLI do
-  def main(args \\ []) do
+  def main(_ \\ []) do
     Elixirbot.Game.connect("Alchemist")
-      |> Elixirbot.Game.update_map
+      |> Elixirbot.Game.run
   end
 end
