@@ -15,6 +15,8 @@ additional_css: ["built-codeEdit", "dark-codeEdit"]
 
 <div id="onboarding-container"></div>
 
+### NOTE: The 2017-2018 season of Halite II has ended and submissions have closed. You can still create an account to be alerted when we launch the next season, and you can always play offline.
+
 Welcome to the Halite II competition!  If you’re here, that means you’re excited to make your first bot and get on the Halite II beta leaderboard. Let's get you set up!
 
 ### 1) SIGN UP

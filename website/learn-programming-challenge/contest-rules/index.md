@@ -6,6 +6,8 @@ description: Learn the rules of the game to win the Halite AI Programming Challe
 sort_key: 0
 ---
 
+### NOTE: The 2017-2018 season of Halite II has ended and submissions have closed. You can still create an account to be alerted when we launch the next season, and you can always play offline.
+
 Halite is a fun open-source competition aimed at helping you learn about AI.  All are welcome to play as individuals or as teams. Here are the important things to know about the competition.
 
 *Start date:* 6am on October 23rd, 2017
