@@ -8,11 +8,11 @@ description: Halite is an Artificial Intelligence programming game run by Two Si
 
 Halite is an artificial intelligence programming challenge, created by [Two Sigma](https://www.twosigma.com){:target="_blank"}, where players build bots using the coding language of their choice to battle on a two-dimensional virtual board.
  
-This year’s challenge, Halite II, has a space theme, where players’ bots control ships that mine planets to grow their fleets and defeat their opponents. [Learn to play Halite II here]({{ site.baseurl }}/learn-programming-challenge).
+This year’s challenge, Halite II, had a space theme, where players’ bots control ships that mine planets to grow their fleets and defeat their opponents. [Learn to play Halite II here]({{ site.baseurl }}/learn-programming-challenge).
  
 The Halite competition is a fun way to learn and apply AI, machine learning, and other advanced algorithms by writing smart bots in a collaborative, challenging game setting. Designed for coding enthusiasts of all levels of experience and open to the public, Halite has created an engaging game environment to learn, write, and visualize code in action.  Halite was created as a [Two Sigma open source project](http://opensource.twosigma.com){:target="_blank"} for community outreach and education.
  
-The 2017-2018 season runs October- January, with participants able to join up until the last week of the competition. Players will submit bots that play games against other bots until the Halite ranking algorithm determines a player rank. After submissions are complete, a winner will be determined through a week of final matches.
+The 2017-2018 season ran October- January, with participants able to join up until the last week of the competition. Players submitted bots that play games against other bots until the Halite ranking algorithm determines a player rank. After submissions were complete, a winner was determined through a week of final matches.
 
 > The general who wins the battle makes many calculations in his temple before the battle is fought
 >
@@ -44,7 +44,9 @@ Many have contributed to Halite since Ben and Michael’s invention; in addition
 Camille Fournier, Alfred Spector, Serguei Narojnyi, Xinyun Wu, Barbara Zhan, Georgi Georgiev, Jason Zhang, Nick Vrilo, Tuan Anh Hoang-Vu, Scott Rich, Paul Butler, Scott Lynch, Nick Golubyev, and many more who gave feedback during our internal competition.
 
 ### External and Community Contributors:
-Special thanks to Arnaud Sahuguet, Janzert, Erik Wickerman, Raymond Shumm, Nick Malaguti, Mike Chase and Arjun Viswanathan, as well as to all the users who provided questions and comments to the forums and other conversations with the Halite Team.
+Special thanks to Arnaud Sahuguet, Erik Wickerman, Raymond Shumm, Nick Malaguti, Mike Chase and Arjun Viswanathan, as well as to all the users who provided questions and comments to the forums and other conversations with the Halite Team. And thanks to the ~100 players who made [contributions to the open-source Halite II project](https://github.com/HaliteChallenge/Halite-II/graphs/contributors?from=2016-10-12&to=2018-01-31&type=c) over the course of the 2017-2018 competition.
+
+And our greatest appreciation goes to [Janzert](https://github.com/Janzert), who made the most Github commits of any community contributor (non Two Sigma employee), with 141 commits over the course of Halite II. We are so grateful.
 
 ## May the best bot win!
 

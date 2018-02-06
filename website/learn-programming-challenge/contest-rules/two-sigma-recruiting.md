@@ -17,6 +17,8 @@ people and has offices in New York, Hong Kong, Houston and London. Visit [Two Si
 
 Halite was created inside Two Sigma to teach players about AI and other advanced strategies, but due to its success it was opened to the public in fall of 2016 as a way to engage top engineers from around the world (as well as to have some fun!). Two Sigma has been extraordinarily impressed with the skills and enthusiasm of the Halite community, and will consider inviting any player who is in the Gold tier or above at the end of the competition to connect and skip the first offsite round of the Two Sigma interview process for engineering and modeling roles. Anyone interested will still follow the remaining steps of the interview process, and will be held to the same criteria as any other applicant after this first step. [See some open positions here.](https://careers.twosigma.com/careers/SearchJobs/?3_33_3=%5B%22898%22%2C%22887%22%2C%22890%22%5D&jobOffset=10){:target="_blank"}
 
+If you have any questions, you can reach the Halite team at <halite@halite.io>.
+
 ## On-Campus Events and Recruiting
 
 In an effort to bring a little more coding fun to college and university campuses, Two Sigma will be holding a number of virtual hackathons across North America where students can battle against their school classmates to be the victor of a three-week competition. The winners of each virtual hackathon may be invited to compete in a final competition in New York (expenses paid) and may be invited to on-site interview days. 

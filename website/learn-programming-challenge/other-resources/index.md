@@ -12,3 +12,4 @@ The Halite team and community have provided additional resources to make it easy
 - [Design Principles Underlying Halite II](design-principles-underlying-halite-II)
 - [Game Servers](game-servers)
 - [Best Practices](best-practices)
+- [Community Resources](community-resources)
