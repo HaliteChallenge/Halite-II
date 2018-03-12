@@ -47,9 +47,9 @@ module.exports = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            api_server_url: "'https://api.halite.io/v1/api'",
-            login_server_url: "'https://api.halite.io/v1/login'",
-            logout_server_url: "'https://api.halite.io/v1/logout/'"
+            api_server_url: "'http://api.jclap.org/v1/api'",
+            login_server_url: "'http://api.jclap.org/v1/login'",
+            logout_server_url: "'http://api.jclap.org/v1/logout/'"
         }),
         new CopyWebpackPlugin([
             { from: '../../website/assets/images/icon-replay.svg', to: 'assets/images/' },

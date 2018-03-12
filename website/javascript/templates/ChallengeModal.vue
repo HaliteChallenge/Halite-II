@@ -49,7 +49,7 @@
           <div class="no-login">You must sign in to challenge a player</div>
           <div class="ha-button-container">
             <div>
-              <a class="ha-button" href="https://api.halite.io/v1/login/github" onclick="javascript:handleOutboundLinkClicks('account', 'click-to-sign-up','navigation');return true;"><span>SIGN INTO HALITE</span></a>
+              <a class="ha-button" href="http://api.jclap.org/v1/login/github" onclick="javascript:handleOutboundLinkClicks('account', 'click-to-sign-up','navigation');return true;"><span>SIGN INTO HALITE</span></a>
             </div>
           </div>
         </div>

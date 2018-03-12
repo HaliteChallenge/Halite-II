@@ -13,7 +13,7 @@
             <div class="panel panel-default upload-zone">
                 <div class="panel-body text-center">
                     <h2>Log in to upload bot</h2>
-                    <p style="text-align: center;">In order to play Halite and appear on the leaderboard, you must <a href="https://api.halite.io/v1/login/github">sign in</a> with your GitHub account</p>
+                    <p style="text-align: center;">In order to play Halite and appear on the leaderboard, you must <a href="http://api.jclap.org/v1/login/github">sign in</a> with your GitHub account</p>
                 </div>
             </div>
         </div>

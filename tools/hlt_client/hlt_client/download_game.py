@@ -124,7 +124,7 @@ class DatedGameDownloader(GameDownloader):
 
 
 class UserGameDownloader(GameDownloader):
-    _USER_BOT_URI = 'https://api.halite.io/v1/api/user/{}/match?limit={}&offset={}'
+    _USER_BOT_URI = 'http://api.jclap.org/v1/api/user/{}/match?limit={}&offset={}'
     _FETCH_THRESHOLD = 250
     _BUCKETS = []
 

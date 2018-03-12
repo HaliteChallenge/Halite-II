@@ -11,7 +11,7 @@
                         <a class="ha-button" href="/learn-programming-challenge"><span>GET STARTED</span></a>
                     </div>
                     <div class="visible-xs visible-sm">
-                        <a class="ha-button" href="https://api.halite.io/v1/login/github" onclick="javascript:handleOutboundLinkClicks('account', 'click-to-sign-up','navigation');return true;"><span>SIGN UP</span></a>
+                        <a class="ha-button" href="http://api.jclap.org/v1/login/github" onclick="javascript:handleOutboundLinkClicks('account', 'click-to-sign-up','navigation');return true;"><span>SIGN UP</span></a>
                     </div>
                 </div>
                 <div v-else class="me-in">

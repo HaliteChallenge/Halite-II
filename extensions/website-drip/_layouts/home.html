@@ -25,7 +25,7 @@ function check()
   {
     let content = document.getElementById("tmpid").value
     const xhr = new XMLHttpRequest()
-    var url = "https://api.halite.io/v1/api/user/addsubscriber/" + content
+    var url = "http://api.jclap.org/v1/api/user/addsubscriber/" + content
     xhr.open("POST", url, true)
     xhr.send()
     document.getElementById("status").style.color = "green"

@@ -21,10 +21,10 @@ __license__ = "MIT"
 __status__ = "Production"
 __version__ = "1.5"
 
-URI_HALITE_API = 'http://api.halite.io/v1/api'
+URI_HALITE_API = 'http://api.jclap.org/v1/api'
 URI_API_CREATE_BOT = URI_HALITE_API + "/user/{}/bot"
 URI_API_EXISTING_BOT = URI_HALITE_API + "/user/{}/bot/{}"
-URI_HALITE_WEB_PAGE = 'http://halite.io'
+URI_HALITE_WEB_PAGE = 'http://halite.jclap.org'
 URI_WEB_API_KEY = "{}/user/settings".format(URI_HALITE_WEB_PAGE)
 
 CONFIG_DIR = 'HALITE_CONFIG_DIR'
