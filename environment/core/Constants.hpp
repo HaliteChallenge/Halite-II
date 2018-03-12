@@ -32,14 +32,14 @@ namespace hlt {
         unsigned short DOCKED_SHIP_REGENERATION = 0;
 
         unsigned int WEAPON_COOLDOWN = 1;
-        double WEAPON_RADIUS = 5.0;
+        double WEAPON_RADIUS = 7.0;
         int WEAPON_DAMAGE = 64;
-        double EXPLOSION_RADIUS = 10.0;
+        double EXPLOSION_RADIUS = 25.0;
 
         double DOCK_RADIUS = 4;
         unsigned int DOCK_TURNS = 5;
         int RESOURCES_PER_RADIUS = 144;
-        bool INFINITE_RESOURCES = true;
+        bool INFINITE_RESOURCES = false;
         int PRODUCTION_PER_SHIP = 72;
         unsigned int BASE_PRODUCTIVITY = 6;
         unsigned int ADDITIONAL_PRODUCTIVITY = 6;
