@@ -9,15 +9,15 @@ from google.cloud import storage
 LOCAL_DEBUG = 'false'
 
 # move to key management soon, create a new key and disable the current one
-CREDLY_KEY = '435da75c82a0978a53e9377ebf51b7c6'
-CREDLY_SECRET = '7fI/ZtKob5qcADJ/W4g7zlmYHf0iQ1x086Etlhr/y1p6j5c8ASqoCP+Td3xho2rYYXy9/z4vnYp8g+XyVxMHBY1+rqiLmfKY7Nvhz0odLppc/35uM8BIklG7vnGqrfNOoz10jwgvYPWMTUnFuhHIVvSU5uHQdN3TDBsYmvMwJM0='
-USER = 'halite@halite.io'
-PASSWORD = 'Sgm975pjT6v3GuyjXE0m'
+CREDLY_KEY = ''
+CREDLY_SECRET = ''
+USER = ''
+PASSWORD = ''
 AUTH_TOKEN = ''
 MEMBER_ID = ''
 
 # google cloud details
-PROJECT = 'halite-2'
+PROJECT = ''
 BADGE_BUCKET = 'credlybadges'
 
 CREDLY_BASE_API_URL = 'https://api.credly.com/v1.1/'
@@ -29,8 +29,8 @@ HEADERS = {
     'cache-control': "no-cache",
 }
 
-CLOUDSQL_USER = 'haslite@halite.io'
-CLOUDSQL_PASSWORD = '23WEsdXC'
+CLOUDSQL_USER = ''
+CLOUDSQL_PASSWORD = ''
 CLOUDSQL_CONNECTION_NAME = 'halite-2:us-east1:halite-db'
 
 # authenticate every time, regnerating token every time given the kehy expires every 3 years
