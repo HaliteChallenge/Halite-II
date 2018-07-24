@@ -4,6 +4,12 @@
 ;;;
 ;;; Generic Functions
 
+(defgeneric ship-docking-p (ship))
+
+(defgeneric planet-owned-p (planet))
+
+(defgeneric nth-player (n game-map))
+
 (defgeneric angle-between (entity-1 entity-2))
 
 (defgeneric distance (entity-1 entity-2))
@@ -14,8 +20,6 @@
 
 (defgeneric nearby-entities-by-distance (entity))
 
-(defgeneric write-object (object stream))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;; Classes
@@ -24,7 +28,7 @@
   ((%id :initarg :id :reader id)))
 
 (defclass command-mixin ()
-  ((%command :initarg :command :reader command)))
+  ((%command :initform nil :accessor command)))
 
 (defclass player (id-mixin)
   ((%ships :initarg :ships :reader ships)))
@@ -45,7 +49,7 @@
 (defclass ship (entity command-mixin)
   ((%x-vecocity :initarg :x-velocity :reader x-velocity)
    (%y-vecocity :initarg :y-velocity :reader y-velocity)
-   (%status :initarg :status :reader status :type docking-status)
+   (%docking-status :initarg :docking-status :reader docking-status)
    (%planet :initarg :planet :reader planet :initform nil)
    (%progress :initarg :progress :reader progress)
    (%weapon-cooldown :initarg :weapon-cooldown :reader weapon-cooldown)))
@@ -56,14 +60,25 @@
    (%entity-table :initarg :entity-table :reader entity-table)))
 
 (defclass game ()
-  ((%user-id :initarg :user-id :reader user-id)
+  ((%width :initarg :width :reader width)
+   (%height :initarg :height :reader height)
+   (%user-id :initarg :user-id :reader user-id)
    (%bot-name :initarg :bot-name :reader bot-name)
    (%initial-map :initarg :initial-map :reader initial-map)
    (%current-map :initarg :current-map :accessor current-map)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;; Methods
+;;; Methods and Functions
+
+(defmethod ship-docking-p (ship)
+  (eq (docking-status ship) :docking))
+
+(defmethod planet-owned-p (planet)
+  (not (null (owner planet))))
+
+(defmethod nth-player (id game-map)
+  (find id (players game-map) :key #'id))
 
 (defmethod distance ((a entity) (b entity))
   (sqrt (+ (expt (- (x a) (x b)) 2)

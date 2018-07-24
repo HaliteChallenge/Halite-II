@@ -17,17 +17,17 @@
   (setf (gethash (id instance) *entity-table*)
         instance))
 
-(defun read-id (stream)
+(defun read-id ()
   (let ((id (next-value)))
     (if (zerop id)
         :unknown-entity
         (or (gethash id *entity-table*)
             (error "Invalid id: ~D." id)))))
 
-(defun read-list (reader-fn)
+(defun read-list (read-fn)
   (let ((n (next-value)))
     (loop repeat n
-          collect (funcall read-fn stream))))
+          collect (funcall read-fn))))
 
 (defun read-game-map (stream)
   (let ((*entity-table* (make-hash-table))
@@ -51,15 +51,15 @@
     :health (next-value)
     :x-velocity (next-value)
     :y-velocity (next-value)
-    :status
+    :docking-status
     (case (next-value)
       (0 :undocked)
       (1 :docking)
       (2 :docked)
       (3 :undocking))
-    :planet (read-id stream)
+    :planet (read-id)
     :progress (next-value)
-    :cooldown (next-value)))
+    :weapon-cooldown (next-value)))
 
 (defun read-planet ()
   (make-instance 'planet
@@ -77,7 +77,7 @@
       (and owner-p (gethash owner-id *entity-table*)))
     :docked-ships
     (loop repeat (next-value)
-          collect (read-id stream))))
+          collect (read-id))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -93,10 +93,12 @@
       (make-instance 'game
         :user-id user-id
         :bot-name bot-name
+        :width width
+        :height height
         :initial-map game-map
         :current-map game-map))))
 
-(defun update-map (game)
+(defun finalize-turn (game)
   ;; Send all commands.
   (let ((player (find (user-id game)
                       (players (current-map game))
