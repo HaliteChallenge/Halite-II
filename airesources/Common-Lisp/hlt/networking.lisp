@@ -110,3 +110,28 @@
   ;; Read in the new map
   (setf (current-map game)
         (read-game-map *standard-input*)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; Sending Game Entities
+
+(defgeneric send-command (command stream))
+
+(defmethod send-command ((command null) stream)
+  (declare (ignore command stream))
+  (values))
+
+(defmethod send-command ((command move-command) stream)
+  (format stream "t ~D ~D ~D~%"
+          (id (ship command))
+          (move-speed command)
+          (move-angle command)))
+
+(defmethod send-command ((command dock-command) stream)
+  (format stream "d ~D ~D~%"
+          (id (ship command))
+          (id (planet command))))
+
+(defmethod send-command ((command undock-command) stream)
+  (format stream "u ~D~%"
+          (id (ship command))))

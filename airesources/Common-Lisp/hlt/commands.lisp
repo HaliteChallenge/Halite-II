@@ -4,15 +4,15 @@
 ;;;
 ;;; Generic Functions
 
-(defgeneric send-command (command stream))
-
 (defgeneric issue-move-command (ship speed angle))
 
 (defgeneric issue-dock-command (ship planet))
 
 (defgeneric issue-undock-command (ship))
 
-(defgeneric issue-navigate-command (ship &key destination speed ignore-ships))
+(defgeneric issue-navigate-command
+    (ship &key target speed avoid-obstacles max-corrections
+            angular-step ignore-ships ignore-planets))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -57,24 +57,7 @@
   (make-instance 'move-command
     :ship ship))
 
-(defmethod issue-navigate-command ((ship ship) &key destination speed ignore-ships)
+(defmethod issue-navigate-command
+    ((ship ship) &key target speed avoid-obstacles max-corrections
+                   angular-step ignore-ships ignore-planets)
   (values))
-
-(defmethod send-command ((command null) stream)
-  (declare (ignore command stream))
-  (values))
-
-(defmethod send-command ((command move-command) stream)
-  (format stream "t ~D ~D ~D~%"
-          (id (ship command))
-          (move-speed command)
-          (move-angle command)))
-
-(defmethod send-command ((command dock-command) stream)
-  (format stream "d ~D ~D~%"
-          (id (ship command))
-          (id (planet command))))
-
-(defmethod send-command ((command undock-command) stream)
-  (format stream "u ~D~%"
-          (id (ship command))))

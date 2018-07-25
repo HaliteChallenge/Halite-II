@@ -20,34 +20,39 @@
 
 (defun mybot ()
   ;; Initialize the game.
-  (let ((*game* (hlt:make-game :bot-name "Settler")))
-    ;; Set up logging
-    (with-open-file (*logfile*
-                     (format nil "settler-~D.log" (hlt:user-id *game*))
-                     :direction :output
-                     :element-type 'extended-char
-                     :if-exists :supersede)
-      ;; Optional: Describe what your bot is doing.
-      (format *logfile* "Settler bot is now up and running!~%")
-      (loop
-        (finish-output *logfile*)
-        (let* ((map (hlt:current-map *game*))
-               (active-player (hlt:nth-player (hlt:user-id *game*) map)))
-          ;; Search all of your ships.
-          (loop for ship in (hlt:ships active-player)
-                ;; Skip ships that are currently docking.
-                unless (hlt:ship-docking-p ship) do
-                  ;; Search all planets.
-                  (loop for planet in (hlt:planets map)
-                        ;; Skip planets that are already owned.
-                        unless (hlt:planet-owned-p planet) do
-                          ;; Either try to dock, or try to move closer to the
-                          ;; planet.
-                          (or (hlt:issue-dock-command ship planet)
-                              (hlt:issue-navigate-command
-                               ship
-                               :destination (hlt:closest-point-to ship planet)
-                               :speed (floor hlt:+max-speed+ 2)
-                               :ignore-ships t))))
-          ;; Send all the issued commands to the game server.
-          (hlt:finalize-turn *game*))))))
+  (let* ((*game* (hlt:make-game :bot-name "Settler"))
+         ;; Set up logging
+         (*logfile* (open (multiple-value-bind (second minute hour day month year)
+                              (get-decoded-time)
+                            (format nil "~D-~D-~DT~2,'0D:~2,'0D:~2,'0D-~D-~A.log"
+                                    year month day hour minute second
+                                    (hlt:user-id *game*)
+                                    (hlt:bot-name *game*)))
+                          :direction :output
+                          :element-type 'extended-char
+                          :external-format :utf-8
+                          :if-exists :supersede)))
+    ;; Optional: Describe what your bot is doing.
+    (format *logfile* "Settler bot is now up and running!~%")
+    (loop
+      (finish-output *logfile*)
+      (let* ((map (hlt:current-map *game*))
+             (active-player (hlt:nth-player (hlt:user-id *game*) map)))
+        ;; Search all of your ships.
+        (loop for ship in (hlt:ships active-player)
+              ;; Skip ships that are currently docking.
+              unless (hlt:ship-docking-p ship) do
+                ;; Search all planets.
+                (loop for planet in (hlt:planets map)
+                      ;; Skip planets that are already owned.
+                      unless (hlt:planet-owned-p planet) do
+                        ;; Either try to dock, or try to move closer to the
+                        ;; planet.
+                        (or (hlt:issue-dock-command ship planet)
+                            (hlt:issue-navigate-command
+                             ship
+                             :target (hlt:closest-point-to ship planet)
+                             :speed (floor hlt:+max-speed+ 2)
+                             :ignore-ships t))))
+        ;; Send all the issued commands to the game server.
+        (hlt:finalize-turn *game*)))))
