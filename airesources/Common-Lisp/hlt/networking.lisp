@@ -4,13 +4,11 @@
 ;;;
 ;;; Receiving Game Entities
 
-(defvar *input-stream*)
-
 ;;; A hash table, mapping from ids to game entities.
 (defvar *entity-table*)
 
 (defun next-value ()
-  (read *input-stream*))
+  (read *standard-input*))
 
 (defmethod initialize-instance :after ((instance id-mixin) &rest initargs)
   (declare (ignore initargs))
@@ -24,33 +22,36 @@
         (or (gethash id *entity-table*)
             (error "Invalid id: ~D." id)))))
 
-(defun read-list (read-fn)
+(defun read-list (read-fn &rest args)
   (let ((n (next-value)))
-    (loop repeat n
-          collect (funcall read-fn))))
+    (loop repeat n collect (apply read-fn args))))
 
-(defun read-game-map (stream)
+(defun read-game-map ()
   (let ((*entity-table* (make-hash-table))
         (*read-default-float-format* 'double-float)
         (*read-eval* nil)
-        (*input-stream* stream))
-    (make-instance 'game-map
-      :players (read-list #'read-player)
-      :planets (read-list #'read-planet)
-      :entity-table *entity-table*)))
+        (game-map (make-instance 'game-map)))
+    (reinitialize-instance game-map
+      :players (read-list #'read-player game-map)
+      :planets (read-list #'read-planet game-map))))
 
-(defun read-player ()
-  (let ((player (make-instance 'player :id (next-value))))
-    (reinitialize-instance player :ships (read-list #'read-ship))))
+(defun read-player (game-map)
+  (let ((player (make-instance 'player
+                  :id (next-value)
+                  :game-map game-map)))
+    (reinitialize-instance player
+      :ships (read-list #'read-ship game-map player))))
 
-(defun read-ship ()
+(defun read-ship (game-map owner)
   (make-instance 'ship
+    :game-map game-map
+    :owner owner
     :id (next-value)
-    :x (next-value)
-    :y (next-value)
+    :pos-x (next-value)
+    :pos-y (next-value)
     :health (next-value)
-    :x-velocity (next-value)
-    :y-velocity (next-value)
+    :vel-x (next-value)
+    :vel-y (next-value)
     :docking-status
     (case (next-value)
       (0 :undocked)
@@ -61,11 +62,12 @@
     :progress (next-value)
     :weapon-cooldown (next-value)))
 
-(defun read-planet ()
+(defun read-planet (game-map)
   (make-instance 'planet
+    :game-map game-map
     :id (next-value)
-    :x (next-value)
-    :y (next-value)
+    :pos-x (next-value)
+    :pos-y (next-value)
     :health (next-value)
     :radius (next-value)
     :docking-spots (next-value)
@@ -85,11 +87,11 @@
 
 (defun make-game (&key bot-name)
   (check-type bot-name string)
-  (let ((user-id (read *standard-input*))
-        (width (read *standard-input*))
-        (height (read *standard-input*)))
+  (let ((user-id (next-value))
+    (width (next-value))
+    (height (next-value)))
     (princ bot-name *standard-output*)
-    (let ((game-map (read-game-map *standard-input*)))
+    (let ((game-map (read-game-map)))
       (make-instance 'game
         :user-id user-id
         :bot-name bot-name
@@ -109,7 +111,7 @@
     (finish-output *standard-output*))
   ;; Read in the new map
   (setf (current-map game)
-        (read-game-map *standard-input*)))
+        (read-game-map)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;

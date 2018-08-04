@@ -4,7 +4,7 @@
 (defconstant +max-speed+ 7)
 
 ;; Radius of a ship.
-(defconstant +ship-radius 0.5d0)
+(defconstant +ship-radius+ 0.5d0)
 
 ;; Maximum health of ship.
 (defconstant +max-ship-health+ 255)
