@@ -2,6 +2,14 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
+;;; Generic Functions
+
+(defgeneric send-bot-name (game bot-name))
+
+(defgeneric finalize-turn (game))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
 ;;; Receiving Game Entities
 
 ;;; Hash tables mapping from ids to game entities.
@@ -103,22 +111,23 @@
 ;;;
 ;;; High-level Interface
 
-(defun make-game (&key bot-name)
-  (check-type bot-name string)
+(defun make-game ()
   (let ((user-id (next-value))
     (width (next-value))
     (height (next-value)))
-    (format *standard-output* "~S~%" bot-name)
     (let ((game-map (read-game-map)))
       (make-instance 'game
         :user-id user-id
-        :bot-name bot-name
         :width width
         :height height
         :initial-map game-map
         :current-map game-map))))
 
-(defun finalize-turn (game)
+(defmethod send-bot-name ((game game) (bot-name string))
+  (format *standard-output* "~S~%" bot-name)
+  (finish-output *standard-output*))
+
+(defmethod finalize-turn ((game game))
   ;; Send all commands.
   (let ((player (find (user-id game)
                       (players (current-map game))

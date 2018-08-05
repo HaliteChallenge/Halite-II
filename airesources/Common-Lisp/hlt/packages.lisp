@@ -21,6 +21,7 @@
    ;; Functions
    #:game
    #:make-game
+   #:send-bot-name
    #:finalize-turn
    #:make-position
    #:make-relative-position

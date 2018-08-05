@@ -80,7 +80,6 @@
   ((%width :initarg :width :reader width)
    (%height :initarg :height :reader height)
    (%user-id :initarg :user-id :reader user-id)
-   (%bot-name :initarg :bot-name :reader bot-name)
    (%initial-map :initarg :initial-map :reader initial-map)
    (%current-map :initarg :current-map :accessor current-map)))
 

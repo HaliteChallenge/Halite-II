@@ -16,12 +16,6 @@
 
 (defvar *game*)
 
-;;; The streams *standard-input* and *standard-output* are used to
-;;; communicate with the Halite application and therefore cannot be used to
-;;; print debug output.  Instead, we open a log file and bind it to the
-;;; special variable *logfile*, such that debugging commands can write
-;;; there instead.
-
 (defvar *logfile*)
 
 (defun open-logfile (user-id bot-name)
@@ -36,12 +30,17 @@
 
 (defun mybot ()
   ;; Initialize the game.
-  (let* ((*game* (hlt:make-game :bot-name "Settler"))
-         ;; Set up logging
-         (*logfile* (open-logfile (hlt:user-id *game*)
-                                  (hlt:bot-name *game*))))
+  (let* ((bot-name "Settler")
+         (*game* (hlt:make-game))
+         ;; The streams *standard-input* and *standard-output* are used to
+         ;; communicate with the Halite application and therefore cannot be
+         ;; used to print debug output.  Instead, we open a log file and
+         ;; bind it to the special variable *logfile*, such that debugging
+         ;; commands can write there instead.
+         (*logfile* (open-logfile (hlt:user-id *game*) bot-name)))
     ;; Optional: Describe what your bot is doing.
-    (format *logfile* "Settler bot is now up and running!~%")
+    (format *logfile* "Bot is now up and running!~%")
+    (hlt:send-bot-name *game* bot-name)
     (loop
       (format *logfile* "~&~%== Next Timestep ==~%")
       ;; Ensure that all logging is actually written to the file.
