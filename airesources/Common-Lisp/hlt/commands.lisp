@@ -60,6 +60,9 @@
     (make-instance 'undock-command
       :ship ship)))
 
+;;; This path finding function uses a very naive algorithm.  If you want to
+;;; turn this starter kit into a competitive AI, you should definitely
+;;; replace this code with something more sophisticated.
 (defmethod issue-navigate-command
     ((ship ship) target &key (speed +max-speed+)
                           (avoid-obstacles t)

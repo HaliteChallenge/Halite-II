@@ -16,6 +16,12 @@
 
 (defvar *game*)
 
+;;; The streams *standard-input* and *standard-output* are used to
+;;; communicate with the Halite application and therefore cannot be used to
+;;; print debug output.  Instead, we open a log file and bind it to the
+;;; special variable *logfile*, such that debugging commands can write
+;;; there instead.
+
 (defvar *logfile*)
 
 (defun open-logfile (user-id bot-name)
@@ -37,7 +43,7 @@
     ;; Optional: Describe what your bot is doing.
     (format *logfile* "Settler bot is now up and running!~%")
     (loop
-      (format *logfile* "~&== Next Timestep ==~%")
+      (format *logfile* "~&~%== Next Timestep ==~%")
       ;; Ensure that all logging is actually written to the file.
       (finish-output *logfile*)
       ;; Determine the current map and active player.
