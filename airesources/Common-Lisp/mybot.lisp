@@ -48,8 +48,7 @@
               ;; Skip ships that are currently docking.
               unless (hlt:ship-docking-p ship) do
                 ;; Search all planets.
-                (loop for planet in (sort (copy-list (hlt:planets map)) #'<
-                                          :key (lambda (planet) (hlt:distance planet ship)))
+                (loop for planet in (hlt:planets map)
                       ;; Skip planets that are already owned.
                       unless (hlt:planet-owned-p planet) do
                         ;; Either try to dock, or try to move closer to the
