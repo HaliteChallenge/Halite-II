@@ -47,17 +47,18 @@
         (loop for ship in (hlt:ships active-player)
               ;; Skip ships that are currently docking.
               unless (hlt:ship-docking-p ship) do
-                (print ship *logfile*)
                 ;; Search all planets.
-                (loop for planet in (hlt:planets map)
+                (loop for planet in (sort (copy-list (hlt:planets map)) #'<
+                                          :key (lambda (planet) (hlt:distance planet ship)))
                       ;; Skip planets that are already owned.
                       unless (hlt:planet-owned-p planet) do
                         ;; Either try to dock, or try to move closer to the
                         ;; planet.
                         (or (hlt:issue-dock-command ship planet)
                             (hlt:issue-navigate-command
-                             ship (hlt:closest-point-to ship planet)
-                             :speed (floor hlt:+max-speed+ 2)
-                             :ignore-ships t))))
+                             ship
+                             (hlt:closest-position ship planet)
+                             :speed (floor hlt:+max-speed+ 2)))
+                        (loop-finish)))
         ;; Send all the issued commands to the game server.
         (hlt:finalize-turn *game*)))))

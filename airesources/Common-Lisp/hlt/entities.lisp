@@ -8,17 +8,13 @@
 
 (defgeneric make-relative-position (position dx dy))
 
-(defgeneric ship-docking-p (ship))
-
-(defgeneric planet-owned-p (planet))
-
 (defgeneric nth-player (n game-map))
 
 (defgeneric angle-between (position-1 position-2))
 
 (defgeneric distance (position-1 position-2))
 
-(defgeneric closest-point-to (source target &key min-distance))
+(defgeneric closest-position (source target &key min-distance))
 
 (defgeneric path-intersects-entity-p (source target entity &key fudge))
 
@@ -32,6 +28,11 @@
 
 (defgeneric planets-between (source target))
 
+(defgeneric ship-docking-p (ship))
+
+(defgeneric planet-owned-p (planet))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;; Classes
@@ -43,8 +44,8 @@
   ((%game-map :initarg :game-map :reader game-map)))
 
 (defclass pos (game-map-mixin)
-  ((%x :initarg :pos-x :reader pos-x :type double-float)
-   (%y :initarg :pos-y :reader pos-y :type double-float)))
+  ((%pos-x :initarg :pos-x :reader pos-x :type double-float)
+   (%pos-y :initarg :pos-y :reader pos-y :type double-float)))
 
 (defclass command-mixin ()
   ((%command :initform nil :accessor command)))
@@ -69,7 +70,8 @@
    (%docking-status :initarg :docking-status :reader docking-status)
    (%planet :initarg :planet :reader planet :initform nil)
    (%progress :initarg :progress :reader progress)
-   (%weapon-cooldown :initarg :weapon-cooldown :reader weapon-cooldown)))
+   (%weapon-cooldown :initarg :weapon-cooldown :reader weapon-cooldown))
+  (:default-initargs :radius +ship-radius+ :health +base-ship-health+))
 
 (defclass game-map ()
   ((%players :initarg :players :reader players)
@@ -88,13 +90,13 @@
 ;;; Methods and Functions
 
 (defmethod make-position ((game-map game-map) (x float) (y float))
-  (make-instance 'position
+  (make-instance 'pos
     :game-map game-map
     :pos-x (coerce x 'double-float)
     :pos-y (coerce y 'double-float)))
 
 (defmethod make-relative-position ((pos pos) (dx float) (dy float))
-  (make-instance 'position
+  (make-instance 'pos
     :game-map (game-map pos)
     :pos-x (+ (pos-x pos) (coerce dx 'double-float))
     :pos-y (+ (pos-y pos) (coerce dy 'double-float))))
@@ -116,11 +118,10 @@
   (atan (- (pos-y target) (pos-y source))
         (- (pos-x target) (pos-x source))))
 
-(defmethod closest-point-to ((source pos) (target pos) &key (min-distance 3))
+(defmethod closest-position ((source pos) (target pos) &key (min-distance 3))
   (let ((angle (angle-between source target))
         (radius (+ (radius target) min-distance)))
-    (values (+ (pos-x target) (* radius (cos angle)))
-            (+ (pos-y target) (* radius (sin angle))))))
+    (make-relative-position target (* (cos angle) radius) (* (sin angle) radius))))
 
 (defmethod path-intersects-entity-p ((source pos) (target pos) (entity entity)
                                      &key (fudge +ship-radius+))
@@ -163,7 +164,20 @@
 ;;;
 ;;; Printing of Game Entities
 
+(defmethod print-object ((pos pos) stream)
+  (print-unreadable-object (pos stream :type t)
+    (format stream ":POS-X ~,2F :POS ~,2F"
+            (pos-x pos) (pos-y pos))))
+
+(defmethod print-object ((player player) stream)
+  (print-unreadable-object (player stream :type t)
+    (format stream ":ID ~S"
+            (id player))))
+
 (defmethod print-object ((entity entity) stream)
   (print-unreadable-object (entity stream :type t)
-    (format stream ":ID ~S :POS-X ~S :POS-Y ~S :HEALTH ~S :OWNER ~S"
-            (id entity) (pos-x entity) (pos-y entity) (health entity) (id (owner entity)))))
+    (format stream ":ID ~S :POS-X ~,2F :POS-Y ~,2F :HEALTH ~S"
+            (id entity) (pos-x entity) (pos-y entity) (health entity))
+    (when (owner entity)
+      (format stream ":OWNER ~S"
+              (id (owner entity))))))

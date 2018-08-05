@@ -4,30 +4,48 @@
 ;;;
 ;;; Receiving Game Entities
 
-;;; A hash table, mapping from ids to game entities.
-(defvar *entity-table*)
+;;; Hash tables mapping from ids to game entities.
+
+(defvar *player-table*)
+
+(defvar *ship-table*)
+
+(defvar *planet-table*)
+
 
 (defun next-value ()
   (read *standard-input*))
 
-(defmethod initialize-instance :after ((instance id-mixin) &rest initargs)
+(defmethod initialize-instance :after ((instance player) &rest initargs)
   (declare (ignore initargs))
-  (setf (gethash (id instance) *entity-table*)
-        instance))
+  (setf (gethash (id instance) *player-table*) instance))
 
-(defun read-id ()
+(defmethod initialize-instance :after ((instance ship) &rest initargs)
+  (declare (ignore initargs))
+  (setf (gethash (id instance) *ship-table*) instance))
+
+(defmethod initialize-instance :after ((instance planet) &rest initargs)
+  (declare (ignore initargs))
+  (setf (gethash (id instance) *planet-table*) instance))
+
+(defun read-by-id (table)
   (let ((id (next-value)))
-    (if (zerop id)
-        :unknown-entity
-        (or (gethash id *entity-table*)
-            (error "Invalid id: ~D." id)))))
+    (gethash id table)))
+
+(defun read-ship-by-id ()
+  (read-by-id *ship-table*))
+
+(defun read-planet-by-id ()
+  (read-by-id *planet-table*))
 
 (defun read-list (read-fn &rest args)
   (let ((n (next-value)))
     (loop repeat n collect (apply read-fn args))))
 
 (defun read-game-map ()
-  (let ((*entity-table* (make-hash-table))
+  (let ((*player-table* (make-hash-table))
+        (*ship-table* (make-hash-table))
+        (*planet-table* (make-hash-table))
         (*read-default-float-format* 'double-float)
         (*read-eval* nil)
         (game-map (make-instance 'game-map)))
@@ -58,7 +76,7 @@
       (1 :docking)
       (2 :docked)
       (3 :undocking))
-    :planet (read-id)
+    :planet (read-planet-by-id)
     :progress (next-value)
     :weapon-cooldown (next-value)))
 
@@ -74,12 +92,12 @@
     :production (next-value)
     :resources (next-value)
     :owner
-    (let ((owner-p (zerop (next-value)))
+    (let ((owner-p (plusp (next-value)))
           (owner-id (next-value)))
-      (and owner-p (gethash owner-id *entity-table*)))
+      (and owner-p (gethash owner-id *player-table*)))
     :docked-ships
     (loop repeat (next-value)
-          collect (read-id))))
+          collect (read-ship-by-id))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -90,7 +108,7 @@
   (let ((user-id (next-value))
     (width (next-value))
     (height (next-value)))
-    (princ bot-name *standard-output*)
+    (format *standard-output* "~S~%" bot-name)
     (let ((game-map (read-game-map)))
       (make-instance 'game
         :user-id user-id
@@ -124,16 +142,16 @@
   (values))
 
 (defmethod send-command ((command move-command) stream)
-  (format stream "t ~D ~D ~D~%"
+  (format stream "t ~D ~D ~D "
           (id (ship command))
-          (move-speed command)
-          (move-angle command)))
+          (round (move-speed command))
+          (round (* (move-angle command) 180.0d0 (/ pi)))))
 
 (defmethod send-command ((command dock-command) stream)
-  (format stream "d ~D ~D~%"
+  (format stream "d ~D ~D "
           (id (ship command))
           (id (planet command))))
 
 (defmethod send-command ((command undock-command) stream)
-  (format stream "u ~D~%"
+  (format stream "u ~D "
           (id (ship command))))

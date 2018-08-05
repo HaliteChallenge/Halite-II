@@ -19,21 +19,29 @@
    #:+spawn-radius+
 
    ;; Functions
+   #:game
    #:make-game
    #:finalize-turn
-   #:game
+   #:make-position
+   #:make-relative-position
+   #:nth-player
    #:angle-between
    #:distance
-   #:closest-point-to
+   #:closest-position
+   #:path-intersects-entity-p
    #:nearby-entities
    #:nearby-entities-by-distance
+   #:obstacles-between
+   #:ships-between
+   #:planets-between
    #:ship-docking-p
    #:planet-owned-p
-   #:nth-player
    #:id
+   #:game-map
+   #:pos-x
+   #:pos-y
+   #:command
    #:ships
-   #:x
-   #:y
    #:radius
    #:health
    #:owner
@@ -41,8 +49,8 @@
    #:resources
    #:docking-spots
    #:docked-ships
-   #:x-velocity
-   #:y-velocity
+   #:vel-x
+   #:vel-y
    #:docking-status
    #:planet
    #:progress

@@ -22,8 +22,8 @@
   ((%ship :initarg :ship :reader ship)))
 
 (defclass move-command (command)
-  ((%move-speed :initarg :speed :reader move-speed :type integer)
-   (%move-angle :initarg :angle :reader move-angle :type (integer 0 359))))
+  ((%move-speed :initarg :speed :reader move-speed)
+   (%move-angle :initarg :angle :reader move-angle)))
 
 (defclass dock-command (command)
   ((%planet :initarg :planet :reader planet)))
@@ -37,25 +37,28 @@
 
 (defmethod initialize-instance :after ((command command) &rest initargs)
   (declare (ignore initargs))
-  (with-accessors ((current-command command)) (ship command)
-    (if (null current-command)
-        (setf current-command command)
-        (error "Multiple commands in one turn for ship ~A." (ship command)))))
+  (setf (command (ship command)) command))
 
-(defmethod issue-move-command ((ship ship) (speed float) (angle float))
+(defmethod issue-move-command ((ship ship) (speed number) (angle number))
+  (when (minusp speed)
+    (incf angle pi)
+    (setf speed (abs speed)))
   (make-instance 'move-command
     :ship ship
-    :move-speed (coerce speed 'double-float)
-    :move-angle (coerce angle 'double-float)))
+    :speed (min speed +max-speed+)
+    :angle (mod angle (* 2 pi))))
 
 (defmethod issue-dock-command ((ship ship) (planet planet))
-  (make-instance 'move-command
-    :ship ship
-    :planet planet))
+  (when (<= (distance ship planet)
+            (+ (radius planet) (radius ship) +dock-radius+))
+    (make-instance 'dock-command
+      :ship ship
+      :planet planet)))
 
 (defmethod issue-undock-command ((ship ship))
-  (make-instance 'move-command
-    :ship ship))
+  (when (ship-docking-p ship)
+    (make-instance 'undock-command
+      :ship ship)))
 
 (defmethod issue-navigate-command
     ((ship ship) target &key (speed +max-speed+)
@@ -87,3 +90,21 @@
                     (1- max-corrections))))))
     (navigate-to target (if avoid-obstacles max-corrections 0))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; Printing of Commands
+
+(defmethod print-object ((command move-command) stream)
+  (print-unreadable-object (command stream :type t)
+    (format stream ":SHIP-ID ~S :SPEED ~S :ANGLE ~S"
+            (id (ship command)) (move-speed command) (move-angle command))))
+
+(defmethod print-object ((command dock-command) stream)
+  (print-unreadable-object (command stream :type t)
+    (format stream ":SHIP-ID ~S :PLANET-ID ~S"
+            (id (ship command)) (id (planet command)))))
+
+(defmethod print-object ((command undock-command) stream)
+  (print-unreadable-object (command stream :type t)
+    (format stream ":SHIP-ID ~S"
+            (id (ship command)))))
