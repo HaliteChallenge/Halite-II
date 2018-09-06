@@ -15,8 +15,8 @@ The Halite Team has compiled a list of useful tools for you to check out. We hav
 
 ## Analyzing your bot
 Here are some tools to figure out how well your bot is playing. Most of these are for your local iteration workflows
-- **Match Manager:** <https://github.com/smiley1983/halite2-match-manager> 
-- **Alternative Local Replay Viewer:** <https://github.com/fohristiwhirl/chlorine> from <https://forums.halite.io/t/alternative-local-replay-viewer/248>
+- **Match Manager:** <https://github.com/smiley1983/halite2-match-manager>
+- **Alternative Local Replay Viewer:** <https://github.com/fohristiwhirl/chlorine> from <https://2017.forums.halite.io/t/alternative-local-replay-viewer/248>
 - **Tool to pipe game replay through the bot to recover logs or see differences in output** <https://github.com/fohristiwhirl/halite2_reload> - Created by player [fohristiwhirl](https://halite.io/user?user_id=1278), rank 17.
 - **Accurate local ranking info** <https://github.com/HaliteChallenge/Halite-II/tree/master/tools/manager>
 - **Fast one on one bot tests** <https://github.com/HaliteChallenge/Halite-II/tree/master/tools/hlt_client/hlt_client>
@@ -27,18 +27,15 @@ Here are some tools to figure out how well your bot is playing. Most of these ar
 - Get replays for challenges: <https://gist.github.com/fohristiwhirl/a88b33afec9695dcf2af72d2378fea4f>
 
 ## Open-source bots & post-mortems
-Taken from the forum post <https://forums.halite.io/t/post-mortem-bot-source-code/1372>, here are a few bots from the top 10 that were open-sourced when the competition ended. Thanks to all 20+ players who have made their source code available to the community!
+Taken from the forum post <https://2017.forums.halite.io/t/post-mortem-bot-source-code/1372>, here are a few bots from the top 10 that were open-sourced when the competition ended. Thanks to all 20+ players who have made their source code available to the community!
 
-- From [ReCurs3](https://halite.io/user?user_id=1896) Rank 1: <https://recursive.cc/blog/halite-ii-post-mortem.html>
-- From [FakePsyho](https://halite.io/user?user_id=4355) Rank 2: <https://github.com/FakePsyho/halite2>
-- From [shummie](https://halite.io/user?user_id=1281) Rank 3: <https://shummie.github.io/Halite-2-Shummie/>, <https://bitbucket.org/rbshum/halite-2-shummie/src>
-- From [Prisoner3D](https://halite.io/user?user_id=1647) Rank 4: <https://github.com/Prisoner3D/Halite-II>
-- From [mellendo](https://halite.io/user?user_id=1117) Rank 6: <https://github.com/mellendo/Halite2>
-- From [mlomb](https://halite.io/user?user_id=5622) Rank 7: <https://github.com/mlomb/halite2-bot>
+- From [ReCurs3](https://2017.halite.io/user?user_id=1896) Rank 1: <https://recursive.cc/blog/halite-ii-post-mortem.html>
+- From [FakePsyho](https://2017.halite.io/user?user_id=4355) Rank 2: <https://github.com/FakePsyho/halite2>
+- From [shummie](https://2017.halite.io/user?user_id=1281) Rank 3: <https://shummie.github.io/Halite-2-Shummie/>, <https://bitbucket.org/rbshum/halite-2-shummie/src>
+- From [Prisoner3D](https://2017.halite.io/user?user_id=1647) Rank 4: <https://github.com/Prisoner3D/Halite-II>
+- From [mellendo](https://2017.halite.io/user?user_id=1117) Rank 6: <https://github.com/mellendo/Halite2>
+- From [mlomb](https://2017.halite.io/user?user_id=5622) Rank 7: <https://github.com/mlomb/halite2-bot>
 
 Also a summary & a post-mortem on ML:
-- From [arjunvis](https://halite.io/user?user_id=1052) Rank 62: <https://forums.halite.io/t/concrete-info-top-100-with-rl-policy-gradients/892>
-- From [pshah123](https://halite.io/user?user_id=6473) Rank 102: <https://forums.halite.io/t/quick-post-mortem-on-improving-basic-bots-with-ml/1401>
-
-
-
+- From [arjunvis](https://2017.halite.io/user?user_id=1052) Rank 62: <https://2017.forums.halite.io/t/concrete-info-top-100-with-rl-policy-gradients/892>
+- From [pshah123](https://2017.halite.io/user?user_id=6473) Rank 102: <https://2017.forums.halite.io/t/quick-post-mortem-on-improving-basic-bots-with-ml/1401>
