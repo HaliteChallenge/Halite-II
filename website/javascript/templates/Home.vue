@@ -164,7 +164,7 @@
                                 <div class="clear"></div>
                                 <div class="ha-button-container no-bg-button">
                                     <div>
-                                        <a href="https://forums.halite.io/" target="_blank" class="ha-button"><span>JOIN NOW</span></a>
+                                        <a href="https://2017.forums.halite.io/" target="_blank" class="ha-button"><span>JOIN NOW</span></a>
                                     </div>
                                 </div>
                             </div>
