@@ -24,28 +24,7 @@ export function me_cached () {
 }
 
 export function me () {
-  if (cached_me !== null) return Promise.resolve(cached_me)
-  else if (logged_in === false) return Promise.resolve(null)
-
-  return $.get({
-    url: `${LOGIN_SERVER_URL}/me`,
-    xhrFields: {
-      withCredentials: true
-    }
-  }).then((me) => {
-    if (me === null) {
-      logged_in = false
-      return null
-    }
-    logged_in = true
-    return get_user(me.user_id).then((user) => {
-      cached_me = user
-      window.localStorage['cache'] = Date.now()
-      window.localStorage['user_id'] = user.user_id
-      window.localStorage['username'] = user.username
-      return user
-    })
-  })
+  return Promise.resolve(null)
 }
 
 export function get_user (user_id) {
@@ -247,27 +226,39 @@ export function get_expired_replay (replay_class, replay_name) {
 }
 
 export function leaderboard (filters, hackathon = null, offset = null, limit = null) {
-  let url = `${API_SERVER_URL}/leaderboard`
-  let fields = {}
-  if (hackathon) {
-    url = `${API_SERVER_URL}/hackathon/${hackathon}/leaderboard`
-    fields.withCredentials = true
-  }
-
-  const querystring = []
-  if (offset !== null && limit !== null) {
-    querystring.push(`offset=${offset}&limit=${limit}`)
-  }
-  if (filters && filters.length > 0) {
-    filters = filters.map(window.encodeURIComponent);
-    querystring.push(`filter=${filters.join('&filter=')}`)
-  }
-  if (querystring.length > 0) {
-    url += `?${querystring.join('&')}`
-  }
+  console.log(filters);
   return $.get({
-    url: url,
-    xhrFields: fields
+    url: '/static_data/leaderboard.json',
+  }).then((data) => {
+    if (filters && filters.length > 0) {
+      const conditions = [];
+      for (const filter of filters) {
+        const [ field, _, value ] = filter.split(/,/g);
+        if (field === "organization_id") {
+          value = parseInt(value, 10);
+        }
+        if (field === "country_code") {
+          field = "country";
+        }
+        conditions.push([ field, value ]);
+      }
+      data = data.filter(player => {
+        for (const [ field, value ] of conditions) {
+          if (player[field] !== value) {
+            return false;
+          }
+        }
+        return true;
+      });
+    }
+
+    if (offset) {
+      data = data.slice(offset);
+    }
+    if (limit) {
+      data = data.slice(0, limit);
+    }
+    return data;
   })
 }
 

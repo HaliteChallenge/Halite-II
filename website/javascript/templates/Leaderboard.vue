@@ -141,7 +141,7 @@ import moment from 'moment'
 import dateformat from 'dateformat'
 import ChallengeModal from './ChallengeModal.vue'
 
-const DEFAULT_LIMIT = 25
+const DEFAULT_LIMIT = 100
 
 export default {
     name: 'leaderboard',
