@@ -3,25 +3,13 @@
 import Vue from 'vue'
 import 'url-search-params-polyfill'
 import 'element-ui/lib/theme-default/index.css'
-import Associate from './templates/Associate.vue'
-import BotEditor from './templates/BotEditor.vue'
 import FinalsStatus from './templates/FinalsStatus.vue'
-import GameFeed from './templates/GameFeed.vue'
-import HackathonLeaderboard from './templates/HackathonLeaderboard.vue'
 import LeaderboardContainer from './templates/LeaderboardContainer.vue'
 import Upload from './templates/Upload.vue'
 import UserProfile from './templates/UserProfile.vue'
 import UserProfileBar from './templates/UserProfileBar.vue'
-import EditUserProfile from './templates/EditUserProfile.vue'
-import VerifyEmail from './templates/VerifyEmail.vue'
 import VisualizerContainer from './templates/VisualizerContainer.vue'
-import HaliteTV from './templates/HaliteTV.vue'
 import Home from './templates/Home.vue'
-import HackathonPortal from './templates/HackathonPortal.vue'
-import HackathonIndividual from './templates/HackathonIndividual.vue'
-import LeaguesPortal from './templates/LeaguesPortal.vue'
-import LeagueIndividual from './templates/LeagueIndividual.vue'
-import Onboarding from './templates/Onboarding.vue'
 import Play from './templates/Play.vue'
 import View404 from './templates/404.vue'
 
@@ -35,34 +23,10 @@ Vue.use(require('vue-cookie'))
 Vue.use(require('element-ui'))
 
 window.views = {
-  Associate: function () {
-    new Vue({
-      el: '#associate-container',
-      render: (h) => h(Associate)
-    })
-  },
-  BotEditor: function () {
-    new Vue({
-      el: '#bot-editor-container',
-      render: (h) => h(BotEditor)
-    })
-  },
   FinalsStatus: function () {
     new Vue({
       el: '#finals-status',
       render: (h) => h(FinalsStatus, { props: { baseUrl: _global.baseUrl } })
-    })
-  },
-  GameFeed: function () {
-    new Vue({
-      el: '#game-feed',
-      render: (h) => h(GameFeed, { props: { baseUrl: _global.baseUrl } })
-    })
-  },
-  HackathonLeaderboard: function () {
-    new Vue({
-      el: '#hackathon-leaderboard-container',
-      render: (h) => h(HackathonLeaderboard)
     })
   },
   LeaderboardContainer: function () {
@@ -83,18 +47,6 @@ window.views = {
       render: (h) => h(UserProfile, { props: { baseUrl: _global.baseUrl } })
     })
   },
-  EditUserProfile: function () {
-    new Vue({
-      el: '#edit-user-profile-container',
-      render: (h) => h(EditUserProfile, { props: { baseUrl: _global.baseUrl } })
-    })
-  },
-  VerifyEmail: function () {
-    new Vue({
-      el: '#verify-email-container',
-      render: (h) => h(VerifyEmail)
-    })
-  },
   Visualizer: function () {
     new Vue({
       el: '#visualizer-container',
@@ -107,52 +59,16 @@ window.views = {
       render: (h) => h(VisualizerContainer, { props: { baseUrl: _global.baseUrl } })
     })
   },
-  HaliteTV: function () {
-    new Vue({
-      el: '#halite-tv-container',
-      render: (h) => h(HaliteTV, { props: { baseUrl: _global.baseUrl } })
-    })
-  },
   Home: function () {
     new Vue({
       el: '#home-container',
       render: (h) => h(Home, { props: { baseUrl: _global.baseUrl } })
     })
   },
-  HackathonPortal: function () {
-    new Vue({
-      el: '#hackathon-container',
-      render: (h) => h(HackathonPortal, { props: { baseUrl: _global.baseUrl } })
-    })
-  },
-  HackathonIndividual: function () {
-    new Vue({
-      el: '#hackathon-container',
-      render: (h) => h(HackathonIndividual, { props: { baseUrl: _global.baseUrl } })
-    })
-  },
   Play: function () {
     new Vue({
       el: '#play-container',
       render: (h) => h(Play, { props: { baseUrl: _global.baseUrl } })
-    })
-  },
-  LeaguesPortal: function(){
-    new Vue({
-      el: '#leagues-portal-container',
-      render: (h) => h(LeaguesPortal, { props: {baseUrl: _global.baseUrl }})
-    })
-  },
-  LeagueIndividual: function(){
-    new Vue({
-      el: '#leagues-individual-container',
-      render: (h) => h(LeagueIndividual, { props: {baseUrl: _global.baseUrl }})
-    })
-  },
-  Onboarding: function () {
-    new Vue({
-      el: '#onboarding-container',
-      render: (h) => h(Onboarding, { props: { baseUrl: _global.baseUrl } })
     })
   },
   View404: function () {

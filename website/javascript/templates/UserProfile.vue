@@ -39,23 +39,6 @@
 
                 </div>
                 <div class="game-replay-share text-center">
-                    <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>
-                    <div class="popup-container" v-show="sharePopup">
-                        <div class="popup-share">
-                            <label>Share as a link</label>
-                            <div class="form-inline-button">
-                                <input ref="shareInput" type="text" :value="shareLink">
-                                <button class="btn" @click="copyToClipboard">
-                                    <span>Copy</span>
-                                </button>
-                            </div>
-                            <div class="share-socials">
-                                <a :href="shareSocial('facebook')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"><i class="fa fa-facebook-official"></i></a>
-                                <a :href="shareSocial('twitter')"><i class="fa fa-twitter"></i></a>
-                                <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank"><i class="fa fa-linkedin"></i></a>
-                            </div>
-                        </div>
-                    </div>
                     <div>
                         <p v-if="userHistory.length" style="margin-top: 20px;"><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
                     </div>
@@ -444,68 +427,8 @@
             }
           })
         },
-        next_page: function () {
-          this.offset += 10
-          this.fetch().then((data) => {
-            this.page += 1
-            this.isLastPage = false;
-          }).catch((message) => {
-            this.isLastPage = true;
-          })
-        },
-        prev_page: function () {
-          this.offset -= 10
-          this.fetch().then(() => {
-            this.page -= 1
-          })
-        },
-        toggle_filter: function () {
-          this.only_timed_out = !this.only_timed_out
-          this.offset = 0
-          this.fetch().then(() => {
-            this.page = 0
-          })
-        },
-        error_log_link: function (game_id) {
-          return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/error_log`
-        },
-        replay_download_link: function (game_id) {
-          return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/replay`
-        },
         replay_link: function (game_id) {
           return `/play/?game_id=${game_id}`
-        },
-        prev_badge: () => {
-          let content = $('.user-profile-badge-content')
-          let list = $('.user-profile-badge-list')
-          let contentWidth = $(content).width()
-          let listWidth = $(list).children('li').outerWidth(true) * $(list).children('li').length
-          let marginLeft = parseInt($(list).css('marginLeft'))
-          let interval = 20
-          let aniVal = 0
-          let cal = listWidth + marginLeft - contentWidth
-          if (cal > interval) {
-            aniVal = interval
-          } else if (cal > 0 <= interval) {
-            aniVal = cal
-          } else {
-            aniVal = 0
-          }
-          $(list).animate({marginLeft: '-=' + aniVal + 'px'})
-        },
-        next_badge: () => {
-          let list = $('.user-profile-badge-list')
-          let marginLeft = Math.abs(parseInt($(list).css('marginLeft')))
-          let interval = 20
-          let aniVal = 0
-          if (marginLeft > interval) {
-            aniVal = interval
-          } else if (marginLeft > 0 <= interval) {
-            aniVal = marginLeft
-          } else {
-            aniVal = 0
-          }
-          $(list).animate({marginLeft: '+=' + aniVal + 'px'})
         },
         getFormattedDateForGames: function (date, return_value_not_valid) {
           var cdate = moment(date)
@@ -519,42 +442,11 @@
         gaData: function (category, action, label) {
           utils.gaEvent(category, action, label)
         },
-        toggleShare: function () {
-          this.sharePopup = !this.sharePopup
-        },
-        shareSocial: function (social) {
-          let text = 'Halite II Player - ' + this.user.username + ' Rank: ' + this.user.rank + ' Tier: ' + this.user.tier + ' '
-          let tags = 'haliteplayerstats'
-          switch (social) {
-            case 'facebook':
-              return 'https://www.facebook.com/sharer.php?u=' + encodeURIComponent(window.location.href)
-              break
-            case 'twitter':
-              return 'https://twitter.com/intent/tweet?text=' + text + '&url=' + encodeURIComponent(window.location.href) + '&hashtags=' + tags + '&via=haliteAI'
-              break
-            case 'linkedin':
-              return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}`
-              break
-          }
-        },
-        sortChallenge: function(players) {
-          return _.sortBy(players, (player) => -player.points)
-        },
-        /**
-         * @param  {e} event
-         * @return {void}
-         */
         copyToClipboard: function (e) {
           if (e) e.preventDefault()
           this.$refs.shareInput.select()
           document.execCommand('copy')
         },
-        openChallengeModal: function(e) {
-          this.isChallengeModalOpen = true;
-        },
-        closeChallengeModal: function(e) {
-            this.isChallengeModalOpen = false;
-        }
       }
     }
 </script>

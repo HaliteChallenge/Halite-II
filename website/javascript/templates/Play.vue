@@ -22,23 +22,10 @@
         <div class="col-sm-6">
           <div data-v-2c45658c="" id="bot-upload-container" class="upload-container">
             <div data-v-2c45658c="" class="upload-desc text-center">
-              <h2 data-v-2c45658c="">Submissions have closed</h2> 
+              <h2 data-v-2c45658c="">Submissions have closed</h2>
               <p data-v-2c45658c="">The 2017-2018 season of Halite has ended. But you can still<a data-v-8c5003f2="" href="https://api.halite.io/v1/login/github"> sign up </a>to join our newsletter to be the first to know about future competitions.</p>
-            </div> 
+            </div>
           </div>
-          <!-- <div class="upload-container" id="bot-upload-container">
-            <div class="upload-desc text-center">
-              <h2>Submit a bot</h2>
-              <p>To play a Halite bot in the competition, submit a .zip file here. Bot submissions need to adhere to specific guidelines</p>
-              <p><a href="/learn-programming-challenge/downloads-and-starter-kits/submit-bot">Learn more</a></p>
-            </div>
-            <Upload :logged-in="loggedIn" :showMessage="showMessage"></Upload>
-            <div class="upload-note text-center">
-              <h2>advanced submission options</h2>
-              <p>You can also submit a bot using our <a href="/learn-programming-challenge/halite-cli-and-tools/halite-client-tools">Halite Client Tools</a></p>
-            </div>
-          </div> -->
-          
         </div>
         <div class="col-sm-6">
           <div class="upload-container">
@@ -67,13 +54,6 @@
         <h2 class="font-headline">Sorry, Not Supported</h2>
         <p>You must play Halite on a desktop device.<br>This page is not supported on mobile.</p>
       </div>
-    </div>
-
-    <div id="halite-uploaded-bot" v-if="currentView=='botUpload'">
-
-      <bot-upload :user="user" :bot-file="botFile" :bots-list="botsList"  v-if="currentView='botUpload'"
-      :showMessage="showMessage"></bot-upload>
-
     </div>
 
     <div v-if="message" class="row">
@@ -110,8 +90,6 @@
   import HaliteBreadcrumb from './Breadcrumb.vue'
   import VisualizerContainer from './VisualizerContainer.vue'
   import * as libhaliteviz from '../../../libhaliteviz'
-  import Upload from './Upload.vue'
-  import BotUpload from './BotUpload.vue'
   import Message from './Message.vue'
   import {Alert} from '../utils.js'
   import UploadZone from './UploadZone.vue'
@@ -161,8 +139,6 @@
     name: 'uploader',
     props: ['baseUrl'],
     components: {
-      'Upload': Upload,
-      'bot-upload': BotUpload,
       'visualizer-container': VisualizerContainer,
       'halite-upload-zone': UploadZone,
       HaliteBreadcrumb

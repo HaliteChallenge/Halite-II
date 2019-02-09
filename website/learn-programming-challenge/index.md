@@ -5,15 +5,10 @@ breadcrumb: Learn
 toc: false
 menu: learn
 description: Welcome to the Halite II competition! Learn how to quickly get started downloading, building, and submitting an AI bot.
-mount_view: Onboarding
-additional_js: ["FileSaver.min", "jszip.min", "jszip-utils.min", "editorBuild/code_edit/built-codeEdit.min"]
-additional_css: ["built-codeEdit", "dark-codeEdit"]
 ---
 <script>
   var site_downloads = {{ site.data.downloads | jsonify }};
 </script>
-
-<div id="onboarding-container"></div>
 
 ### NOTE: The 2017-2018 season of Halite II has ended and submissions have closed. You can still create an account to be alerted when we launch the next season, and you can always play offline.
 
@@ -37,7 +32,7 @@ Next, get a feel for how to play the game. Here's one of our favorite videos:
 
 To find more games, check out some user profiles, where you'll find recently played games.
 
-You might also want to [browse the game rules][game rules], but it helps to watch some videos first.  
+You might also want to [browse the game rules][game rules], but it helps to watch some videos first.
 
 ### 3) DOWNLOAD A BOT
 
