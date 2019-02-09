@@ -17,16 +17,6 @@
                             <span v-if="lang.length > 0" class="hl"><a  :href="`/programming-competition-leaderboard?language=${lang}`">{{lang}}</a></span><span v-if="(index+1) < botLang.length">,</span>
                         </template>
                     </p>
-                    <div v-if="is_my_page && bots && bots[0] && bots[0].compilation_status==='Disabled'" class="text-center" style="margin-top: 10px;">
-                        <p class="warning">
-                            Your bot is disabled   <span title="Due to excessive timeouts or errors, you bot has been disabled, look at the game logs to debug the issue or try submitting it again." class="info-icon icon-info"></span>
-                        </p>
-                    </div>
-                     <div v-if="is_my_page && bots && bots[0] && bots[0].compilation_status==='Failed'" class="text-center" style="margin-top: 10px;">
-                        <p class="warning">
-                            Your bot failed to compile   <span title="Look at the compilation failure mail to debug the issue or try submitting it again." class="info-icon icon-info"></span>
-                        </p>
-                    </div>
                 </div>
                 <div class="user-profile-rank">
                     <i class="xline xline-top"></i>
@@ -122,11 +112,6 @@
                                     <span title="Games played by your bot, replay files are kept forever, but games data might be deleted every 2 weeks" class="info-icon icon-info pull-right"></span>
                                 </h2>
 
-                                <!-- <div v-if="!games.length" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
-                                    <h2>No games played yet</h2>
-                                    <p v-if="is_my_page">Complete your first game and view replays. <br/> <a href="/play-programming-challenge">Play here</a></p>
-                                </div> -->
                                 <div v-if="games.length">
                                     <table class="table table-leader">
                                         <thead>
@@ -165,71 +150,8 @@
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <div class="btn-group text-center" role="group" aria-label="Game Navigation">
-                                        <button
-                                            type="button"
-                                            class="btn"
-                                            :disabled="page === 0"
-                                            v-on:click="prev_page"><span>Prev</span></button>
-                                        <button
-                                            type="button"
-                                            class="btn"
-                                            :disabled="isLastPage"
-                                            v-on:click="next_page"><span>Next</span></button>
-                                    </div>
                                 </div>
 
-                            </section>
-                            <section v-if="is_my_page" class="profile-section profile-section-error">
-                                <h2>
-                                    <i class="xline xline-bottom"></i>
-                                    Your Errors
-                                    <span title="Download the replay files and error logs (last 30) for games where your bot errored or timed out." class="info-icon icon-info pull-right"></span>
-                                </h2>
-                                 <div v-if="!error_games.length" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
-                                    <h2>No errors yet</h2>
-                                </div>
-                                <div>
-                                    <div v-if="error_games.length > 0" class="table-sticky-container">
-                                        <div class="table-wrapper">
-                                            <table class="table table-leader table-sticky">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Id</th>
-                                                        <th class="hidden-xs">Date</th>
-                                                        <th>Log File</th>
-                                                        <th>Game</th>
-                                                    </tr>
-                                                </thead>
-                                            </table>
-                                            <div class="table-scrollable-content">
-                                                <table class="table table-leader">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Id</th>
-                                                            <th class="hidden-xs">Date</th>
-                                                            <th>Log File</th>
-                                                            <th>Game</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-for="game in error_games">
-                                                            <td>{{game.game_id}}</td>
-                                                            <td class="hidden-xs"><time :datetime="game.time_played"
-                                                                    :title="game.time_played">
-                                                                    {{ getFormattedDateForGames(game.time_played)}}
-                                                                </time>
-                                                            </td>
-                                                            <td><a :href="error_log_link(game.game_id)" target="_blank">Download Log</a></td>
-                                                            <td><a :href="replay_link(game.game_id)" target="_blank">View</a> / <a :href="replay_download_link(game.game_id)" target="_blank">Download</a></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </section>
                         </div>
                     </div>
@@ -241,11 +163,6 @@
                                     Rating Analysis
                                     <span title="Rating is calculated as mu - 3 * sigma;" class="info-icon icon-info pull-right"></span>
                                 </h2>
-                                <!-- <div v-if="!user.mu" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
-                                    <h2>No rating analysis</h2>
-                                    <p v-if="is_my_page">Submit your first bot to get your rating. <br/> <a href="/play-programming-challenge">Play here</a></p>
-                                </div> -->
                                 <div v-if="user.mu" class="user-profile-rank-stats">
                                     <div class="stats-item">
                                         <h3>Rating</h3>
@@ -267,11 +184,6 @@
                                     History
                                     <span title="Rank/Rating history of your bots, the rank/rating is the last rating or rank achieved before the bot was retired." class="info-icon icon-info pull-right"></span>
                                 </h2>
-                                <!-- <div v-if="!userHistory.length" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
-                                    <h2>No history</h2>
-                                    <p v-if="is_my_page">Submit your first bot to see your history.<br/> <a href="/play-programming-challenge">Play here</a></p>
-                                </div> -->
                                 <div v-if="userHistory.length > 0">
                                     <div class="table-sticky-container">
                                         <div class="table-wrapper">
@@ -423,10 +335,6 @@
           }
         }, (e) => {
           window.location.replace(`${this.baseUrl}/404`);
-        })
-
-        api.me().then((me) => {
-          this.is_my_page = me && me.user_id === this.user.user_id
         })
 
         // sticky tables
