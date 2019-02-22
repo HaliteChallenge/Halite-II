@@ -25,9 +25,9 @@ markdown: kramdown
 
 permalink: /blog/:year/:month/:day/:title.html
 
-api_server_url: "https://api.halite.io/v1/api"
-login_server_url: "https://api.halite.io/v1/login"
-logout_server_url: "https://api.halite.io/v1/logout/"
+api_server_url: ""
+login_server_url: ""
+logout_server_url: ""
 
 breadcrumbs:
   root:

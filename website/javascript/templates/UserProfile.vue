@@ -17,16 +17,6 @@
                             <span v-if="lang.length > 0" class="hl"><a  :href="`/programming-competition-leaderboard?language=${lang}`">{{lang}}</a></span><span v-if="(index+1) < botLang.length">,</span>
                         </template>
                     </p>
-                    <div v-if="is_my_page && bots && bots[0] && bots[0].compilation_status==='Disabled'" class="text-center" style="margin-top: 10px;">
-                        <p class="warning">
-                            Your bot is disabled   <span title="Due to excessive timeouts or errors, you bot has been disabled, look at the game logs to debug the issue or try submitting it again." class="info-icon icon-info"></span>
-                        </p>
-                    </div>
-                     <div v-if="is_my_page && bots && bots[0] && bots[0].compilation_status==='Failed'" class="text-center" style="margin-top: 10px;">
-                        <p class="warning">
-                            Your bot failed to compile   <span title="Look at the compilation failure mail to debug the issue or try submitting it again." class="info-icon icon-info"></span>
-                        </p>
-                    </div>
                 </div>
                 <div class="user-profile-rank">
                     <i class="xline xline-top"></i>
@@ -49,48 +39,7 @@
 
                 </div>
                 <div class="game-replay-share text-center">
-                    <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>
-                    <div class="popup-container" v-show="sharePopup">
-                        <div class="popup-share">
-                            <label>Share as a link</label>
-                            <div class="form-inline-button">
-                                <input ref="shareInput" type="text" :value="shareLink">
-                                <button class="btn" @click="copyToClipboard">
-                                    <span>Copy</span>
-                                </button>
-                            </div>
-                            <div class="share-socials">
-                                <a :href="shareSocial('facebook')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"><i class="fa fa-facebook-official"></i></a>
-                                <a :href="shareSocial('twitter')"><i class="fa fa-twitter"></i></a>
-                                <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank"><i class="fa fa-linkedin"></i></a>
-                            </div>
-                        </div>
-                    </div>
                     <div>
-                        <div v-if="!is_my_page">
-                          <button class="btn" @click="openChallengeModal">
-                              <span>CHALLENGE</span>
-                          </button>
-                          <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="user.username"></ChallengeModal>
-                        </div>
-                        <button v-else class="btn" @click="toggleShare">
-                            <span>SHARE</span>
-                        </button>
-                        <!-- <div class="user-profile-badge">
-                            <i class="xline xline-top"></i>
-                            <h2>Badges</h2>
-                            <div class="user-profile-badge-page"><img v-on:click.stop.prevent="prev_badge" :src="`${baseUrl}/assets/images/page-prev.svg`"><img v-on:click.stop.prevent="next_badge" :src="`${baseUrl}/assets/images/page-next.svg`"></div>
-                            <div class="user-profile-badge-content">
-                                <ul class="user-profile-badge-list">
-                                    <li><img :src="`${baseUrl}/assets/images/temp/badge_1.png`"></li>
-                                    <li><img :src="`${baseUrl}/assets/images/temp/badge_2.png`"></li>
-                                    <li><img :src="`${baseUrl}/assets/images/temp/badge_3.png`"></li>
-                                    <li><img :src="`${baseUrl}/assets/images/temp/badge_4.png`"></li>
-                                    <li><img :src="`${baseUrl}/assets/images/temp/badge_5.png`"></li>
-                                </ul>
-                            </div>
-                            <a v-if="is_my_page" class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
-                        </div> -->
                         <p v-if="userHistory.length" style="margin-top: 20px;"><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
                     </div>
                 </div>
@@ -134,13 +83,6 @@
                         <i class="xline xline-bottom"></i>
                         </a>
                     </li>
-                    <li role="presentation">
-                        <a href="#hackathons" @click="refreshStickyTable" aria-controls="hackathons" role="tab" data-toggle="tab">
-                        <i class="xline xline-top"></i>
-                        <span>Hackathons</span>
-                        <i class="xline xline-bottom"></i>
-                        </a>
-                    </li>
                 </ul>
                 <!-- Tab panes -->
                 <div class="tab-content">
@@ -153,11 +95,6 @@
                                     <span title="Games played by your bot, replay files are kept forever, but games data might be deleted every 2 weeks" class="info-icon icon-info pull-right"></span>
                                 </h2>
 
-                                <!-- <div v-if="!games.length" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
-                                    <h2>No games played yet</h2>
-                                    <p v-if="is_my_page">Complete your first game and view replays. <br/> <a href="/play-programming-challenge">Play here</a></p>
-                                </div> -->
                                 <div v-if="games.length">
                                     <table class="table table-leader">
                                         <thead>
@@ -196,71 +133,8 @@
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <div class="btn-group text-center" role="group" aria-label="Game Navigation">
-                                        <button
-                                            type="button"
-                                            class="btn"
-                                            :disabled="page === 0"
-                                            v-on:click="prev_page"><span>Prev</span></button>
-                                        <button
-                                            type="button"
-                                            class="btn"
-                                            :disabled="isLastPage"
-                                            v-on:click="next_page"><span>Next</span></button>
-                                    </div>
                                 </div>
 
-                            </section>
-                            <section v-if="is_my_page" class="profile-section profile-section-error">
-                                <h2>
-                                    <i class="xline xline-bottom"></i>
-                                    Your Errors
-                                    <span title="Download the replay files and error logs (last 30) for games where your bot errored or timed out." class="info-icon icon-info pull-right"></span>
-                                </h2>
-                                 <div v-if="!error_games.length" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
-                                    <h2>No errors yet</h2>
-                                </div>
-                                <div>
-                                    <div v-if="error_games.length > 0" class="table-sticky-container">
-                                        <div class="table-wrapper">
-                                            <table class="table table-leader table-sticky">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Id</th>
-                                                        <th class="hidden-xs">Date</th>
-                                                        <th>Log File</th>
-                                                        <th>Game</th>
-                                                    </tr>
-                                                </thead>
-                                            </table>
-                                            <div class="table-scrollable-content">
-                                                <table class="table table-leader">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Id</th>
-                                                            <th class="hidden-xs">Date</th>
-                                                            <th>Log File</th>
-                                                            <th>Game</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-for="game in error_games">
-                                                            <td>{{game.game_id}}</td>
-                                                            <td class="hidden-xs"><time :datetime="game.time_played"
-                                                                    :title="game.time_played">
-                                                                    {{ getFormattedDateForGames(game.time_played)}}
-                                                                </time>
-                                                            </td>
-                                                            <td><a :href="error_log_link(game.game_id)" target="_blank">Download Log</a></td>
-                                                            <td><a :href="replay_link(game.game_id)" target="_blank">View</a> / <a :href="replay_download_link(game.game_id)" target="_blank">Download</a></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </section>
                         </div>
                     </div>
@@ -272,11 +146,6 @@
                                     Rating Analysis
                                     <span title="Rating is calculated as mu - 3 * sigma;" class="info-icon icon-info pull-right"></span>
                                 </h2>
-                                <!-- <div v-if="!user.mu" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
-                                    <h2>No rating analysis</h2>
-                                    <p v-if="is_my_page">Submit your first bot to get your rating. <br/> <a href="/play-programming-challenge">Play here</a></p>
-                                </div> -->
                                 <div v-if="user.mu" class="user-profile-rank-stats">
                                     <div class="stats-item">
                                         <h3>Rating</h3>
@@ -295,139 +164,9 @@
                             <section class="profile-section">
                                 <h2>
                                     <i class="xline xline-bottom"></i>
-                                    Challenges
-                                    <span title="A challenge will run for 30 games. Challenge games will not affect your score and will never make up more than 10% of total games running while the competition is live. You can initiate up to three challenges per day." class="info-icon icon-info pull-right"></span>
-                                </h2>
-                                <div v-if="!challengeGames.length" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
-                                    <h2>No Challenge yet</h2>
-                                </div>
-                                <div v-if="challengeGames.length > 0">
-                                    <div class="table-sticky-container">
-                                        <div class="table-wrapper">
-                                            <table class="table table-leader table-sticky">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Challengers</th>
-                                                        <th class="text-center hidden-xs">Games</th>
-                                                        <th class="text-center">Date Initiated</th>
-                                                        <th class="text-center">Status</th>
-                                                    </tr>
-                                                </thead>
-                                            </table>
-                                            <div class="table-scrollable-content">
-                                                <table class="table table-leader">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Challengers</th>
-                                                            <th class="text-center hidden-xs">Games</th>
-                                                            <th class="text-center">Date Initiated</th>
-                                                            <th class="text-center">Status</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-for="challenge in challengeGames">
-                                                            <td>
-                                                              <div class="info-icon-trophy" v-if="challenge.players[0].rank == 0 && challenge.status == 'Completed'">
-                                                                <span class="icon-trophy"></span>
-                                                              </div>
-                                                              <a v-for="(player, index) in challenge.players" :href="`/user?user_id=${player.user_id}`" class="game-participant">
-                                                                <img :src="`https://github.com/${player.username}.png`" :alt="player.username">
-                                                                <span class="rank">{{player.rank + 1}}</span>
-                                                              </a>
-                                                            </td>
-                                                            <td class="text-center hidden-xs">
-                                                              {{challenge.num_games}}
-                                                            </td>
-                                                            <td class="text-center">
-                                                              {{getFormattedDateForGames(challenge.time_created, "N/A")}}
-                                                            </td>
-                                                            <td class="text-center">
-                                                              <span :class="{'text-success': challenge.finished}">
-                                                                {{challenge.status}}
-                                                              </span>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                            <section class="profile-section">
-                                <h2>
-                                    <i class="xline xline-bottom"></i>
-                                    Nemesis
-                                    <span title="Players you most often lose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
-                                </h2>
-                                <!-- <div v-if="!nemesisList.length" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
-                                    <h2>No nemesis yet</h2>
-                                    <p v-if="is_my_page">Submit your first bot to uncover your nemesis. <br/><a href="/play-programming-challenge">Play here</a></p>
-                                </div> -->
-                                <div v-if="nemesisList.length > 0">
-                                    <div class="table-sticky-container">
-                                        <div class="table-wrapper">
-                                            <table class="table table-leader table-sticky">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Nemesis</th>
-                                                        <th class="text-center hidden-xs">Games</th>
-                                                        <th class="text-center">Win %</th>
-                                                        <th class="text-center">Loss %</th>
-                                                    </tr>
-                                                </thead>
-                                            </table>
-                                            <div class="table-scrollable-content">
-                                                <table class="table table-leader">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Nemesis</th>
-                                                            <th class="text-center hidden-xs">Games</th>
-                                                            <th class="text-center">Win %</th>
-                                                            <th class="text-center">Loss %</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-for="nemesis in nemesisList">
-                                                            <td>
-                                                                <a :href="'/user?user_id=' + nemesis.id"
-                                                                class="game-participant">
-                                                                    <img :src="profile_images[nemesis.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
-                                                                    <span class="rank">
-                                                                        {{usernames[nemesis.id]}}
-                                                                    </span>
-                                                                </a>
-                                                            </td>
-                                                            <td class="text-center hidden-xs">
-                                                                {{nemesis.total}}
-                                                            </td>
-                                                            <td class="text-center">
-                                                                {{nemesis.wins}}
-                                                            </td>
-                                                            <td class="text-center">
-                                                                {{nemesis.losses}}
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                            <section class="profile-section">
-                                <h2>
-                                    <i class="xline xline-bottom"></i>
                                     History
                                     <span title="Rank/Rating history of your bots, the rank/rating is the last rating or rank achieved before the bot was retired." class="info-icon icon-info pull-right"></span>
                                 </h2>
-                                <!-- <div v-if="!userHistory.length" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
-                                    <h2>No history</h2>
-                                    <p v-if="is_my_page">Submit your first bot to see your history.<br/> <a href="/play-programming-challenge">Play here</a></p>
-                                </div> -->
                                 <div v-if="userHistory.length > 0">
                                     <div class="table-sticky-container">
                                         <div class="table-wrapper">
@@ -470,61 +209,6 @@
                                                             <td class="hidden-xs">
                                                                 {{getFormattedDateForGames(historyItem.when_retired, "Still Playing")}}
                                                             </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="hackathons">
-                        <div id="map_stats_pane">
-                            <section class="profile-section profile-section-hackathon">
-                                <h2>
-                                    <i class="xline xline-bottom"></i>
-                                    Hackathons
-                                    <span title="All the hackathons in which you are as participant" class="info-icon icon-info pull-right"></span>
-                                </h2>
-
-                                <div v-if="!hackathons.length" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/temp/event.png`" class="icon-"></img>
-                                    <h2>Not part of any Hackathons yet</h2>
-                                    <p v-if="is_my_page">If you have a Hackthon code, add it to your <br/>your profile</p>
-                                    <div v-if="is_my_page" class="ha-button-container">
-                                        <div>
-                                            <a :href="`${baseUrl}/user/edit-user`" class="ha-button"><span>Add your Hackathon code</span></a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div v-if="hackathons.length > 0">
-                                    <div class="table-sticky-container">
-                                        <div class="table-wrapper">
-                                            <table class="table table-leader table-sticky">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Hackathon</th>
-                                                        <th>Location</th>
-                                                        <th>Status</th>
-                                                    </tr>
-                                                </thead>
-                                            </table>
-                                            <div class="table-scrollable-content">
-                                                <table class="table table-leader">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Hackathon</th>
-                                                            <th>Location</th>
-                                                            <th>Status</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-for="hackathon in hackathons">
-                                                            <td><a :href="'/hackathon-individual?hackathon_id=' + hackathon.hackathon_id">{{hackathon.title}}</a></td>
-                                                            <td>{{hackathon.location}}</td>
-                                                            <td>{{hackathon.status.charAt(0).toUpperCase() + hackathon.status.slice(1)}}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -621,12 +305,8 @@
             this.bots = bots
           })
           this.fetch()
-          this.fetchHackathon()
-          this.fetchErrorGames()
-          this.fetchnemesis()
           this.fetchhistory()
           this.fetchHalite1Stats()
-          this.fetchChallengeGames()
 
           // switch to analysis tab if requested
           const url = new URLSearchParams(location.search)
@@ -638,10 +318,6 @@
           }
         }, (e) => {
           window.location.replace(`${this.baseUrl}/404`);
-        })
-
-        api.me().then((me) => {
-          this.is_my_page = me && me.user_id === this.user.user_id
         })
 
         // sticky tables
@@ -673,51 +349,41 @@
             window.refreshStickyTable();
         },
         fetch: function () {
-          let query = `order_by=desc,time_played&offset=${this.offset}&limit=${this.limit}`
-          if (this.only_timed_out) {
-            query += `&filter=timed_out,=,${this.user.user_id}`
-          }
-          const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`
+          api.get_games(this.user.last_games).then(games => {
+            console.log(games);
+            for (let game of games) {
+              for (let player_id of Object.keys(game.players)) {
+                let player = Object.assign({}, api.unsafe_get_user(player_id),
+                                           game.players[player_id]);
+                game.players[player_id] = player;
+                let username = player.username
+                let rating = player.mu - (player.sigma * 3)
+                player.rating = rating
+                rating = Math.round(rating * 100) / 100
+                let mu = Math.round(player.mu * 100) / 100
+                let sigma = Math.round(player.sigma * 1000) / 1000
 
-          return new Promise((resolve, reject) => {
-            $.get(url).then((data) => {
-                if ( data.length > 0 ){
-                    this.games = data
-                    for (let game of data) {
-                      for (let player_id in game.players) {
-                        let player = game.players[player_id]
-                        let username = player.username
-                        let rating = player.mu - (player.sigma * 3)
-                        player.rating = rating
-                        rating = Math.round(rating * 100) / 100
-                        let mu = Math.round(player.mu * 100) / 100
-                        let sigma = Math.round(player.sigma * 1000) / 1000
+                player.id = player_id
+                player.name_rank = `(${player.leaderboard_rank}) ${username} [${rating}=${mu}μ${sigma}σ]`
 
-                        player.id = player_id
-                        player.name_rank = `(${player.leaderboard_rank}) ${username} [${rating}=${mu}μ${sigma}σ]`
+                this.profile_images[player_id] = api.make_profile_image_url(username)
+                this.usernames[player_id] = username
 
-                        this.profile_images[player_id] = api.make_profile_image_url(username)
-                        this.usernames[player_id] = username
-
-                        if (player_id == this.user.user_id) {
-                            game.versions_back = this.user.num_submissions - player.version_number
-                        }
-                      }
-
-                      const players = Object.values(game.players).sort((r1, r2) => {
-                        if (r1.id.toString() === this.user.user_id.toString()) { return -1 }
-                        if (r2.id.toString() === this.user.user_id.toString()) { return 1 }
-                        return r1.rank - r2.rank
-                      })
-
-                      game.playerSorted = players
-                    }
-
-                    resolve(data)
-                } else {
-                    reject("Last page reached")
+                if (player_id == this.user.user_id) {
+                  game.versions_back = this.user.num_submissions - player.version_number
                 }
+              }
+
+              const players = Object.values(game.players).sort((r1, r2) => {
+                if (r1.id.toString() === this.user.user_id.toString()) { return -1 }
+                if (r2.id.toString() === this.user.user_id.toString()) { return 1 }
+                return r1.rank - r2.rank
               })
+
+              game.playerSorted = players
+            }
+
+            this.games = games;
           });
         },
         getLocation: function () {
@@ -738,167 +404,9 @@
           const location = `${state ? state + ', ' : ''}${country}`
           return location || ''
         },
-        fetchChallengeGames: function(){
-          this.challengeGames = []
-          let url = `${api.API_SERVER_URL}/user/${this.user.user_id}/challenge?limit=250&order_by=desc,created`
-          return $.get(url).then((data) => {
-            let challenges = data.map((challenge) => {
-              let newChallenge = challenge;
-              let players = [];
-              // add user id
-              _.forEach(challenge.players, (player, id) => {
-                let p = player
-                p.user_id = id
-                players.push(p)
-              })
-              newChallenge.players = players;
-
-              // sort
-              if (challenge.num_games > 0){
-                let sortedPlayers = _.orderBy(newChallenge.players, ['points'], ['desc'])
-                _.forEach(newChallenge.players, (player, index) => {
-                  sortedPlayers.forEach((p, i) => {
-                    if (p.user_id == player.user_id){
-                      newChallenge.players[index].rank = i
-                      return false
-                    }
-                  })
-                })
-              } else {
-                // set rank to 1 if there is no game
-                _.forEach(newChallenge.players, (player, index) => {
-                  newChallenge.players[index].rank = 0
-                })
-              }
-
-              // move current user up
-              _.forEach(newChallenge.players, (p, i) => {
-                if (p.user_id == this.user.user_id){
-                  newChallenge.players.splice(i, 1);
-                  newChallenge.players.splice(0, 0, p);
-                  return false;
-                }
-              })
-
-              return newChallenge
-            })
-
-            // get all participant ids
-            let participant_ids = [];
-            challenges.forEach((c, i) => {
-              challenges[i].status = c.finished ? 'Completed' : 'In Progress'
-              c.players.forEach((p, i) => {
-                let participant = null
-                if (participant_ids.indexOf(p.user_id) === -1){
-                  participant_ids.push(p.user_id)
-                };
-              })
-            });
-            // ^ this semicolon is needed, else the IIFE below gets parsed as
-            // calling the result of challenges.forEach
-
-            // search for participants information
-            (new Promise((resolve, reject) => {
-              let total = participant_ids.length
-              let count = 0;
-              participant_ids.forEach((user_id) => {
-                // get user information
-                api.list_bots(user_id).then((bots) => {
-                  count++;
-                  this.participants[user_id] = bots
-                  if (count >= total){
-                    resolve(this.participants);
-                  }
-                })
-              })
-            })).then((data) => {
-              challenges.forEach((c, i) => {
-                let flag = false
-                c.players.forEach((p) => {
-                  if (!flag){
-                    // no bots
-                    if (this.participants[p.user_id].length == 0){
-                      challenges[i].status = 'Paused'
-                      flag = true
-                    }
-                    // bots compilation is failed
-                    else if (this.participants[p.user_id] &&
-                      this.participants[p.user_id][0].compilation_status !== 'Successful' &&
-                      !c.finished){
-                        challenges[i].status = 'Paused'
-                        flag = true
-                      } else {
-                        challenges[i].status = c.finished ? 'Completed' : 'In Progress'
-                      }
-                  }
-                });
-              })
-            })
-
-            this.challengeGames = challenges
-          })
-        },
-        fetchnemesis: function () {
-          let query = `order_by=desc,time_played&offset=0&limit=${this.nemesisGameCount}`
-          const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`
-          return $.get(url).then((data) => {
-            var nemesisMap = new Map()
-            for (let game of data) {
-              let user_player = game.players[this.user.user_id]
-              for (let participant of Object.keys(game.players)) {
-                if (participant == this.user.user_id) {
-                  continue
-                }
-
-                let username = game.players[participant].username
-                this.profile_images[participant] = api.make_profile_image_url(username)
-                this.usernames[participant] = username
-
-                let playerData = nemesisMap.get(participant)
-                if (typeof playerData === 'undefined') {
-                  playerData = {wins: 0, losses: 0}
-                  nemesisMap.set(participant, playerData)
-                }
-
-                if (user_player.rank < game.players[participant].rank) {
-                  playerData.wins++
-                } else {
-                  playerData.losses++
-                }
-              }
-            }
-            for (var [key, value] of nemesisMap) {
-              let totalGames = value.wins + value.losses
-              let winRatio = value.wins / totalGames
-              let lossRatio = value.losses / totalGames
-              if (totalGames >= this.nemesisGameThreshold) {
-                var obj = {
-                  id: key,
-                  wins: Math.round(winRatio * 100),
-                  losses: Math.round(lossRatio * 100),
-                  total: totalGames
-                }
-                this.nemesisList.push(obj)
-              }
-            }
-
-            this.nemesisList.sort(function (a, b) { return b.losses - a.losses })
-            this.nemesisList = this.nemesisList.slice(0, this.nemesisLimit)
-            this.refreshStickyTable()
-          })
-        },
         fetchHalite1Stats: function () {
           api.get_season1_stats(this.user.user_id).then(userDetails => {
             this.season1stats = userDetails;
-          })
-        },
-        fetchHackathon: function () {
-          api.getUserHackathons(this.user.user_id).then(hackathons => {
-            if (hackathons && hackathons instanceof Array) {
-              this.hackathons = hackathons.filter((h) => {
-                return h.participant == true
-              })
-            }
           })
         },
         fetchhistory: function () {
@@ -919,76 +427,8 @@
             }
           })
         },
-        fetchErrorGames: function () {
-          let query = `order_by=desc,time_played&offset=0&limit=50&filter=timed_out,=,${this.user.user_id}`
-          const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`
-          return $.get(url).then((data) => {
-            this.error_games = data
-            this.refreshStickyTable()
-          })
-        },
-        next_page: function () {
-          this.offset += 10
-          this.fetch().then((data) => {
-            this.page += 1
-            this.isLastPage = false;
-          }).catch((message) => {
-            this.isLastPage = true;
-          })
-        },
-        prev_page: function () {
-          this.offset -= 10
-          this.fetch().then(() => {
-            this.page -= 1
-          })
-        },
-        toggle_filter: function () {
-          this.only_timed_out = !this.only_timed_out
-          this.offset = 0
-          this.fetch().then(() => {
-            this.page = 0
-          })
-        },
-        error_log_link: function (game_id) {
-          return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/error_log`
-        },
-        replay_download_link: function (game_id) {
-          return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/replay`
-        },
         replay_link: function (game_id) {
           return `/play/?game_id=${game_id}`
-        },
-        prev_badge: () => {
-          let content = $('.user-profile-badge-content')
-          let list = $('.user-profile-badge-list')
-          let contentWidth = $(content).width()
-          let listWidth = $(list).children('li').outerWidth(true) * $(list).children('li').length
-          let marginLeft = parseInt($(list).css('marginLeft'))
-          let interval = 20
-          let aniVal = 0
-          let cal = listWidth + marginLeft - contentWidth
-          if (cal > interval) {
-            aniVal = interval
-          } else if (cal > 0 <= interval) {
-            aniVal = cal
-          } else {
-            aniVal = 0
-          }
-          $(list).animate({marginLeft: '-=' + aniVal + 'px'})
-        },
-        next_badge: () => {
-          let list = $('.user-profile-badge-list')
-          let marginLeft = Math.abs(parseInt($(list).css('marginLeft')))
-          let interval = 20
-          let aniVal = 0
-          if (marginLeft > interval) {
-            aniVal = interval
-          } else if (marginLeft > 0 <= interval) {
-            aniVal = marginLeft
-          } else {
-            aniVal = 0
-          }
-          $(list).animate({marginLeft: '+=' + aniVal + 'px'})
         },
         getFormattedDateForGames: function (date, return_value_not_valid) {
           var cdate = moment(date)
@@ -1002,42 +442,11 @@
         gaData: function (category, action, label) {
           utils.gaEvent(category, action, label)
         },
-        toggleShare: function () {
-          this.sharePopup = !this.sharePopup
-        },
-        shareSocial: function (social) {
-          let text = 'Halite II Player - ' + this.user.username + ' Rank: ' + this.user.rank + ' Tier: ' + this.user.tier + ' '
-          let tags = 'haliteplayerstats'
-          switch (social) {
-            case 'facebook':
-              return 'https://www.facebook.com/sharer.php?u=' + encodeURIComponent(window.location.href)
-              break
-            case 'twitter':
-              return 'https://twitter.com/intent/tweet?text=' + text + '&url=' + encodeURIComponent(window.location.href) + '&hashtags=' + tags + '&via=haliteAI'
-              break
-            case 'linkedin':
-              return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}`
-              break
-          }
-        },
-        sortChallenge: function(players) {
-          return _.sortBy(players, (player) => -player.points)
-        },
-        /**
-         * @param  {e} event
-         * @return {void}
-         */
         copyToClipboard: function (e) {
           if (e) e.preventDefault()
           this.$refs.shareInput.select()
           document.execCommand('copy')
         },
-        openChallengeModal: function(e) {
-          this.isChallengeModalOpen = true;
-        },
-        closeChallengeModal: function(e) {
-            this.isChallengeModalOpen = false;
-        }
       }
     }
 </script>

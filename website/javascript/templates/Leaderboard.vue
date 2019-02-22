@@ -74,7 +74,6 @@
             <th>Player</th>
             <th>Rating</th>
             <th class="text-center">Tier</th>
-            <th>Challenge</th>
             <th>Level</th>
             <th class="text-center">Country</th>
             <th>Organization</th>
@@ -94,9 +93,6 @@
             <td :title="`${player.rating_components}`">{{ Math.round(100 * player.score) / 100 }}</td>
             <td class="text-center tier-td">
               <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
-            </td>
-            <td class="text-center">
-              <a @click="openChallengeModal(player.username)" class="toggle-challenge"><img :src="`${baseUrl}/assets/images/icon-challenge.svg`"></a>
             </td>
             <td>{{ player.level }}</td>
             <td class="text-center">
@@ -119,7 +115,6 @@
           :changePage="this.changePage"
         />
       </div>
-      <ChallengeModal :baseUrl="baseUrl" :isOn="isChallengeModalOpen" :close="closeChallengeModal" :username="challengeUsername"></ChallengeModal>
     </div>
     <div v-else class="zero-state-pane">
       <img src="/assets/images/leaderboard-zero-icon.png" alt="" />
@@ -139,9 +134,8 @@ import vSelect from 'vue-select'
 import _ from 'lodash'
 import moment from 'moment'
 import dateformat from 'dateformat'
-import ChallengeModal from './ChallengeModal.vue'
 
-const DEFAULT_LIMIT = 25
+const DEFAULT_LIMIT = 100
 
 export default {
     name: 'leaderboard',
@@ -150,7 +144,6 @@ export default {
       HalitePagination,
       vSelect,
       TierPopover,
-      ChallengeModal
     },
     data: function () {
       const countries = countries_data
@@ -653,13 +646,6 @@ export default {
       getFormattedDate: function (date) {
         return moment(date).fromNow();
       },
-      openChallengeModal: function(username) {
-        this.challengeUsername = username
-        this.isChallengeModalOpen = true
-      },
-      closeChallengeModal: function(e) {
-        this.isChallengeModalOpen = false
-      }
     }
   }
 </script>
