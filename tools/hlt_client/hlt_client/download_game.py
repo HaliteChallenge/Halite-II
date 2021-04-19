@@ -1,6 +1,7 @@
 import os
 import zstd
 import re
+import datetime
 
 import requests
 import multiprocessing
@@ -125,24 +126,27 @@ class DatedGameDownloader(GameDownloader):
 
 class UserGameDownloader(GameDownloader):
     _USER_BOT_URI = 'https://api.halite.io/v1/api/user/{}/match?limit={}&offset={}'
+    _DATE_BOT_URI = 'https://api.halite.io/v1/api/user/{}/match?limit={}&offset={}&filter=time_played,>=,{}'
     _FETCH_THRESHOLD = 250
     _BUCKETS = []
 
-    def __init__(self, destination, user_id, limit):
+    def __init__(self, destination, user_id, limit, date):
         """
         Download games for a user
         :param destination: Where to download
         :param user_id: Which user's replays to fetch
         :param limit: How many replays to fetch (max)
+        :param date: Which date to download
         """
         self.destination = destination
-        self.objects = self._parse_user_metadata(self._fetch_metadata(user_id, limit))
+        self.objects = self._parse_user_metadata(self._fetch_metadata(user_id, limit, date))
 
-    def _fetch_metadata(self, user_id, limit):
+    def _fetch_metadata(self, user_id, limit, date):
         """
         Retrieves paginated game metadata from the halite servers for a specified user up to limit items
         :param user_id: The id of the user to fetch
         :param limit: The maximum number of items to fetch
+        :param date: Which date to download
         :return: The full metadata of items
         """
         print('Fetching Metadata')
@@ -150,7 +154,12 @@ class UserGameDownloader(GameDownloader):
         result_set = []
         while current <= limit:
             current_limit = self._FETCH_THRESHOLD if ((limit - current) >= self._FETCH_THRESHOLD) else (limit - current)
-            result_set += requests.get(self._USER_BOT_URI.format(user_id, current_limit, current)).json()
+            if date is None:
+                result_set += requests.get(self._USER_BOT_URI.format(user_id, current_limit, current)).json()
+            else:
+                requested_date = datetime.datetime.strptime(date,'%Y%m%d').strftime('%Y-%m-%d')
+                result_set += [ replay for replay in requests.get(self._DATE_BOT_URI.format(user_id, current_limit, current, requested_date)).json() \
+                                if datetime.datetime.strptime(replay["time_played"],'%a, %d %b %Y %H:%M:%S GMT').strftime('%Y-%m-%d') == requested_date ]
             current += self._FETCH_THRESHOLD
         print('Finished metadata fetch. Found {} game files.'.format(len(result_set)))
         return result_set
@@ -197,5 +206,7 @@ def download(mode, destination, date, all_bots, default_user_id, user_id, limit)
     elif mode == client.REPLAY_MODE_USER:
         if not (default_user_id or user_id):
             raise ValueError("Cannot run default mode without authenticating .Please run `client.py --auth` first.")
-        UserGameDownloader(destination, default_user_id if not user_id else user_id, limit).get_objects()
+        if date != None and not _valid_date(date):
+            raise ValueError("Date must match format YYYYMMDD")
+        UserGameDownloader(destination, default_user_id if not user_id else user_id, limit, date).get_objects()
     print('Finished writing files to desired location')
