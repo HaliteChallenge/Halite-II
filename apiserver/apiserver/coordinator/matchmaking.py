@@ -176,15 +176,30 @@ def find_challenge(conn, has_gpu=False):
     # Reset any stuck challenges
     reset_challenges(conn)
 
+    extra_clause = sqlalchemy.sql.expression.true()
+    if not has_gpu:
+        # Don't pick up challenges involving GPU bots
+        extra_clause = ~sqlalchemy.sql.exists(
+            sqlalchemy.sql.select(["*"]).select_from(
+                model.challenge_participants.join(
+                    model.users,
+                    model.challenge_participants.c.user_id == model.users.c.id
+                )
+            ).where(
+                (model.challenge_participants.c.challenge_id == model.challenges.c.id) &
+                (model.users.c.is_gpu_enabled == True)
+            ).correlate(model.challenges)
+        )
+
     challenge = conn.execute(
         model.challenges.select(
-            (model.challenges.c.status == model.ChallengeStatus.CREATED.value) |
-            # Also pick up any stuck challenges
-            (
-                (model.challenges.c.status == model.ChallengeStatus.PLAYING_GAME.value) &
-                (model.challenges.c.most_recent_game_task <
-                 datetime.datetime.now() - datetime.timedelta(minutes=30))
-            )
+            ((model.challenges.c.status == model.ChallengeStatus.CREATED.value) |
+             # Also pick up any stuck challenges
+             (
+                 (model.challenges.c.status == model.ChallengeStatus.PLAYING_GAME.value) &
+                 (model.challenges.c.most_recent_game_task <
+                  datetime.datetime.now() - datetime.timedelta(minutes=30))
+             )) & extra_clause
         ).order_by(
             model.challenges.c.most_recent_game_task.asc()
         )
@@ -192,10 +207,6 @@ def find_challenge(conn, has_gpu=False):
 
     if not challenge:
         return None
-
-    player_filter = sqlalchemy.sql.expression.true()
-    if not has_gpu:
-        player_filter = (model.ranked_bots_users.c.is_gpu_enabled == False)
 
     total_players = conn.execute(model.total_ranked_users).first()[0]
     thresholds = util.tier_thresholds(total_players)
@@ -205,6 +216,8 @@ def find_challenge(conn, has_gpu=False):
         model.ranked_bots_users.c.bot_id,
         model.ranked_bots_users.c.username,
         model.ranked_bots_users.c.rank,
+        model.ranked_bots_users.c.compile_status,
+        model.ranked_bots_users.c.is_gpu_enabled,
         model.ranked_bots_users.c.num_submissions.label("version_number"),
     ]).select_from(
         model.ranked_bots_users.join(
@@ -213,23 +226,25 @@ def find_challenge(conn, has_gpu=False):
             (model.ranked_bots_users.c.bot_id == model.bots.c.id)
         )
     ).where(
-        (model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value) &
         sqlalchemy.sql.exists(
             model.challenge_participants.select(
                 (model.ranked_bots.c.user_id == model.challenge_participants.c.user_id) &
                 (model.challenge_participants.c.challenge_id == challenge["id"]) &
                 (model.challenge_participants.c.user_id == model.ranked_bots_users.c.user_id)
             )
-        ) &
-        player_filter
+        )
     )
     bots = conn.execute(bots_query).fetchall()
 
     user_bots = collections.defaultdict(list)
+    all_successful = True
     for bot in bots:
         user_bots[bot["user_id"]].append(bot)
+        if (bot["compile_status"] != model.CompileStatus.SUCCESSFUL.value or
+            (bot["is_gpu_enabled"] and not has_gpu)):
+            all_successful = False
 
-    if len(user_bots) < 2 or challenge["issuer"] not in user_bots:
+    if len(user_bots) < 2 or challenge["issuer"] not in user_bots or not all_successful:
         # We had to skip this challenge, but give it a time anyways,
         # so that we don't get stuck on it
         conn.execute(model.challenges.update().values(
